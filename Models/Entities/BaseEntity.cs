@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Blood_Donation_Website.Models
+namespace Blood_Donation_Website.Models.Entities
 {
     public abstract class BaseEntity
     {
