@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blood_Donation_Website.Models.Entities
 {
+    [Table("Setting")]
     public class Setting : BaseEntity
     {
         [Key]
