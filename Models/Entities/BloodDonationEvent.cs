@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    [Table("BloodDonationEvent")]
     public class BloodDonationEvent : BaseEntity
     {
         [Required]
@@ -34,9 +33,9 @@ namespace Blood_Donation_Website.Models.Entities
         [StringLength(100)]
         public string? RequiredBloodTypes { get; set; }
 
-        public int CreatedBy { get; set; }  // Foreign key property
+        public int CreatedBy { get; set; }
 
-        // Navigation properties
+        
         [ForeignKey("LocationId")]
         public virtual Location Location { get; set; } = null!;
 

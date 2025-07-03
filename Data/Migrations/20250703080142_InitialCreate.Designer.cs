@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Blood_Donation_Website.Migrations
+namespace Blood_Donation_Website.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250703012502_demo1")]
-    partial class demo1
+    [Migration("20250703080142_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,7 +65,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
@@ -96,7 +98,8 @@ namespace Blood_Donation_Website.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
+                    b.HasIndex("CreatedBy")
+                        .HasDatabaseName("IX_BloodDonationEvents_CreatedBy");
 
                     b.HasIndex("EventDate")
                         .HasDatabaseName("IX_BloodDonationEvents_EventDate");
@@ -114,8 +117,7 @@ namespace Blood_Donation_Website.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("BloodTypeId");
+                        .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
@@ -142,26 +144,31 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BloodTypeName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("UQ_BloodTypes_BloodTypeName");
 
                     b.ToTable("BloodTypes", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.ContactMessage", b =>
                 {
-                    b.Property<int>("MessageId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
@@ -178,11 +185,10 @@ namespace Blood_Donation_Website.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -212,22 +218,30 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
-                    b.HasKey("MessageId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .HasDatabaseName("IX_ContactMessages_Email");
 
                     b.HasIndex("ResolvedBy");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_ContactMessages_Status");
 
                     b.ToTable("ContactMessages", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.DonationHistory", b =>
                 {
-                    b.Property<int>("DonationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DonationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BloodType")
                         .IsRequired()
@@ -240,7 +254,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<DateTime>("DonationDate")
                         .HasColumnType("datetime2");
@@ -248,11 +264,10 @@ namespace Blood_Donation_Website.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("NextEligibleDate")
                         .HasColumnType("datetime2");
@@ -272,7 +287,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasDefaultValue("Completed");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -282,24 +299,28 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(350);
 
-                    b.HasKey("DonationId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonationDate")
+                        .HasDatabaseName("IX_DonationHistory_DonationDate");
 
                     b.HasIndex("EventId");
 
                     b.HasIndex("RegistrationId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_DonationHistory_UserId");
 
                     b.ToTable("DonationHistory", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.DonationRegistration", b =>
                 {
-                    b.Property<int>("RegistrationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegistrationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CancellationReason")
                         .HasMaxLength(200)
@@ -312,16 +333,17 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsEligible")
                         .ValueGeneratedOnAdd()
@@ -345,12 +367,14 @@ namespace Blood_Donation_Website.Migrations
                         .HasDefaultValue("Registered");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("RegistrationId");
+                    b.HasKey("Id");
 
                     b.HasIndex("EventId");
 
@@ -369,15 +393,20 @@ namespace Blood_Donation_Website.Migrations
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.HealthScreening", b =>
                 {
-                    b.Property<int>("ScreeningId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScreeningId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BloodPressure")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DisqualifyReason")
                         .HasMaxLength(500)
@@ -392,6 +421,11 @@ namespace Blood_Donation_Website.Migrations
                     b.Property<decimal?>("Hemoglobin")
                         .HasColumnType("decimal(4,2)");
 
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<bool>("IsEligible")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -405,19 +439,21 @@ namespace Blood_Donation_Website.Migrations
 
                     b.Property<DateTime>("ScreeningDate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<decimal?>("Temperature")
                         .HasColumnType("decimal(4,2)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<decimal?>("Weight")
                         .HasColumnType("decimal(5,2)");
 
-                    b.HasKey("ScreeningId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RegistrationId")
                         .IsUnique()
@@ -428,9 +464,7 @@ namespace Blood_Donation_Website.Migrations
                     b.HasIndex("ScreeningDate")
                         .HasDatabaseName("IX_HealthScreening_ScreeningDate");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HealthScreenings", (string)null);
+                    b.ToTable("HealthScreening", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.Location", b =>
@@ -471,20 +505,25 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationName")
+                        .HasDatabaseName("IX_Locations_LocationName");
 
                     b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.News", b =>
                 {
-                    b.Property<int>("NewsId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NewsId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AuthorId")
                         .HasColumnType("int");
@@ -501,15 +540,14 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsPublished")
                         .ValueGeneratedOnAdd()
@@ -538,9 +576,10 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
-                    b.HasKey("NewsId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AuthorId")
+                        .HasDatabaseName("IX_News_AuthorId");
 
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("IX_News_CategoryId");
@@ -551,16 +590,19 @@ namespace Blood_Donation_Website.Migrations
                     b.HasIndex("PublishedDate")
                         .HasDatabaseName("IX_News_PublishedDate");
 
+                    b.HasIndex("Title")
+                        .HasDatabaseName("IX_News_Title");
+
                     b.ToTable("News", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.NewsCategory", b =>
                 {
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
@@ -568,14 +610,13 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -583,31 +624,36 @@ namespace Blood_Donation_Website.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
-                    b.HasKey("CategoryId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryName")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_NewsCategories_CategoryName");
 
                     b.ToTable("NewsCategories", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.Notification", b =>
                 {
-                    b.Property<int>("NotificationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsRead")
                         .ValueGeneratedOnAdd()
@@ -629,14 +675,20 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("NotificationId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("IsRead")
+                        .HasDatabaseName("IX_Notifications_IsRead");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Notifications_UserId");
 
                     b.ToTable("Notifications", (string)null);
                 });
@@ -659,7 +711,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("RoleName")
                         .IsRequired()
@@ -667,36 +721,40 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleName")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("UQ_Roles_RoleName");
 
                     b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.Setting", b =>
                 {
-                    b.Property<int>("SettingId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Description")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("SettingKey")
                         .IsRequired()
@@ -713,10 +771,11 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.HasKey("SettingId");
+                    b.HasKey("Id");
 
                     b.HasIndex("SettingKey")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("UQ_Settings_SettingKey");
 
                     b.ToTable("Settings", (string)null);
                 });
@@ -737,7 +796,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -748,7 +809,9 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("EmailVerified")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -760,27 +823,31 @@ namespace Blood_Donation_Website.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime?>("LastDonationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RoleId1")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(2);
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -792,14 +859,15 @@ namespace Blood_Donation_Website.Migrations
                     b.HasIndex("BloodTypeId");
 
                     b.HasIndex("Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("UQ_Users_Email");
 
-                    b.HasIndex("RoleId");
-
-                    b.HasIndex("RoleId1");
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("IX_Users_RoleId");
 
                     b.HasIndex("Username")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("UQ_Users_Username");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -826,8 +894,9 @@ namespace Blood_Donation_Website.Migrations
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.ContactMessage", b =>
                 {
                     b.HasOne("Blood_Donation_Website.Models.Entities.User", "ResolvedByUser")
-                        .WithMany("ContactMessages")
-                        .HasForeignKey("ResolvedBy");
+                        .WithMany("ResolvedContactMessages")
+                        .HasForeignKey("ResolvedBy")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ResolvedByUser");
                 });
@@ -848,7 +917,7 @@ namespace Blood_Donation_Website.Migrations
                     b.HasOne("Blood_Donation_Website.Models.Entities.User", "User")
                         .WithMany("DonationHistories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Event");
@@ -886,13 +955,9 @@ namespace Blood_Donation_Website.Migrations
                         .IsRequired();
 
                     b.HasOne("Blood_Donation_Website.Models.Entities.User", "ScreenedByUser")
-                        .WithMany()
+                        .WithMany("HealthScreenings")
                         .HasForeignKey("ScreenedBy")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Blood_Donation_Website.Models.Entities.User", null)
-                        .WithMany("HealthScreenings")
-                        .HasForeignKey("UserId");
 
                     b.Navigation("Registration");
 
@@ -902,8 +967,9 @@ namespace Blood_Donation_Website.Migrations
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.News", b =>
                 {
                     b.HasOne("Blood_Donation_Website.Models.Entities.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .WithMany("AuthoredNews")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Blood_Donation_Website.Models.Entities.NewsCategory", "Category")
                         .WithMany("NewsArticles")
@@ -933,14 +999,10 @@ namespace Blood_Donation_Website.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Blood_Donation_Website.Models.Entities.Role", "Role")
-                        .WithMany()
+                        .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("Blood_Donation_Website.Models.Entities.Role", null)
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId1");
 
                     b.Navigation("BloodType");
 
@@ -978,7 +1040,7 @@ namespace Blood_Donation_Website.Migrations
 
             modelBuilder.Entity("Blood_Donation_Website.Models.Entities.User", b =>
                 {
-                    b.Navigation("ContactMessages");
+                    b.Navigation("AuthoredNews");
 
                     b.Navigation("CreatedEvents");
 
@@ -989,6 +1051,8 @@ namespace Blood_Donation_Website.Migrations
                     b.Navigation("HealthScreenings");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("ResolvedContactMessages");
                 });
 #pragma warning restore 612, 618
         }
