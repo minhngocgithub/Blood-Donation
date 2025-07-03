@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
+    [Table("Notification")]
     public class Notification : BaseEntity
     {
         [Key]
