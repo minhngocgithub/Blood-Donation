@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class RoleConfiguration : IEntityTypeConfiguration<Role>
+    public class RoleConfiguration : BaseEntityConfiguration<Role>
     {
-        public void Configure(EntityTypeBuilder<Role> builder)
+        public override void Configure(EntityTypeBuilder<Role> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("Roles");
-
-            builder.HasKey(r => r.Id);
-
-            builder.Property(r => r.Id)
-                .ValueGeneratedOnAdd();
 
             builder.Property(r => r.RoleName)
                 .IsRequired()
@@ -22,11 +19,10 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(r => r.Description)
                 .HasMaxLength(200);
 
-            builder.Property(r => r.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
-
+            // Indexes
             builder.HasIndex(r => r.RoleName)
-                .IsUnique();
+                .IsUnique()
+                .HasDatabaseName("UQ_Roles_RoleName");
         }
     }
 }
