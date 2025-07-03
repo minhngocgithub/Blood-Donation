@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    public class HealthScreening : BaseEntity
+    [Table("HealthScreening")]
+    public class HealthScreening
     {
         [Key]
         public int ScreeningId { get; set; }
@@ -34,12 +35,15 @@ namespace Blood_Donation_Website.Models.Entities
         public string? DisqualifyReason { get; set; }
 
         public int? ScreenedBy { get; set; }
+
+        [Column(TypeName = "datetime")]
         public DateTime ScreeningDate { get; set; } = DateTime.Now;
 
+        
         [ForeignKey("RegistrationId")]
         public virtual DonationRegistration Registration { get; set; } = null!;
 
         [ForeignKey("ScreenedBy")]
-        public virtual User? Screener { get; set; }
+        public virtual User? ScreenedByUser { get; set; }
     }
 }
