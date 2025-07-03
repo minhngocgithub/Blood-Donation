@@ -6,9 +6,6 @@ namespace Blood_Donation_Website.Models.Entities
     [Table("Setting")]
     public class Setting : BaseEntity
     {
-        [Key]
-        public int SettingId { get; set; }
-
         [Required]
         [StringLength(50)]
         public string SettingKey { get; set; } = string.Empty;

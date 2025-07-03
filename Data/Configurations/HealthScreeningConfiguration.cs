@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class HealthScreeningConfiguration : IEntityTypeConfiguration<HealthScreening>
+    public class HealthScreeningConfiguration : BaseEntityConfiguration<HealthScreening>
     {
-        public void Configure(EntityTypeBuilder<HealthScreening> builder)
+        public override void Configure(EntityTypeBuilder<HealthScreening> builder)
         {
-            // Primary Key
-            builder.HasKey(h => h.ScreeningId);
+            base.Configure(builder);
 
-            // Properties Configuration
+            builder.ToTable("HealthScreening");
+
+            // Properties
             builder.Property(h => h.Weight)
                 .HasColumnType("decimal(5,2)");
 
@@ -43,7 +44,7 @@ namespace Blood_Donation_Website.Data.Configurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(h => h.ScreenedByUser)
-                .WithMany()
+                .WithMany(u => u.HealthScreenings)
                 .HasForeignKey(h => h.ScreenedBy)
                 .OnDelete(DeleteBehavior.SetNull);
 
@@ -54,9 +55,6 @@ namespace Blood_Donation_Website.Data.Configurations
 
             builder.HasIndex(h => h.ScreeningDate)
                 .HasDatabaseName("IX_HealthScreening_ScreeningDate");
-
-            // Table Configuration
-            builder.ToTable("HealthScreenings");
-        }
+        } 
     }
 }

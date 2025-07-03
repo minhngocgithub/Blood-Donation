@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    [Table("DonationRegistration")]
+    [Table("DonationRegistrations")]
     public class DonationRegistration : BaseEntity
     {
-        [Key]
-        public int RegistrationId { get; set; }
-
         [Required]
         public int UserId { get; set; }
 
