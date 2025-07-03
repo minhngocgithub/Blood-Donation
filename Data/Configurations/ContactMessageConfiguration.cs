@@ -42,10 +42,7 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasDefaultValueSql("GETDATE()");
 
             // Relationship
-            builder.HasOne(cm => cm.ResolvedByUser)
-                .WithMany(u => u.ResolvedContactMessages)
-                .HasForeignKey(cm => cm.ResolvedBy)
-                .OnDelete(DeleteBehavior.SetNull);
+            
         }
     }
 }
