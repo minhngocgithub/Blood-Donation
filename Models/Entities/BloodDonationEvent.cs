@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
+    [Table("BloodDonationEvent")]
     public class BloodDonationEvent : BaseEntity
     {
         [Required]
