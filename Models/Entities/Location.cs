@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    [Table("Location")]
+    [Table("Locations")]
     public class Location : BaseEntity
     {
         [Required]
@@ -19,6 +19,7 @@ namespace Blood_Donation_Website.Models.Entities
 
         public int Capacity { get; set; } = 50;
 
+        // Navigation properties
         public virtual ICollection<BloodDonationEvent> Events { get; set; } = new List<BloodDonationEvent>();
     }
 }

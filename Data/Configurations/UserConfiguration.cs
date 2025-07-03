@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    public class UserConfiguration : BaseEntityConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<User> builder)
+        public override void Configure(EntityTypeBuilder<User> builder)
         {
-            // Primary Key
-            builder.HasKey(u => u.Id);
+            base.Configure(builder);
 
-            // Properties Configuration
+            builder.ToTable("Users");
+
+            // Properties
             builder.Property(u => u.Username)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -29,31 +30,19 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasMaxLength(100);
 
             builder.Property(u => u.Phone)
-                .HasMaxLength(15);
+                .HasMaxLength(20);
 
             builder.Property(u => u.Address)
-                .HasMaxLength(255);
+                .HasMaxLength(200);
 
             builder.Property(u => u.Gender)
                 .HasMaxLength(10);
 
-            builder.Property(u => u.BloodType)
-                .HasMaxLength(5);
-
             builder.Property(u => u.RoleId)
                 .HasDefaultValue(2);
 
-            builder.Property(u => u.IsActive)
-                .HasDefaultValue(true);
-
             builder.Property(u => u.EmailVerified)
                 .HasDefaultValue(false);
-
-            builder.Property(u => u.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
-
-            builder.Property(u => u.UpdatedDate)
-                .HasDefaultValueSql("GETDATE()");
 
             // Relationships
             builder.HasOne(u => u.Role)
@@ -61,20 +50,22 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Indexes
-            builder.HasIndex(u => u.Username)
-                .IsUnique()
-                .HasDatabaseName("UQ_Users_Username");
+            builder.HasOne(u => u.BloodType)
+                .WithMany()
+                .HasForeignKey(u => u.BloodTypeId)
+                .OnDelete(DeleteBehavior.SetNull);
 
+            // Indexes
             builder.HasIndex(u => u.Email)
                 .IsUnique()
                 .HasDatabaseName("UQ_Users_Email");
 
-            builder.HasIndex(u => u.BloodType)
-                .HasDatabaseName("IX_Users_BloodType");
+            builder.HasIndex(u => u.Username)
+                .IsUnique()
+                .HasDatabaseName("UQ_Users_Username");
 
-            // Table Configuration
-            builder.ToTable("Users");
+            builder.HasIndex(u => u.RoleId)
+                .HasDatabaseName("IX_Users_RoleId");
         }
     }
 }

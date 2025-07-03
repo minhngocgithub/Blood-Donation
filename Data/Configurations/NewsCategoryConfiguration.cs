@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class NewsCategoryConfiguration : IEntityTypeConfiguration<NewsCategory>
+    public class NewsCategoryConfiguration : BaseEntityConfiguration<NewsCategory>
     {
-        public void Configure(EntityTypeBuilder<NewsCategory> builder)
+        public override void Configure(EntityTypeBuilder<NewsCategory> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("NewsCategories");
-
-            builder.HasKey(nc => nc.CategoryId);
-
-            builder.Property(nc => nc.CategoryId)
-                .ValueGeneratedOnAdd();
 
             builder.Property(nc => nc.CategoryName)
                 .IsRequired()
@@ -22,8 +19,10 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(nc => nc.Description)
                 .HasMaxLength(200);
 
-            builder.Property(nc => nc.IsActive)
-                .HasDefaultValue(true);
+            // Indexes
+            builder.HasIndex(nc => nc.CategoryName)
+                .IsUnique()
+                .HasDatabaseName("UQ_NewsCategories_CategoryName");
         }
     }
 }

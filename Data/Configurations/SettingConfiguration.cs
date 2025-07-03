@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class SettingConfiguration : IEntityTypeConfiguration<Setting>
+    public class SettingConfiguration : BaseEntityConfiguration<Setting>
     {
-        public void Configure(EntityTypeBuilder<Setting> builder)
+        public override void Configure(EntityTypeBuilder<Setting> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("Settings");
-
-            builder.HasKey(s => s.SettingId);
-
-            builder.Property(s => s.SettingId)
-                .ValueGeneratedOnAdd();
 
             builder.Property(s => s.SettingKey)
                 .IsRequired()
@@ -26,11 +23,10 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(s => s.Description)
                 .HasMaxLength(200);
 
-            builder.Property(s => s.UpdatedDate)
-                .HasDefaultValueSql("GETDATE()");
-
+            // Indexes
             builder.HasIndex(s => s.SettingKey)
-                .IsUnique();
+                .IsUnique()
+                .HasDatabaseName("UQ_Settings_SettingKey");
         }
     }
 }

@@ -3,16 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Blood_Donation_Website.Models.Entities;
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class LocationConfiguration : IEntityTypeConfiguration<Location>
+    public class LocationConfiguration : BaseEntityConfiguration<Location>
     {
-        public void Configure(EntityTypeBuilder<Location> builder)
+        public override void Configure(EntityTypeBuilder<Location> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("Locations");
-
-            builder.HasKey(l => l.Id);
-
-            builder.Property(l => l.Id)
-                .ValueGeneratedOnAdd();
 
             builder.Property(l => l.LocationName)
                 .IsRequired()
@@ -28,11 +25,9 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(l => l.Capacity)
                 .HasDefaultValue(50);
 
-            builder.Property(l => l.IsActive)
-                .HasDefaultValue(true);
-
-            builder.Property(l => l.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
+            // Indexes
+            builder.HasIndex(l => l.LocationName)
+                .HasDatabaseName("IX_Locations_LocationName");
         }
     }
 }

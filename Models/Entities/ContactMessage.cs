@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    [Table("ContactMessage")]
+    [Table("ContactMessages")]
     public class ContactMessage : BaseEntity
     {
-        [Key]
-        public int MessageId { get; set; }
-
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;

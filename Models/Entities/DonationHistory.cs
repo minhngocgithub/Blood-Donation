@@ -6,9 +6,6 @@ namespace Blood_Donation_Website.Models.Entities
     [Table("DonationHistory")]
     public class DonationHistory : BaseEntity
     {
-        [Key]
-        public int DonationId { get; set; }
-
         [Required]
         public int UserId { get; set; }
 
@@ -35,13 +32,8 @@ namespace Blood_Donation_Website.Models.Entities
         public DateTime? NextEligibleDate { get; set; }
         public bool CertificateIssued { get; set; } = false;
 
-        [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
-
-        [ForeignKey("EventId")]
         public virtual BloodDonationEvent Event { get; set; } = null!;
-
-        [ForeignKey("RegistrationId")]
         public virtual DonationRegistration? Registration { get; set; }
     }
 }

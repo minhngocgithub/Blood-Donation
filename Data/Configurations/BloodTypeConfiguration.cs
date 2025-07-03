@@ -4,17 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class BloodTypeConfiguration : IEntityTypeConfiguration<BloodType>
+    public class BloodTypeConfiguration : BaseEntityConfiguration<BloodType>
     {
-        public void Configure(EntityTypeBuilder<BloodType> builder)
+        public override void Configure(EntityTypeBuilder<BloodType> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("BloodTypes");
-
-            builder.HasKey(bt => bt.Id);
-
-            builder.Property(bt => bt.Id)
-                .HasColumnName("BloodTypeId")
-                .ValueGeneratedOnAdd();
 
             builder.Property(bt => bt.BloodTypeName)
                 .IsRequired()
@@ -29,11 +25,10 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(bt => bt.CanReceiveFrom)
                 .HasMaxLength(50);
 
-            builder.Property(bt => bt.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
-
+            // Indexes
             builder.HasIndex(bt => bt.BloodTypeName)
-                .IsUnique();
+                .IsUnique()
+                .HasDatabaseName("UQ_BloodTypes_BloodTypeName");
         }
     }
 }

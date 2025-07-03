@@ -13,7 +13,6 @@ namespace Blood_Donation_Website.Models.Entities
         [StringLength(200)]
         public string? Description { get; set; }
 
-        // Navigation Properties
         public virtual ICollection<User> Users { get; set; } = new List<User>();
     }
 }
