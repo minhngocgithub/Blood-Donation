@@ -44,10 +44,7 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasForeignKey(n => n.CategoryId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.HasOne(n => n.Author)
-                .WithMany(u => u.NewsArticles)
-                .HasForeignKey(n => n.AuthorId)
-                .OnDelete(DeleteBehavior.SetNull);
+            
 
             // Indexes
             builder.HasIndex(n => n.IsPublished)

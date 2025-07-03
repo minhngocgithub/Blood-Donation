@@ -34,9 +34,9 @@ namespace Blood_Donation_Website.Models.Entities
         [StringLength(100)]
         public string? RequiredBloodTypes { get; set; }
 
-        public int CreatedBy { get; set; }
+        public int CreatedBy { get; set; }  // Foreign key property
 
-        
+        // Navigation properties
         [ForeignKey("LocationId")]
         public virtual Location Location { get; set; } = null!;
 
