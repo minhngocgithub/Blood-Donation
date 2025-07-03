@@ -32,7 +32,7 @@ namespace Blood_Donation_Website.Data
 
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
-            modelBuilder.ApplyConfiguration(new (BloodType));
+            modelBuilder.ApplyConfiguration(new BloodTypeConfiguration());
             modelBuilder.ApplyConfiguration(new LocationConfiguration());
             modelBuilder.ApplyConfiguration(new BloodDonationEventConfiguration());
             modelBuilder.ApplyConfiguration(new DonationRegistrationConfiguration());

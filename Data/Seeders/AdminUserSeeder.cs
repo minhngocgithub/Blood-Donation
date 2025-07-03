@@ -14,6 +14,21 @@ namespace Blood_Donation_Website.Data.Seeders
             var adminRole = context.Roles.FirstOrDefault(r => r.RoleName == "Admin");
             if (adminRole == null) return;
 
+            // Lấy BloodType O+ (hoặc tạo nếu chưa có)
+            var bloodType = context.BloodTypes.FirstOrDefault(bt => bt.BloodTypeName == "O+");
+            if (bloodType == null)
+            {
+                bloodType = new BloodType
+                {
+                    BloodTypeName = "O+",
+                    Description = "O Positive",
+                    CanDonateTo = "O+, A+, B+, AB+",
+                    CanReceiveFrom = "O+, O-"
+                };
+                context.BloodTypes.Add(bloodType);
+                context.SaveChanges();
+            }
+
             var adminUser = new User
             {
                 Username = "admin",
@@ -24,7 +39,7 @@ namespace Blood_Donation_Website.Data.Seeders
                 DateOfBirth = new DateTime(1990, 1, 1),
                 Gender = "Nam",
                 Address = "Hà Nội, Việt Nam",
-                BloodType = "O+",
+                BloodTypeId = bloodType.Id, // Use BloodTypeId instead of BloodType
                 RoleId = adminRole.Id,
                 IsActive = true,
                 EmailVerified = true,
