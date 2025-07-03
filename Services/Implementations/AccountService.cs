@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.ViewModels.Account;
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Services.Utilities;
+using Blood_Donation_Website.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Services.Implementations
@@ -18,7 +19,8 @@ namespace Blood_Donation_Website.Services.Implementations
             _emailService = emailService;
         }
 
-        public async Task<(bool Success, string Message, User? User)> LoginAsync(LoginViewModel model)
+        // Interface methods - return Task<bool>
+        public async Task<bool> LoginAsync(LoginViewModel model)
         {
             try
             {
@@ -27,116 +29,82 @@ namespace Blood_Donation_Website.Services.Implementations
                     .FirstOrDefaultAsync(u => u.Email == model.Email && u.IsActive);
 
                 if (user == null)
-                {
-                    return (false, "Email hoặc mật khẩu không chính xác", null);
-                }
+                    return false;
 
                 if (!await VerifyPasswordAsync(model.Password, user.PasswordHash))
-                {
-                    return (false, "Email hoặc mật khẩu không chính xác", null);
-                }
+                    return false;
 
                 if (!user.EmailVerified)
-                {
-                    return (false, "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để xác thực tài khoản", null);
-                }
+                    return false;
 
                 await UpdateLastLoginAsync(user.Id);
-                return (true, "Đăng nhập thành công", user);
+                return true;
             }
-            catch (Exception ex)
+            catch
             {
-                return (false, "Có lỗi xảy ra trong quá trình đăng nhập", null);
+                return false;
             }
         }
 
-        public async Task<(bool Success, string Message, User? User)> RegisterAsync(RegisterViewModel model)
+        public async Task<bool> RegisterAsync(RegisterViewModel model)
         {
             try
             {
-                // Kiểm tra user đã tồn tại
-                if (await UserExistsAsync(model.Email, model.Email))
-                {
-                    return (false, "Email đã được sử dụng", null);
-                }
+                if (await IsEmailExistsAsync(model.Email))
+                    return false;
 
-                // Tạo user mới
                 var user = new User
                 {
-                    Username = model.Email, // Sử dụng email làm username
+                    Username = model.Email,
                     Email = model.Email,
                     FullName = model.FullName,
                     PasswordHash = await HashPasswordAsync(model.Password),
-                    RoleId = 2, // Default role: User
+                    RoleId = 2,
                     IsActive = true,
-                    EmailVerified = true, // Tạm thời set true để demo
+                    EmailVerified = true,
                     CreatedDate = DateTime.Now
                 };
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Gửi email chào mừng
                 try
                 {
                     await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName);
                 }
-                catch (Exception ex)
-                {
-                    // Log error nhưng không fail registration
-                    // _logger.LogError(ex, "Failed to send welcome email");
-                }
+                catch { }
 
-                return (true, "Đăng ký thành công", user);
+                return true;
             }
-            catch (Exception ex)
+            catch
             {
-                return (false, "Có lỗi xảy ra trong quá trình đăng ký", null);
+                return false;
             }
         }
 
-        public async Task<bool> UserExistsAsync(string email, string username)
+        public async Task<bool> LogoutAsync()
         {
-            return await _context.Users
-                .AnyAsync(u => u.Email == email || u.Username == username);
+            // Implement logout logic if needed
+            return await Task.FromResult(true);
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<bool> ForgotPasswordAsync(ForgotPasswordViewModel model)
         {
-            return await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == email);
-        }
+            try
+            {
+                var user = await GetUserByEmailAsync(model.Email);
+                if (user == null) return false;
 
-        public async Task<User?> GetUserByIdAsync(int userId)
-        {
-            return await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-        }
+                // Generate reset token and send email
+                var token = Guid.NewGuid().ToString();
+                // Store token logic here
 
-        public async Task<bool> VerifyPasswordAsync(string password, string hashedPassword)
-        {
-            return await Task.FromResult(PasswordHelper.VerifyPassword(password, hashedPassword));
-        }
-
-        public async Task<string> HashPasswordAsync(string password)
-        {
-            return await Task.FromResult(PasswordHelper.HashPassword(password));
-        }
-
-        public async Task<bool> SendPasswordResetEmailAsync(string email)
-        {
-            var user = await GetUserByEmailAsync(email);
-            if (user == null) return false;
-
-            // Tạo token reset password
-            var token = Guid.NewGuid().ToString();
-
-            // Lưu token vào database hoặc cache (tùy implementation)
-            // Ở đây tạm thời return true
-
-            return true;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> ResetPasswordAsync(ResetPasswordViewModel model)
@@ -145,8 +113,6 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 var user = await GetUserByEmailAsync(model.Email);
                 if (user == null) return false;
-
-                // Verify token (tùy implementation)
 
                 user.PasswordHash = await HashPasswordAsync(model.Password);
                 user.UpdatedDate = DateTime.Now;
@@ -160,7 +126,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        public async Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
         {
             try
             {
@@ -182,7 +148,199 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> UpdateLastLoginAsync(int userId)
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User> GetUserByIdAsync(string userId)
+        {
+            if (int.TryParse(userId, out int id))
+            {
+                return await _context.Users
+                    .Include(u => u.Role)
+                    .FirstOrDefaultAsync(u => u.Id == id);
+            }
+            return null;
+        }
+
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> VerifyEmailAsync(string userId, string token)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                user.EmailVerified = true;
+                user.UpdatedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsUserInRoleAsync(string userId, string role)
+        {
+            var user = await GetUserByIdAsync(userId);
+            return user?.Role?.RoleName == role;
+        }
+
+        public async Task<UserDto> GetUserProfileAsync(string userId)
+        {
+            var user = await GetUserByIdAsync(userId);
+            if (user == null) return null;
+
+            return new UserDto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FullName = user.FullName,
+                Phone = user.Phone,  // Changed from PhoneNumber to Phone
+                DateOfBirth = user.DateOfBirth,
+                Gender = user.Gender,
+                Address = user.Address,
+                BloodTypeId = user.BloodTypeId,
+                RoleId = user.RoleId,
+                IsActive = user.IsActive,
+                EmailVerified = user.EmailVerified,
+                LastDonationDate = user.LastDonationDate,
+                CreatedDate = user.CreatedDate,
+                UpdatedDate = user.UpdatedDate
+            };
+        }
+
+        public async Task<bool> UpdateUserProfileAsync(string userId, UserDto userDto)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                user.FullName = userDto.FullName;
+                user.Phone = userDto.Phone;  // Changed from PhoneNumber to Phone
+                user.DateOfBirth = userDto.DateOfBirth;
+                user.Gender = userDto.Gender;
+                user.Address = userDto.Address;
+                user.BloodTypeId = userDto.BloodTypeId;
+                user.UpdatedDate = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> LockUserAsync(string userId)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                user.IsActive = false;
+                user.UpdatedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UnlockUserAsync(string userId)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                user.IsActive = true;
+                user.UpdatedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        {
+            var users = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.BloodType)
+                .ToListAsync();
+
+            return users.Select(u => new UserDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                FullName = u.FullName,
+                Phone = u.Phone,  // Changed from PhoneNumber to Phone
+                DateOfBirth = u.DateOfBirth,
+                Gender = u.Gender,
+                Address = u.Address,
+                BloodTypeId = u.BloodTypeId,
+                RoleId = u.RoleId,
+                IsActive = u.IsActive,
+                EmailVerified = u.EmailVerified,
+                LastDonationDate = u.LastDonationDate,
+                CreatedDate = u.CreatedDate,
+                UpdatedDate = u.UpdatedDate,
+                BloodTypeName = u.BloodType?.BloodTypeName,
+                RoleName = u.Role?.RoleName
+            });
+        }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            try
+            {
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Helper methods
+        private async Task<bool> VerifyPasswordAsync(string password, string hashedPassword)
+        {
+            return await Task.FromResult(PasswordHelper.VerifyPassword(password, hashedPassword));
+        }
+
+        private async Task<string> HashPasswordAsync(string password)
+        {
+            return await Task.FromResult(PasswordHelper.HashPassword(password));
+        }
+
+        private async Task<bool> UpdateLastLoginAsync(int userId)
         {
             try
             {

@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class ContactMessageConfiguration : IEntityTypeConfiguration<ContactMessage>
+    public class ContactMessageConfiguration : BaseEntityConfiguration<ContactMessage>
     {
-        public void Configure(EntityTypeBuilder<ContactMessage> builder)
+        public override void Configure(EntityTypeBuilder<ContactMessage> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("ContactMessages");
-
-            builder.HasKey(cm => cm.MessageId);
-
-            builder.Property(cm => cm.MessageId)
-                .ValueGeneratedOnAdd();
 
             builder.Property(cm => cm.FullName)
                 .IsRequired()
@@ -38,14 +35,18 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasMaxLength(20)
                 .HasDefaultValue("New");
 
-            builder.Property(cm => cm.CreatedDate)
-                .HasDefaultValueSql("GETDATE()");
-
-            // Relationship
             builder.HasOne(cm => cm.ResolvedByUser)
                 .WithMany(u => u.ResolvedContactMessages)
                 .HasForeignKey(cm => cm.ResolvedBy)
                 .OnDelete(DeleteBehavior.SetNull);
+
+
+            // Indexes
+            builder.HasIndex(cm => cm.Status)
+                .HasDatabaseName("IX_ContactMessages_Status");
+
+            builder.HasIndex(cm => cm.Email)
+                .HasDatabaseName("IX_ContactMessages_Email");
         }
     }
 }
