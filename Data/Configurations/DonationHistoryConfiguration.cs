@@ -4,23 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class DonationHistoryConfiguration : IEntityTypeConfiguration<DonationHistory>
+    public class DonationHistoryConfiguration : BaseEntityConfiguration<DonationHistory>
     {
-        public void Configure(EntityTypeBuilder<DonationHistory> builder)
+        public override void Configure(EntityTypeBuilder<DonationHistory> builder)
         {
+            base.Configure(builder);
+
             builder.ToTable("DonationHistory");
 
-            builder.HasKey(dh => dh.DonationId);
-
-            builder.Property(dh => dh.DonationId)
-                .ValueGeneratedOnAdd();
-
-            builder.Property(dh => dh.UserId)
-                .IsRequired();
-
-            builder.Property(dh => dh.EventId)
-                .IsRequired();
-
+            // Properties
             builder.Property(dh => dh.DonationDate)
                 .IsRequired();
 
@@ -45,19 +37,26 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.HasOne(dh => dh.User)
                 .WithMany(u => u.DonationHistories)
                 .HasForeignKey(dh => dh.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(dh => dh.Event)
                 .WithMany(e => e.DonationHistories)
                 .HasForeignKey(dh => dh.EventId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // RegistrationId có thể null, nên đây là quan hệ One-to-Many (optional)
             builder.HasOne(dh => dh.Registration)
                 .WithMany(dr => dr.DonationHistories)
                 .HasForeignKey(dh => dh.RegistrationId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
+
+            // Indexes
+            builder.HasIndex(dh => dh.UserId)
+                .HasDatabaseName("IX_DonationHistory_UserId");
+
+            builder.HasIndex(dh => dh.DonationDate)
+                .HasDatabaseName("IX_DonationHistory_DonationDate");
         }
     }
+
 }

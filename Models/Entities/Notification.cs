@@ -6,9 +6,6 @@ namespace Blood_Donation_Website.Models.Entities
     [Table("Notification")]
     public class Notification : BaseEntity
     {
-        [Key]
-        public int NotificationId { get; set; }
-
         public int? UserId { get; set; }
 
         [Required]
@@ -24,7 +21,7 @@ namespace Blood_Donation_Website.Models.Entities
 
         public bool IsRead { get; set; } = false;
 
-        [ForeignKey("UserId")]
+       
         public virtual User? User { get; set; }
     }
 }

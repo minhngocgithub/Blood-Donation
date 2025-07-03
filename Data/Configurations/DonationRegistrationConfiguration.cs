@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class DonationRegistrationConfiguration : IEntityTypeConfiguration<DonationRegistration>
+    public class DonationRegistrationConfiguration : BaseEntityConfiguration<DonationRegistration>
     {
-        public void Configure(EntityTypeBuilder<DonationRegistration> builder)
+        public override void Configure(EntityTypeBuilder<DonationRegistration> builder)
         {
-            // Primary Key
-            builder.HasKey(r => r.RegistrationId);
+            base.Configure(builder);
 
-            // Properties Configuration
+            builder.ToTable("DonationRegistrations");
+
+            // Properties
             builder.Property(r => r.RegistrationDate)
                 .HasDefaultValueSql("GETDATE()");
 
@@ -49,9 +50,6 @@ namespace Blood_Donation_Website.Data.Configurations
 
             builder.HasIndex(r => r.RegistrationDate)
                 .HasDatabaseName("IX_DonationRegistrations_RegistrationDate");
-
-            // Table Configuration
-            builder.ToTable("DonationRegistrations");
         }
     }
 }
