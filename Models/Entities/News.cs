@@ -6,9 +6,6 @@ namespace Blood_Donation_Website.Models.Entities
     [Table("News")]
     public class News : BaseEntity
     {
-        [Key]
-        public int NewsId { get; set; }
-
         [Required]
         [StringLength(200)]
         public string Title { get; set; } = string.Empty;
@@ -28,10 +25,8 @@ namespace Blood_Donation_Website.Models.Entities
         public bool IsPublished { get; set; } = false;
         public DateTime? PublishedDate { get; set; }
 
-        [ForeignKey("CategoryId")]
+   
         public virtual NewsCategory? Category { get; set; }
-
-        [ForeignKey("AuthorId")]
         public virtual User? Author { get; set; }
     }
 }
