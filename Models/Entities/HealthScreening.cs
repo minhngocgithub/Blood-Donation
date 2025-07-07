@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("HealthScreening")]
-    public class HealthScreening : BaseEntity
+    public class HealthScreening
     {
+        [Key]
+        public int ScreeningId { get; set; }
+
         [Required]
         public int RegistrationId { get; set; }
 
@@ -32,15 +35,12 @@ namespace Blood_Donation_Website.Models.Entities
         public string? DisqualifyReason { get; set; }
 
         public int? ScreenedBy { get; set; }
-
         public DateTime ScreeningDate { get; set; } = DateTime.Now;
 
-        // Navigation properties
         [ForeignKey("RegistrationId")]
         public virtual DonationRegistration Registration { get; set; } = null!;
 
         [ForeignKey("ScreenedBy")]
         public virtual User? ScreenedByUser { get; set; }
     }
-
 }

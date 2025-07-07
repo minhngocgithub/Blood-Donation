@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("Users")]
-    public class User : BaseEntity
+    public class User
     {
+        [Key]
+        public int UserId { get; set; }
+
         [Required]
         [StringLength(50)]
         public string Username { get; set; } = string.Empty;
@@ -15,16 +18,17 @@ namespace Blood_Donation_Website.Models.Entities
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(255)]
         public string PasswordHash { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
 
-        [StringLength(20)]
+        [StringLength(15)]
         public string? Phone { get; set; }
 
-        [StringLength(200)]
+        [StringLength(255)]
         public string? Address { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
@@ -34,14 +38,17 @@ namespace Blood_Donation_Website.Models.Entities
 
         public int? BloodTypeId { get; set; }
 
-        [Required]
-        public int RoleId { get; set; }
+        public int RoleId { get; set; } = 2;
 
+        public bool IsActive { get; set; } = true;
         public bool EmailVerified { get; set; } = false;
         public DateTime? LastDonationDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime UpdatedDate { get; set; } = DateTime.Now;
 
- 
+        [ForeignKey("RoleId")]
         public virtual Role Role { get; set; } = null!;
+        [ForeignKey("BloodTypeId")]
         public virtual BloodType? BloodType { get; set; }
 
         public virtual ICollection<BloodDonationEvent> CreatedEvents { get; set; } = new List<BloodDonationEvent>();
