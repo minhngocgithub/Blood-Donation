@@ -1,28 +1,25 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class RoleConfiguration : BaseEntityConfiguration<Role>
+    public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
-        public override void Configure(EntityTypeBuilder<Role> builder)
+        public void Configure(EntityTypeBuilder<Role> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("Roles");
-
+            builder.HasKey(r => r.RoleId);
             builder.Property(r => r.RoleName)
                 .IsRequired()
                 .HasMaxLength(50);
-
+            builder.HasIndex(r => r.RoleName).IsUnique();
             builder.Property(r => r.Description)
                 .HasMaxLength(200);
-
-            // Indexes
-            builder.HasIndex(r => r.RoleName)
-                .IsUnique()
-                .HasDatabaseName("UQ_Roles_RoleName");
+            builder.Property(r => r.CreatedDate)
+                .HasDefaultValueSql("getdate()");
+            builder.HasMany(r => r.Users)
+                .WithOne(u => u.Role)
+                .HasForeignKey(u => u.RoleId);
         }
     }
 }

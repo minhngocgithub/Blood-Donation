@@ -1,43 +1,28 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class NotificationConfiguration : BaseEntityConfiguration<Notification>
+    public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
-        public override void Configure(EntityTypeBuilder<Notification> builder)
+        public void Configure(EntityTypeBuilder<Notification> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("Notifications");
-
+            builder.HasKey(n => n.NotificationId);
+            builder.Property(n => n.UserId);
             builder.Property(n => n.Title)
                 .IsRequired()
                 .HasMaxLength(200);
-
             builder.Property(n => n.Message)
                 .IsRequired()
                 .HasMaxLength(500);
-
             builder.Property(n => n.Type)
                 .HasMaxLength(50);
-
-            builder.Property(n => n.IsRead)
-                .HasDefaultValue(false);
-
-            // Relationship
+            builder.Property(n => n.IsRead).HasDefaultValue(false);
+            builder.Property(n => n.CreatedDate).HasDefaultValueSql("getdate()");
             builder.HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Indexes
-            builder.HasIndex(n => n.UserId)
-                .HasDatabaseName("IX_Notifications_UserId");
-
-            builder.HasIndex(n => n.IsRead)
-                .HasDatabaseName("IX_Notifications_IsRead");
+                .HasForeignKey(n => n.UserId);
         }
     }
 }

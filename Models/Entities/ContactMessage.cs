@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("ContactMessages")]
-    public class ContactMessage : BaseEntity
+    public class ContactMessage
     {
+        [Key]
+        public int MessageId { get; set; }
+
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
@@ -28,7 +31,7 @@ namespace Blood_Donation_Website.Models.Entities
 
         [StringLength(20)]
         public string Status { get; set; } = "New";
-
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime? ResolvedDate { get; set; }
         public int? ResolvedBy { get; set; }
 

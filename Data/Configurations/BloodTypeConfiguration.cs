@@ -1,34 +1,20 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class BloodTypeConfiguration : BaseEntityConfiguration<BloodType>
+    public class BloodTypeConfiguration : IEntityTypeConfiguration<BloodType>
     {
-        public override void Configure(EntityTypeBuilder<BloodType> builder)
+        public void Configure(EntityTypeBuilder<BloodType> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("BloodTypes");
-
-            builder.Property(bt => bt.BloodTypeName)
+            builder.HasKey(b => b.BloodTypeId);
+            builder.Property(b => b.BloodTypeName)
                 .IsRequired()
                 .HasMaxLength(5);
-
-            builder.Property(bt => bt.Description)
+            builder.HasIndex(b => b.BloodTypeName).IsUnique();
+            builder.Property(b => b.Description)
                 .HasMaxLength(100);
-
-            builder.Property(bt => bt.CanDonateTo)
-                .HasMaxLength(50);
-
-            builder.Property(bt => bt.CanReceiveFrom)
-                .HasMaxLength(50);
-
-            // Indexes
-            builder.HasIndex(bt => bt.BloodTypeName)
-                .IsUnique()
-                .HasDatabaseName("UQ_BloodTypes_BloodTypeName");
         }
     }
 }

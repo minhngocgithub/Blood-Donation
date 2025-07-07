@@ -1,62 +1,36 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class DonationHistoryConfiguration : BaseEntityConfiguration<DonationHistory>
+    public class DonationHistoryConfiguration : IEntityTypeConfiguration<DonationHistory>
     {
-        public override void Configure(EntityTypeBuilder<DonationHistory> builder)
+        public void Configure(EntityTypeBuilder<DonationHistory> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("DonationHistory");
-
-            // Properties
-            builder.Property(dh => dh.DonationDate)
-                .IsRequired();
-
-            builder.Property(dh => dh.BloodType)
-                .IsRequired()
-                .HasMaxLength(5);
-
-            builder.Property(dh => dh.Volume)
-                .HasDefaultValue(350);
-
-            builder.Property(dh => dh.Status)
-                .HasMaxLength(20)
-                .HasDefaultValue("Completed");
-
-            builder.Property(dh => dh.Notes)
-                .HasMaxLength(500);
-
-            builder.Property(dh => dh.CertificateIssued)
-                .HasDefaultValue(false);
-
-            // Relationships
-            builder.HasOne(dh => dh.User)
+            builder.HasKey(d => d.DonationId);
+            builder.Property(d => d.UserId).IsRequired();
+            builder.Property(d => d.EventId).IsRequired();
+            builder.Property(d => d.RegistrationId);
+            builder.Property(d => d.DonationDate).IsRequired();
+            builder.Property(d => d.BloodTypeId).IsRequired();
+            builder.Property(d => d.Volume).HasDefaultValue(350);
+            builder.Property(d => d.Status).HasMaxLength(20).HasDefaultValue("Completed");
+            builder.Property(d => d.Notes).HasMaxLength(500);
+            builder.Property(d => d.NextEligibleDate);
+            builder.Property(d => d.CertificateIssued).HasDefaultValue(false);
+            builder.HasOne(d => d.User)
                 .WithMany(u => u.DonationHistories)
-                .HasForeignKey(dh => dh.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(dh => dh.Event)
+                .HasForeignKey(d => d.UserId);
+            builder.HasOne(d => d.Event)
                 .WithMany(e => e.DonationHistories)
-                .HasForeignKey(dh => dh.EventId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(dh => dh.Registration)
-                .WithMany(dr => dr.DonationHistories)
-                .HasForeignKey(dh => dh.RegistrationId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .IsRequired(false);
-
-            // Indexes
-            builder.HasIndex(dh => dh.UserId)
-                .HasDatabaseName("IX_DonationHistory_UserId");
-
-            builder.HasIndex(dh => dh.DonationDate)
-                .HasDatabaseName("IX_DonationHistory_DonationDate");
+                .HasForeignKey(d => d.EventId);
+            builder.HasOne(d => d.Registration)
+                .WithMany(r => r.DonationHistories)
+                .HasForeignKey(d => d.RegistrationId);
+            builder.HasOne(d => d.BloodType)
+                .WithMany()
+                .HasForeignKey(d => d.BloodTypeId);
         }
     }
-
 }

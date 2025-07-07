@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("News")]
-    public class News : BaseEntity
+    public class News
     {
+        [Key]
+        public int NewsId { get; set; }
+
         [Required]
         [StringLength(200)]
         public string Title { get; set; } = string.Empty;
@@ -24,9 +27,12 @@ namespace Blood_Donation_Website.Models.Entities
         public int ViewCount { get; set; } = 0;
         public bool IsPublished { get; set; } = false;
         public DateTime? PublishedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime UpdatedDate { get; set; } = DateTime.Now;
 
-   
+        [ForeignKey("CategoryId")]
         public virtual NewsCategory? Category { get; set; }
+        [ForeignKey("AuthorId")]
         public virtual User? Author { get; set; }
     }
 }

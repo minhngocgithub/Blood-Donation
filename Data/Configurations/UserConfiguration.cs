@@ -1,71 +1,48 @@
-﻿using Blood_Donation_Website.Models.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class UserConfiguration : BaseEntityConfiguration<User>
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        public override void Configure(EntityTypeBuilder<User> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("Users");
-
-            // Properties
+            builder.HasKey(u => u.UserId);
             builder.Property(u => u.Username)
                 .IsRequired()
                 .HasMaxLength(50);
-
+            builder.HasIndex(u => u.Username).IsUnique();
             builder.Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(100);
-
+            builder.HasIndex(u => u.Email).IsUnique();
             builder.Property(u => u.PasswordHash)
                 .IsRequired()
                 .HasMaxLength(255);
-
             builder.Property(u => u.FullName)
                 .IsRequired()
                 .HasMaxLength(100);
-
             builder.Property(u => u.Phone)
-                .HasMaxLength(20);
-
+                .HasMaxLength(15);
             builder.Property(u => u.Address)
-                .HasMaxLength(200);
-
+                .HasMaxLength(255);
+            builder.Property(u => u.DateOfBirth);
             builder.Property(u => u.Gender)
                 .HasMaxLength(10);
-
-            builder.Property(u => u.RoleId)
-                .HasDefaultValue(2);
-
-            builder.Property(u => u.EmailVerified)
-                .HasDefaultValue(false);
-
-            // Relationships
+            builder.Property(u => u.BloodTypeId);
+            builder.Property(u => u.RoleId).HasDefaultValue(2);
+            builder.Property(u => u.IsActive).HasDefaultValue(true);
+            builder.Property(u => u.EmailVerified).HasDefaultValue(false);
+            builder.Property(u => u.LastDonationDate);
+            builder.Property(u => u.CreatedDate).HasDefaultValueSql("getdate()");
+            builder.Property(u => u.UpdatedDate).HasDefaultValueSql("getdate()");
             builder.HasOne(u => u.Role)
                 .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+                .HasForeignKey(u => u.RoleId);
             builder.HasOne(u => u.BloodType)
                 .WithMany()
-                .HasForeignKey(u => u.BloodTypeId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            // Indexes
-            builder.HasIndex(u => u.Email)
-                .IsUnique()
-                .HasDatabaseName("UQ_Users_Email");
-
-            builder.HasIndex(u => u.Username)
-                .IsUnique()
-                .HasDatabaseName("UQ_Users_Username");
-
-            builder.HasIndex(u => u.RoleId)
-                .HasDatabaseName("IX_Users_RoleId");
+                .HasForeignKey(u => u.BloodTypeId);
         }
     }
 }

@@ -1,32 +1,24 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class SettingConfiguration : BaseEntityConfiguration<Setting>
+    public class SettingConfiguration : IEntityTypeConfiguration<Setting>
     {
-        public override void Configure(EntityTypeBuilder<Setting> builder)
+        public void Configure(EntityTypeBuilder<Setting> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("Settings");
-
+            builder.HasKey(s => s.SettingId);
             builder.Property(s => s.SettingKey)
                 .IsRequired()
                 .HasMaxLength(50);
-
+            builder.HasIndex(s => s.SettingKey).IsUnique();
             builder.Property(s => s.SettingValue)
                 .IsRequired()
                 .HasMaxLength(255);
-
             builder.Property(s => s.Description)
                 .HasMaxLength(200);
-
-            // Indexes
-            builder.HasIndex(s => s.SettingKey)
-                .IsUnique()
-                .HasDatabaseName("UQ_Settings_SettingKey");
+            builder.Property(s => s.UpdatedDate).HasDefaultValueSql("getdate()");
         }
     }
 }

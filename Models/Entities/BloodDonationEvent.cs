@@ -3,8 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    public class BloodDonationEvent : BaseEntity
+    [Table("BloodDonationEvents")]
+    public class BloodDonationEvent
     {
+        [Key]
+        public int EventId { get; set; }
+
         [Required]
         [StringLength(200)]
         public string EventName { get; set; } = string.Empty;
@@ -20,7 +24,7 @@ namespace Blood_Donation_Website.Models.Entities
         [Required]
         public TimeSpan EndTime { get; set; }
 
-        public int LocationId { get; set; }
+        public int? LocationId { get; set; }
         public int MaxDonors { get; set; } = 100;
         public int CurrentDonors { get; set; } = 0;
 
@@ -33,14 +37,15 @@ namespace Blood_Donation_Website.Models.Entities
         [StringLength(100)]
         public string? RequiredBloodTypes { get; set; }
 
-        public int CreatedBy { get; set; }
+        public int? CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime UpdatedDate { get; set; } = DateTime.Now;
 
-        
         [ForeignKey("LocationId")]
-        public virtual Location Location { get; set; } = null!;
+        public virtual Location? Location { get; set; }
 
         [ForeignKey("CreatedBy")]
-        public virtual User Creator { get; set; } = null!;
+        public virtual User? Creator { get; set; }
 
         public virtual ICollection<DonationRegistration> Registrations { get; set; } = new List<DonationRegistration>();
         public virtual ICollection<DonationHistory> DonationHistories { get; set; } = new List<DonationHistory>();

@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("DonationRegistrations")]
-    public class DonationRegistration : BaseEntity
+    public class DonationRegistration
     {
+        [Key]
+        public int RegistrationId { get; set; }
+
         [Required]
         public int UserId { get; set; }
 

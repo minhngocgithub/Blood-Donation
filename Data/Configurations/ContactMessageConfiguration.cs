@@ -1,51 +1,43 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class ContactMessageConfiguration : BaseEntityConfiguration<ContactMessage>
+    public class ContactMessageConfiguration : IEntityTypeConfiguration<ContactMessage>
     {
-        public override void Configure(EntityTypeBuilder<ContactMessage> builder)
+        public void Configure(EntityTypeBuilder<ContactMessage> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("ContactMessages");
-
-            builder.Property(cm => cm.FullName)
+            builder.HasKey(c => c.MessageId);
+            builder.Property(c => c.FullName)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            builder.Property(cm => cm.Email)
+            builder.Property(c => c.Email)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            builder.Property(cm => cm.Phone)
+            builder.Property(c => c.Phone)
                 .HasMaxLength(15);
-
-            builder.Property(cm => cm.Subject)
+            builder.Property(c => c.Subject)
                 .IsRequired()
                 .HasMaxLength(200);
-
-            builder.Property(cm => cm.Message)
+            builder.Property(c => c.Message)
                 .IsRequired()
                 .HasMaxLength(1000);
-
-            builder.Property(cm => cm.Status)
+            builder.Property(c => c.Status)
                 .HasMaxLength(20)
                 .HasDefaultValue("New");
-
-            builder.HasOne(cm => cm.ResolvedByUser)
+            builder.Property(c => c.CreatedDate).HasDefaultValueSql("getdate()");
+            builder.Property(c => c.ResolvedDate);
+            builder.Property(c => c.ResolvedBy);
+            builder.HasOne(c => c.ResolvedByUser)
                 .WithMany(u => u.ResolvedContactMessages)
-                .HasForeignKey(cm => cm.ResolvedBy)
-                .OnDelete(DeleteBehavior.SetNull);
-
+                .HasForeignKey(c => c.ResolvedBy);
 
             // Indexes
-            builder.HasIndex(cm => cm.Status)
+            builder.HasIndex(c => c.Status)
                 .HasDatabaseName("IX_ContactMessages_Status");
 
-            builder.HasIndex(cm => cm.Email)
+            builder.HasIndex(c => c.Email)
                 .HasDatabaseName("IX_ContactMessages_Email");
         }
     }

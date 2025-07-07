@@ -2,7 +2,7 @@
 
 namespace Blood_Donation_Website.Data.Seeders
 {
-    public class RoleSeeder
+    public static class RoleSeeder
     {
         public static void Seed(ApplicationDbContext context)
         {
@@ -10,9 +10,9 @@ namespace Blood_Donation_Website.Data.Seeders
 
             var roles = new List<Role>
             {
-                new Role { RoleName = "Admin", Description = "Quản trị viên hệ thống", CreatedDate = DateTime.Now },
-                new Role { RoleName = "User", Description = "Người dùng thông thường", CreatedDate = DateTime.Now },
-                new Role { RoleName = "Volunteer", Description = "Tình nguyện viên", CreatedDate = DateTime.Now }
+                new Role { RoleName = "Admin", Description = "System Administrator", CreatedDate = DateTime.Now },
+                new Role { RoleName = "User", Description = "Regular User", CreatedDate = DateTime.Now },
+                new Role { RoleName = "Volunteer", Description = "Volunteer", CreatedDate = DateTime.Now }
             };
 
             context.Roles.AddRange(roles);
