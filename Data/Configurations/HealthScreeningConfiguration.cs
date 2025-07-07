@@ -1,60 +1,31 @@
-﻿using Blood_Donation_Website.Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
-    public class HealthScreeningConfiguration : BaseEntityConfiguration<HealthScreening>
+    public class HealthScreeningConfiguration : IEntityTypeConfiguration<HealthScreening>
     {
-        public override void Configure(EntityTypeBuilder<HealthScreening> builder)
+        public void Configure(EntityTypeBuilder<HealthScreening> builder)
         {
-            base.Configure(builder);
-
-            builder.ToTable("HealthScreening");
-
-            // Properties
-            builder.Property(h => h.Weight)
-                .HasColumnType("decimal(5,2)");
-
-            builder.Property(h => h.Height)
-                .HasColumnType("decimal(5,2)");
-
-            builder.Property(h => h.BloodPressure)
-                .HasMaxLength(20);
-
-            builder.Property(h => h.Temperature)
-                .HasColumnType("decimal(4,2)");
-
-            builder.Property(h => h.Hemoglobin)
-                .HasColumnType("decimal(4,2)");
-
-            builder.Property(h => h.IsEligible)
-                .HasDefaultValue(true);
-
-            builder.Property(h => h.DisqualifyReason)
-                .HasMaxLength(500);
-
-            builder.Property(h => h.ScreeningDate)
-                .HasDefaultValueSql("GETDATE()");
-
-            // Relationships (One-to-One with DonationRegistration)
+            builder.HasKey(h => h.ScreeningId);
+            builder.Property(h => h.RegistrationId).IsRequired();
+            builder.Property(h => h.Weight).HasColumnType("decimal(5,2)");
+            builder.Property(h => h.Height).HasColumnType("decimal(5,2)");
+            builder.Property(h => h.BloodPressure).HasMaxLength(20);
+            builder.Property(h => h.HeartRate);
+            builder.Property(h => h.Temperature).HasColumnType("decimal(4,2)");
+            builder.Property(h => h.Hemoglobin).HasColumnType("decimal(4,2)");
+            builder.Property(h => h.IsEligible).HasDefaultValue(true);
+            builder.Property(h => h.DisqualifyReason).HasMaxLength(500);
+            builder.Property(h => h.ScreenedBy);
+            builder.Property(h => h.ScreeningDate).HasDefaultValueSql("getdate()");
             builder.HasOne(h => h.Registration)
                 .WithOne(r => r.HealthScreening)
-                .HasForeignKey<HealthScreening>(h => h.RegistrationId)
-                .OnDelete(DeleteBehavior.Cascade);
-
+                .HasForeignKey<HealthScreening>(h => h.RegistrationId);
             builder.HasOne(h => h.ScreenedByUser)
                 .WithMany(u => u.HealthScreenings)
-                .HasForeignKey(h => h.ScreenedBy)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            // Indexes
-            builder.HasIndex(h => h.RegistrationId)
-                .IsUnique()
-                .HasDatabaseName("UQ_HealthScreening_RegistrationId");
-
-            builder.HasIndex(h => h.ScreeningDate)
-                .HasDatabaseName("IX_HealthScreening_ScreeningDate");
-        } 
+                .HasForeignKey(h => h.ScreenedBy);
+        }
     }
 }

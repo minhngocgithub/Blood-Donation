@@ -2,10 +2,9 @@
 
 namespace Blood_Donation_Website.Data.Seeders
 {
-    public class NewsCategorySeeder
+    public static class NewsCategorySeeder
     {
-        
-            public static void Seed(ApplicationDbContext context)
+        public static void Seed(ApplicationDbContext context)
             {
                 // Kiểm tra xem đã có dữ liệu chưa
                 if (context.NewsCategories.Any()) return;
