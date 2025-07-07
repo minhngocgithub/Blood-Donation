@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations;
 namespace Blood_Donation_Website.Models.Entities
 {
     [Table("DonationHistory")]
-    public class DonationHistory : BaseEntity
+    public class DonationHistory
     {
+        [Key]
+        public int DonationId { get; set; }
+
         [Required]
         public int UserId { get; set; }
 
@@ -18,8 +21,7 @@ namespace Blood_Donation_Website.Models.Entities
         public DateTime DonationDate { get; set; }
 
         [Required]
-        [StringLength(5)]
-        public string BloodType { get; set; } = string.Empty;
+        public int BloodTypeId { get; set; }
 
         public int Volume { get; set; } = 350;
 
@@ -32,8 +34,13 @@ namespace Blood_Donation_Website.Models.Entities
         public DateTime? NextEligibleDate { get; set; }
         public bool CertificateIssued { get; set; } = false;
 
+        [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
+        [ForeignKey("EventId")]
         public virtual BloodDonationEvent Event { get; set; } = null!;
+        [ForeignKey("RegistrationId")]
         public virtual DonationRegistration? Registration { get; set; }
+        [ForeignKey("BloodTypeId")]
+        public virtual BloodType BloodType { get; set; } = null!;
     }
 }

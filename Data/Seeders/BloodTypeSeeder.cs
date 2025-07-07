@@ -2,23 +2,55 @@
 
 namespace Blood_Donation_Website.Data.Seeders
 {
-    public class BloodTypeSeeder
+    public static class BloodTypeSeeder
     {
         public static void Seed(ApplicationDbContext context)
         {
-            // Kiểm tra xem đã có dữ liệu chưa
+            // Check if blood types already exist
             if (context.BloodTypes.Any()) return;
 
             var bloodTypes = new List<BloodType>
             {
-                new BloodType { BloodTypeName = "A+", Description = "Nhóm máu A Rh dương", CanDonateTo = "A+, AB+", CanReceiveFrom = "A+, A-, O+, O-" },
-                new BloodType { BloodTypeName = "A-", Description = "Nhóm máu A Rh âm", CanDonateTo = "A+, A-, AB+, AB-", CanReceiveFrom = "A-, O-" },
-                new BloodType { BloodTypeName = "B+", Description = "Nhóm máu B Rh dương", CanDonateTo = "B+, AB+", CanReceiveFrom = "B+, B-, O+, O-" },
-                new BloodType { BloodTypeName = "B-", Description = "Nhóm máu B Rh âm", CanDonateTo = "B+, B-, AB+, AB-", CanReceiveFrom = "B-, O-" },
-                new BloodType { BloodTypeName = "AB+", Description = "Nhóm máu AB Rh dương", CanDonateTo = "AB+", CanReceiveFrom = "Tất cả" },
-                new BloodType { BloodTypeName = "AB-", Description = "Nhóm máu AB Rh âm", CanDonateTo = "AB+, AB-", CanReceiveFrom = "A-, B-, AB-, O-" },
-                new BloodType { BloodTypeName = "O+", Description = "Nhóm máu O Rh dương", CanDonateTo = "A+, B+, AB+, O+", CanReceiveFrom = "O+, O-" },
-                new BloodType { BloodTypeName = "O-", Description = "Nhóm máu O Rh âm", CanDonateTo = "Tất cả", CanReceiveFrom = "O-" }
+                new BloodType 
+                { 
+                    BloodTypeName = "A+", 
+                    Description = "Blood type A positive - Can donate to A+ and AB+, can receive from A+, A-, O+, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "A-", 
+                    Description = "Blood type A negative - Can donate to A+, A-, AB+, AB-, can receive from A-, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "B+", 
+                    Description = "Blood type B positive - Can donate to B+ and AB+, can receive from B+, B-, O+, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "B-", 
+                    Description = "Blood type B negative - Can donate to B+, B-, AB+, AB-, can receive from B-, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "AB+", 
+                    Description = "Blood type AB positive - Universal plasma donor, can receive from all blood types" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "AB-", 
+                    Description = "Blood type AB negative - Can donate to AB+, AB-, can receive from A-, B-, AB-, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "O+", 
+                    Description = "Blood type O positive - Can donate to A+, B+, AB+, O+, can receive from O+, O-" 
+                },
+                new BloodType 
+                { 
+                    BloodTypeName = "O-", 
+                    Description = "Blood type O negative - Universal donor, can donate to all blood types" 
+                }
             };
 
             context.BloodTypes.AddRange(bloodTypes);

@@ -37,7 +37,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 if (!user.EmailVerified)
                     return false;
 
-                await UpdateLastLoginAsync(user.Id);
+                await UpdateLastLoginAsync(user.UserId);
                 return true;
             }
             catch
@@ -148,20 +148,20 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public async Task<User> GetUserByIdAsync(string userId)
+        public async Task<User?> GetUserByIdAsync(string userId)
         {
             if (int.TryParse(userId, out int id))
             {
                 return await _context.Users
                     .Include(u => u.Role)
-                    .FirstOrDefaultAsync(u => u.Id == id);
+                    .FirstOrDefaultAsync(u => u.UserId == id);
             }
             return null;
         }
@@ -196,18 +196,18 @@ namespace Blood_Donation_Website.Services.Implementations
             return user?.Role?.RoleName == role;
         }
 
-        public async Task<UserDto> GetUserProfileAsync(string userId)
+        public async Task<UserDto?> GetUserProfileAsync(string userId)
         {
             var user = await GetUserByIdAsync(userId);
             if (user == null) return null;
 
             return new UserDto
             {
-                Id = user.Id,
+                Id = user.UserId,
                 Username = user.Username,
                 Email = user.Email,
                 FullName = user.FullName,
-                Phone = user.Phone,  // Changed from PhoneNumber to Phone
+                Phone = user.Phone,
                 DateOfBirth = user.DateOfBirth,
                 Gender = user.Gender,
                 Address = user.Address,
@@ -229,7 +229,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 if (user == null) return false;
 
                 user.FullName = userDto.FullName;
-                user.Phone = userDto.Phone;  // Changed from PhoneNumber to Phone
+                user.Phone = userDto.Phone;
                 user.DateOfBirth = userDto.DateOfBirth;
                 user.Gender = userDto.Gender;
                 user.Address = userDto.Address;
@@ -292,7 +292,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
             return users.Select(u => new UserDto
             {
-                Id = u.Id,
+                Id = u.UserId,
                 Username = u.Username,
                 Email = u.Email,
                 FullName = u.FullName,

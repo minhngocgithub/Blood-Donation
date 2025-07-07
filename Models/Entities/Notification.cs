@@ -3,9 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Blood_Donation_Website.Models.Entities
 {
-    [Table("Notification")]
-    public class Notification : BaseEntity
+    [Table("Notifications")]
+    public class Notification
     {
+        [Key]
+        public int NotificationId { get; set; }
+
         public int? UserId { get; set; }
 
         [Required]
@@ -20,8 +23,9 @@ namespace Blood_Donation_Website.Models.Entities
         public string? Type { get; set; }
 
         public bool IsRead { get; set; } = false;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-       
+        [ForeignKey("UserId")]
         public virtual User? User { get; set; }
     }
 }
