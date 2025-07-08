@@ -19,7 +19,7 @@ namespace Blood_Donation_Website.Services.Implementations
             _emailService = emailService;
         }
 
-        // Interface methods - return Task<bool>
+        
         public async Task<bool> LoginAsync(LoginViewModel model)
         {
             try
