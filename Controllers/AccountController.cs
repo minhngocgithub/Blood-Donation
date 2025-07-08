@@ -30,7 +30,7 @@ namespace Blood_Donation_Website.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
-        [HttpPost]
+        [HttpPost("login")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
@@ -61,7 +61,7 @@ namespace Blood_Donation_Website.Controllers
                 // Create claims
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
@@ -93,7 +93,7 @@ namespace Blood_Donation_Website.Controllers
                 return View(model);
             }
         }
-        [HttpGet]
+        [HttpGet("register")]
         public IActionResult Register()
         {
             if (User.Identity?.IsAuthenticated == true)
@@ -104,7 +104,7 @@ namespace Blood_Donation_Website.Controllers
             return View(new RegisterViewModel());
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -113,12 +113,34 @@ namespace Blood_Donation_Website.Controllers
                 return View(model);
             }
 
-            var result = await _accountService.RegisterAsync(model);
+            try
+            {
+                var result = await _accountService.RegisterAsync(model);
+                
+                if (!result)
+                {
+                    ModelState.AddModelError(string.Empty, "Email đã tồn tại hoặc có lỗi xảy ra.");
+                    return View(model);
+                }
 
-            
+                TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+                return RedirectToAction(nameof(Login));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during registration for user {Email}", model.Email);
+                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.");
+                return View(model);
+            }
+        }
 
-            
-            return RedirectToAction(nameof(Login));
+        [HttpPost("logout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction("Index", "Home");
         }
         private IActionResult RedirectToLocal(string? returnUrl)
         {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blood_Donation_Website.Models.Entities;
+using Blood_Donation_Website.Services.Utilities;
 
 namespace Blood_Donation_Website.Data.Seeders
 {
@@ -17,7 +18,7 @@ namespace Blood_Donation_Website.Data.Seeders
                     { 
                         Username = "john_doe", 
                         Email = "john.doe@example.com", 
-                        PasswordHash = "AQAAAAEAACcQAAAAEHashed_Password_Here_123", 
+                        PasswordHash = PasswordHelper.HashPassword("Password123!"), 
                         FullName = "John Doe",
                         Phone = "555-0101",
                         Address = "123 Main St, City, State 12345",
@@ -33,7 +34,7 @@ namespace Blood_Donation_Website.Data.Seeders
                     { 
                         Username = "jane_smith", 
                         Email = "jane.smith@example.com", 
-                        PasswordHash = "AQAAAAEAACcQAAAAEHashed_Password_Here_456", 
+                        PasswordHash = PasswordHelper.HashPassword("Password123!"), 
                         FullName = "Jane Smith",
                         Phone = "555-0102",
                         Address = "456 Oak Ave, City, State 12346",

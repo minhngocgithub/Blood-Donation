@@ -1,4 +1,5 @@
 ﻿using Blood_Donation_Website.Models.Entities;
+using Blood_Donation_Website.Services.Utilities;
 using System.Text;
 
 namespace Blood_Donation_Website.Data.Seeders
@@ -33,7 +34,7 @@ namespace Blood_Donation_Website.Data.Seeders
                 Username = "admin",
                 FullName = "System Administrator",
                 Email = "admin@blooddonation.com",
-                PasswordHash = HashPassword("Admin@123"), // Default password
+                PasswordHash = PasswordHelper.HashPassword("Admin@123"), // Default password
                 Phone = "0123456789",
                 DateOfBirth = new DateTime(1990, 1, 1),
                 Gender = "Male",
@@ -48,15 +49,6 @@ namespace Blood_Donation_Website.Data.Seeders
 
             context.Users.Add(adminUser);
             context.SaveChanges();
-        }
-
-        private static string HashPassword(string password)
-        {
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
         }
     }
 }
