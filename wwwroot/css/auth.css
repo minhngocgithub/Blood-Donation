@@ -1,0 +1,113 @@
+﻿/* Authentication Styles */
+.auth-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-left {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+    .auth-left::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("/images/blood-donation-bg.jpg") center / cover;
+        opacity: 0.1;
+    }
+
+.auth-branding {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+}
+
+.auth-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.auth-form .card {
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.form-control-lg {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+    .form-control-lg:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+
+.password-strength {
+    margin-top: 0.25rem;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .auth-form-container {
+        padding: 1rem;
+    }
+
+    .auth-form .card-body {
+        padding: 2rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .auth-form .card-body {
+        padding: 1.5rem !important;
+    }
+}
