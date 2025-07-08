@@ -12,10 +12,11 @@ namespace Blood_Donation_Website.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
-
-        public AccountController(IAccountService accountService)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(IAccountService accountService, ILogger<AccountController> logger)
         {
             _accountService = accountService;
+            _logger = logger;
         }
 
         [HttpGet("login")]
@@ -29,9 +30,7 @@ namespace Blood_Donation_Website.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
-
-        [HttpPost("login")]
-        [AllowAnonymous]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
@@ -42,21 +41,85 @@ namespace Blood_Donation_Website.Controllers
                 return View(model);
             }
 
-            var result = await _accountService.LoginAsync(model);
-
-            // If LoginAsync returns a bool, handle accordingly
-            if (result)
+            try
             {
-                // You may need to retrieve the user info here if needed for claims
-                // For now, just redirect on success
-                TempData["SuccessMessage"] = "Đăng nhập thành công!";
-                return RedirectToLocal(returnUrl);
+                var loginResult = await _accountService.LoginAsync(model);
+                if (!loginResult)
+                {
+                    ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không chính xác.");
+                    return View(model);
+                }
+
+                // Get user info for claims
+                var user = await _accountService.GetUserByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng nhập.");
+                    return View(model);
+                }
+
+                // Create claims
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.FullName),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = model.RememberMe,
+                    ExpiresUtc = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddMinutes(30)
+                };
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity), authProperties);
+
+                _logger.LogInformation("User {Email} logged in.", user.Email);
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during login for user {Email}", model.Email);
+                ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.");
+                return View(model);
+            }
+        }
+        [HttpGet]
+        public IActionResult Register()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError(string.Empty, "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin đăng nhập.");
-            return View(model);
+            return View(new RegisterViewModel());
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _accountService.RegisterAsync(model);
+
+            
+
+            
+            return RedirectToAction(nameof(Login));
+        }
         private IActionResult RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
