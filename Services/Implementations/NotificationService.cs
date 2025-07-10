@@ -25,7 +25,7 @@ namespace Blood_Donation_Website.Services.Implementations
             return notifications.Select(MapToDto);
         }
 
-        public async Task<NotificationDto> GetNotificationByIdAsync(int id)
+        public async Task<NotificationDto?> GetNotificationByIdAsync(int id)
         {
             var notification = await _context.Notifications.FindAsync(id);
             return notification != null ? MapToDto(notification) : null;
@@ -56,7 +56,7 @@ namespace Blood_Donation_Website.Services.Implementations
             return MapToDto(notification);
         }
 
-        public async Task<NotificationDto> UpdateNotificationAsync(int id, NotificationDto notificationDto)
+        public async Task<NotificationDto?> UpdateNotificationAsync(int id, NotificationDto notificationDto)
         {
             var notification = await _context.Notifications.FindAsync(id);
             if (notification == null) return null;
@@ -161,7 +161,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        private bool ShouldSendEmail(string notificationType)
+        private bool ShouldSendEmail(string? notificationType)
         {
             // Định nghĩa các loại thông báo cần gửi email
             return notificationType switch
