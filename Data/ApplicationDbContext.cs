@@ -53,12 +53,11 @@ namespace Blood_Donation_Website.Data
         /// </summary>
         public void SeedData()
         {
-            // Seed data in correct order to respect foreign key constraints
             RoleSeeder.Seed(this);
             BloodTypeSeeder.Seed(this);
             BloodCompatibilitySeeder.Seed(this);
             LocationSeeder.Seed(this);
-            AdminSeeder.Seed(this); // Using AdminSeeder instead of AdminUserSeeder
+            AdminSeeder.Seed(this);
             UserSeeder.Seed(this);
             BloodDonationEventSeeder.Seed(this);
             DonationRegistrationSeeder.Seed(this);
