@@ -1,7 +1,41 @@
 ﻿/* Authentication Styles */
+.auth-body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 50%, #a71e2a 100%);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.auth-body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10 10-4.5 10-10 10-10-4.5-10-10 4.5-10 10-10 10 4.5 10 10z' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E");
+    animation: float 20s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.auth-main {
+    padding: 0;
+    margin: 0;
+}
+
 .auth-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 50%, #a71e2a 100%);
+    position: relative;
+    z-index: 1;
 }
 
 .auth-left {
@@ -25,10 +59,29 @@
     position: relative;
     z-index: 2;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
     padding: 2rem;
+    text-align: center;
+}
+
+.auth-branding h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.auth-branding p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .auth-icon {
@@ -95,6 +148,190 @@
     border-color: #dc3545 !important;
 }
 
+/* Compact Card Layout */
+.auth-card-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.auth-card::before {
+    content: "💉";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 6rem;
+    opacity: 0.05;
+    transform: rotate(15deg);
+    z-index: 0;
+}
+
+.auth-card-body {
+    padding: 3rem 2.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-card-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.auth-card-subtitle {
+    color: #718096;
+    font-size: 0.95rem;
+}
+
+.social-login {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-btn {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    color: #4a5568;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.social-btn:hover {
+    border-color: #cbd5e0;
+    transform: translateY(-1px);
+    color: #2d3748;
+    text-decoration: none;
+}
+
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+
+.divider span {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.compact-form .form-control {
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.compact-form .form-control:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.compact-form .form-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.compact-form .btn-primary {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 0.875rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.compact-form .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+/* Blood Drop Animation */
+.blood-drop {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(220, 53, 69, 0.3);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    animation: dropfall 4s infinite linear;
+}
+
+.blood-drop:nth-child(1) { left: 10%; animation-delay: 0s; }
+.blood-drop:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+.blood-drop:nth-child(3) { left: 30%; animation-delay: 1s; }
+.blood-drop:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+.blood-drop:nth-child(5) { left: 50%; animation-delay: 2s; }
+.blood-drop:nth-child(6) { left: 60%; animation-delay: 2.5s; }
+.blood-drop:nth-child(7) { left: 70%; animation-delay: 3s; }
+.blood-drop:nth-child(8) { left: 80%; animation-delay: 3.5s; }
+.blood-drop:nth-child(9) { left: 90%; animation-delay: 4s; }
+
+@keyframes dropfall {
+    0% {
+        top: -10px;
+        opacity: 1;
+    }
+    100% {
+        top: 100vh;
+        opacity: 0;
+    }
+}
+
+/* Motivational Quote Styling */
+.motivation-quote {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(200, 35, 51, 0.1) 100%);
+    border-left: 4px solid #dc3545;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #6c757d;
+}
+
 /* Responsive adjustments */
 @media (max-width: 991.98px) {
     .auth-form-container {
@@ -104,10 +341,26 @@
     .auth-form .card-body {
         padding: 2rem !important;
     }
+    
+    .auth-card-container {
+        padding: 1rem;
+    }
+    
+    .auth-card-body {
+        padding: 2rem 1.5rem;
+    }
 }
 
 @media (max-width: 575.98px) {
     .auth-form .card-body {
         padding: 1.5rem !important;
+    }
+    
+    .auth-card-body {
+        padding: 1.5rem 1rem;
+    }
+    
+    .auth-card-title {
+        font-size: 1.5rem;
     }
 }

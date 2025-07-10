@@ -9,7 +9,7 @@ namespace Blood_Donation_Website.Services.Interfaces
     {
         Task<bool> RegisterAsync(RegisterViewModel model);
         Task<bool> LoginAsync(LoginViewModel model);
-        Task<bool> LogoutAsync();
+        Task<bool> LogoutAsync(string userId);
         Task<bool> ForgotPasswordAsync(ForgotPasswordViewModel model);
         Task<bool> ResetPasswordAsync(ResetPasswordViewModel model);
         Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword);

@@ -14,7 +14,6 @@ namespace Blood_Donation_Website.Data.Seeders
                 var notifications = new List<Notification>
                 {
                     new Notification { Message = "Welcome to BloodLife!", UserId = 1, CreatedDate = DateTime.Now },
-                    // Add more as needed
                 };
                 context.Notifications.AddRange(notifications);
                 context.SaveChanges();

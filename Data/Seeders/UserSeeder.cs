@@ -10,7 +10,7 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            if (!context.Users.Any(u => u.RoleId == 2)) // Check for regular users (RoleId = 2)
+            if (!context.Users.Any(u => u.RoleId == 2))
             {
                 var users = new List<User>
                 {
