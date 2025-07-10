@@ -306,6 +306,41 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        [HttpGet("change-password")]
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                TempData["ErrorMessage"] = "Không xác định được người dùng.";
+                return RedirectToAction("Login");
+            }
+
+            var result = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu hiện tại không đúng hoặc có lỗi xảy ra.");
+                return View(model);
+            }
+        }
+
         private IActionResult RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
