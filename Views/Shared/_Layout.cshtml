@@ -27,7 +27,7 @@
             <div class="container">
                 <!-- Brand -->
                 <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="./image/Logo.png" alt="Blood Donation Logo" height="40" class="me-2">
+                    <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="me-2">
                     <span class="brand-text fw-bold text-danger">BloodLife</span>
                 </a>
 
@@ -192,7 +192,7 @@
                 <!-- Brand Column -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="footer-brand mb-3">
-                        <img src="./images/logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
+                        <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
                         <h5 class="text-white fw-bold">BloodLife</h5>
                     </div>
                     <p class="text-muted mb-3">
@@ -231,10 +231,10 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h6 class="text-white mb-3 fw-bold">Hỗ trợ</h6>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="#" class="text-muted text-decoration-none">Hướng dẫn hiến máu</a></li>
-                        <li><a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Chính sách bảo mật</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
+                        <li><a asp-controller="Home" asp-action="Guide" class="text-muted text-decoration-none">Hướng dẫn hiến máu</a></li>
+                        <li><a asp-controller="Legal" asp-action="Privacy" class="text-muted text-decoration-none">Chính sách bảo mật</a></li>
+                        <li><a asp-controller="Legal" asp-action="Terms" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
+                        <li><a asp-controller="Home" asp-action="FAQ" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
                         <li><a href="#" class="text-muted text-decoration-none">Hotline: 1900-1234</a></li>
                     </ul>
                 </div>
