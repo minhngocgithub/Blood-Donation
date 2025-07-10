@@ -9,6 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
+// Add session support
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -21,26 +29,40 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/account/login";
-
         options.LogoutPath = "/account/logout";
         options.AccessDeniedPath = "/account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.Name = "BloodDonationAuth";
+        
+        // Configure logout behavior
+        options.Events.OnSigningOut = async context =>
+        {
+            // Additional cleanup logic can be added here
+            // This event is fired when SignOutAsync is called
+            await Task.CompletedTask;
+        };
+        
+        // Configure what happens when the cookie expires
+        options.Events.OnValidatePrincipal = async context =>
+        {
+            // Check if the user is still valid
+            // You can add additional validation logic here
+            await Task.CompletedTask;
+        };
     });
 
 var app = builder.Build();
 
-// Seed data
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     
-    // Ensure database is created
     context.Database.EnsureCreated();
     
-    // Seed all data using the centralized method
     context.SeedData();
 }
 
@@ -55,6 +77,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

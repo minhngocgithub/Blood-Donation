@@ -1,0 +1,264 @@
+﻿@model Blood_Donation_Website.Models.ViewModels.Account.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Đăng Ký";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-container">
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <!-- Left Side - Image/Branding -->
+            <div class="col-lg-6 d-none d-lg-flex auth-left">
+                <div class="auth-branding">
+                    <div class="text-center text-white">
+                        <i class="fas fa-heart auth-icon"></i>
+                        <h1>Tham Gia Cộng Đồng</h1>
+                        <p>Hiến máu cứu người - Nghĩa cử cao đẹp. Mỗi giọt máu bạn hiến có thể cứu sống 3 người.</p>
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-check-circle me-3"></i>
+                                <span>Miễn phí hoàn toàn</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-shield-alt me-3"></i>
+                                <span>An toàn và bảo mật</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-users me-3"></i>
+                                <span>Cộng đồng hiến máu lớn</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-tint me-3"></i>
+                                <span>Mỗi lần hiến máu cứu 3 mạng người</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Register Form -->
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="auth-form-container">
+                    <div class="auth-form">
+                        <!-- Mobile Logo -->
+                        <div class="text-center d-lg-none mb-4">
+                            <i class="fas fa-heart text-danger" style="font-size: 3rem;"></i>
+                            <h3 class="text-danger mt-2">Hiến Máu Nhân Đạo</h3>
+                        </div>
+
+                        <div class="card border-0 shadow-lg">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <h3 class="card-title text-dark mb-2">Đăng Ký Tài Khoản</h3>
+                                    <p class="text-muted">Tham gia cộng đồng hiến máu nhân đạo</p>
+                                </div>
+
+                                <form asp-action="Register" method="post" novalidate>
+                                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="FullName" class="form-label">
+                                            <i class="fas fa-user me-2 text-muted"></i>Họ và tên
+                                        </label>
+                                        <input asp-for="FullName" class="form-control form-control-lg"
+                                               placeholder="Nhập họ và tên đầy đủ" autocomplete="name" />
+                                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Email" class="form-label">
+                                            <i class="fas fa-envelope me-2 text-muted"></i>Email
+                                        </label>
+                                        <input asp-for="Email" class="form-control form-control-lg"
+                                               placeholder="Nhập địa chỉ email" autocomplete="email" />
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Phone" class="form-label">
+                                            <i class="fas fa-phone me-2 text-muted"></i>Số điện thoại
+                                        </label>
+                                        <input asp-for="Phone" class="form-control form-control-lg"
+                                               placeholder="Nhập số điện thoại (10-11 số)" autocomplete="tel" />
+                                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Password" class="form-label">
+                                            <i class="fas fa-lock me-2 text-muted"></i>Mật khẩu
+                                        </label>
+                                        <div class="input-group">
+                                            <input asp-for="Password" class="form-control form-control-lg"
+                                                   placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)" autocomplete="new-password" />
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <span asp-validation-for="Password" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Confirm Password Field -->
+                                    <div class="mb-3">
+                                        <label asp-for="ConfirmPassword" class="form-label">
+                                            <i class="fas fa-lock me-2 text-muted"></i>Xác nhận mật khẩu
+                                        </label>
+                                        <div class="input-group">
+                                            <input asp-for="ConfirmPassword" class="form-control form-control-lg"
+                                                   placeholder="Nhập lại mật khẩu" autocomplete="new-password" />
+                                            <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Terms Agreement -->
+                                    <div class="mb-4">
+                                        <div class="form-check">
+                                            <input asp-for="AgreeToTerms" class="form-check-input" />
+                                            <label asp-for="AgreeToTerms" class="form-check-label text-muted">
+                                                Tôi đồng ý với
+                                                <a href="#" class="text-danger text-decoration-none">Điều khoản sử dụng</a>
+                                                và
+                                                <a href="#" class="text-danger text-decoration-none">Chính sách bảo mật</a>
+                                            </label>
+                                        </div>
+                                        <span asp-validation-for="AgreeToTerms" class="text-danger small"></span>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-danger btn-lg w-100 mb-3">
+                                        <i class="fas fa-user-plus me-2"></i>Đăng Ký
+                                    </button>
+
+                                    <!-- Login Link -->
+                                    <div class="text-center">
+                                        <p class="text-muted mb-0">
+                                            Đã có tài khoản?
+                                            <a asp-action="Login" class="text-danger text-decoration-none fw-bold">
+                                                Đăng nhập ngay
+                                            </a>
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Toggle password visibility
+        function togglePasswordVisibility(toggleButtonId, passwordInputId) {
+            document.getElementById(toggleButtonId).addEventListener('click', function () {
+                const passwordInput = document.getElementById(passwordInputId);
+                const icon = this.querySelector('i');
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        // Initialize password toggles
+        togglePasswordVisibility('togglePassword', 'Password');
+        togglePasswordVisibility('toggleConfirmPassword', 'ConfirmPassword');
+
+        // Phone number formatting
+        document.getElementById('Phone').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.slice(0, 11);
+            }
+            e.target.value = value;
+        });
+
+        // Email validation
+        document.getElementById('Email').addEventListener('blur', async function (e) {
+            const email = e.target.value;
+            if (email) {
+                try {
+                    const response = await fetch('/Account/CheckEmailExists', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(email)
+                    });
+
+                    const result = await response.json();
+                    if (result.exists) {
+                        // Show email exists warning
+                        const emailField = document.getElementById('Email');
+                        emailField.classList.add('is-invalid');
+
+                        let errorSpan = emailField.parentNode.querySelector('.email-exists-error');
+                        if (!errorSpan) {
+                            errorSpan = document.createElement('span');
+                            errorSpan.className = 'text-danger small email-exists-error';
+                            emailField.parentNode.appendChild(errorSpan);
+                        }
+                        errorSpan.textContent = 'Email này đã được sử dụng';
+                    } else {
+                        document.getElementById('Email').classList.remove('is-invalid');
+                        const errorSpan = document.querySelector('.email-exists-error');
+                        if (errorSpan) {
+                            errorSpan.remove();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking email:', error);
+                }
+            }
+        });
+
+        // Password strength indicator
+        document.getElementById('Password').addEventListener('input', function (e) {
+            const password = e.target.value;
+            const strength = calculatePasswordStrength(password);
+
+            // Remove existing strength indicator
+            const existingIndicator = document.querySelector('.password-strength');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+
+            if (password.length > 0) {
+                const indicator = document.createElement('div');
+                indicator.className = 'password-strength mt-1';
+
+                const strengthText = ['Rất yếu', 'Yếu', 'Trung bình', 'Mạnh', 'Rất mạnh'];
+                const strengthColors = ['danger', 'warning', 'info', 'success', 'success'];
+
+                indicator.innerHTML = `
+                            <small class="text-${strengthColors[strength]}">
+                                Độ mạnh mật khẩu: ${strengthText[strength]}
+                            </small>
+                        `;
+
+                e.target.parentNode.parentNode.appendChild(indicator);
+            }
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            return strength;
+        }
+    </script>
+}

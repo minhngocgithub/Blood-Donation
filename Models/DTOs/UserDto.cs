@@ -17,8 +17,6 @@
         public DateTime? LastDonationDate { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        
-        // Navigation properties (optional)
         public string? BloodTypeName { get; set; }
         public string? RoleName { get; set; }
     }

@@ -6,7 +6,6 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            // Check if blood types already exist
             if (context.BloodTypes.Any()) return;
 
             var bloodTypes = new List<BloodType>

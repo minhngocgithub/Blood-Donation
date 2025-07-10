@@ -124,11 +124,20 @@
                                     }
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
-                                            <button type="submit" class="dropdown-item text-danger">
+                                        <div class="dropdown-item-group">
+                                            <!-- Quick Logout -->
+                                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                </button>
+                                            </form>
+                                            <!-- Alternative: Logout with confirmation page -->
+                                            <!--
+                                            <a class="dropdown-item text-danger" asp-controller="Account" asp-action="LogoutConfirmation">
                                                 <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                            </button>
-                                        </form>
+                                            </a>
+                                            -->
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -283,6 +292,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/logout.js" asp-append-version="true"></script>
 
     <!-- Custom Scripts -->
     <script>
