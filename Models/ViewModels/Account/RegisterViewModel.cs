@@ -33,9 +33,28 @@ namespace Blood_Donation_Website.Models.ViewModels.Account
         [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Bạn phải đồng ý với điều khoản sử dụng")]
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Bạn phải đồng ý với điều khoản sử dụng")]
+        [Required]
         [Display(Name = "Đồng ý với điều khoản")]
         public bool AgreeToTerms { get; set; }
+
+        // Custom validation method for AgreeToTerms
+        public bool IsAgreeToTermsValid()
+        {
+            return AgreeToTerms == true;
+        }
+
+        [Display(Name = "Nhóm máu")]
+        public int? BloodTypeId { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Ngày sinh")]
+        public DateTime? DateOfBirth { get; set; }
+
+        [Display(Name = "Giới tính")]
+        public string? Gender { get; set; }
+
+        [StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự")]
+        [Display(Name = "Địa chỉ")]
+        public string? Address { get; set; }
     }
 }

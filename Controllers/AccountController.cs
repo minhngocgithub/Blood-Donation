@@ -50,7 +50,6 @@ namespace Blood_Donation_Website.Controllers
                     return View(model);
                 }
 
-                // Get user info for claims
                 var user = await _accountService.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
@@ -58,7 +57,6 @@ namespace Blood_Donation_Website.Controllers
                     return View(model);
                 }
 
-                // Create claims
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -108,21 +106,41 @@ namespace Blood_Donation_Website.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // Manual validation for AgreeToTerms
+            if (!model.AgreeToTerms)
+            {
+                ModelState.AddModelError("AgreeToTerms", "Bạn phải đồng ý với điều khoản sử dụng");
+            }
+
             if (!ModelState.IsValid)
             {
+                // Log validation errors for debugging
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogWarning("Validation error: {Error}", error.ErrorMessage);
+                }
                 return View(model);
             }
 
             try
             {
+                // Check if email already exists
+                if (await _accountService.IsEmailExistsAsync(model.Email))
+                {
+                    ModelState.AddModelError("Email", "Email này đã được sử dụng.");
+                    return View(model);
+                }
+
                 var result = await _accountService.RegisterAsync(model);
                 
                 if (!result)
                 {
-                    ModelState.AddModelError(string.Empty, "Email đã tồn tại hoặc có lỗi xảy ra.");
+                    _logger.LogWarning("Registration failed for email: {Email}", model.Email);
+                    ModelState.AddModelError(string.Empty, "Đăng ký thất bại. Vui lòng thử lại.");
                     return View(model);
                 }
 
+                _logger.LogInformation("User registered successfully: {Email}", model.Email);
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
                 return RedirectToAction(nameof(Login));
             }
@@ -134,14 +152,160 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        [HttpGet("logout")]
+        public IActionResult LogoutConfirmation()
+        {
+            if (User.Identity?.IsAuthenticated != true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+
         [HttpPost("logout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            _logger.LogInformation("User logged out.");
-            return RedirectToAction("Index", "Home");
+            try
+            {
+                var userEmail = User.Identity?.Name;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    await _accountService.LogoutAsync(userId);
+                }
+                
+                HttpContext.Session.Clear();
+                
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                
+                foreach (var cookie in Request.Cookies.Keys)
+                {
+                    if (cookie.StartsWith(".AspNetCore") || cookie.StartsWith("AspNetCore"))
+                    {
+                        Response.Cookies.Delete(cookie, new CookieOptions
+                        {
+                            Path = "/",
+                            Secure = Request.IsHttps,
+                            SameSite = SameSiteMode.Lax
+                        });
+                    }
+                }
+                
+                Response.Cookies.Delete("BloodDonationAuth", new CookieOptions
+                {
+                    Path = "/",
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax
+                });
+                
+                _logger.LogInformation("User {Email} (ID: {UserId}) logged out successfully. Cookies cleared.", userEmail, userId);
+                
+                TempData["SuccessMessage"] = "Bạn đã đăng xuất thành công!";
+                
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout for user {Email}", User.Identity?.Name);
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.";
+                return RedirectToAction("Index", "Home");
+            }
         }
+
+        [HttpPost("quick-logout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> QuickLogout()
+        {
+            try
+            {
+                var userEmail = User.Identity?.Name;
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    await _accountService.LogoutAsync(userId);
+                }
+                
+                HttpContext.Session.Clear();
+                
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                
+                foreach (var cookie in Request.Cookies.Keys)
+                {
+                    if (cookie.StartsWith(".AspNetCore") || cookie.StartsWith("AspNetCore"))
+                    {
+                        Response.Cookies.Delete(cookie, new CookieOptions
+                        {
+                            Path = "/",
+                            Secure = Request.IsHttps,
+                            SameSite = SameSiteMode.Lax
+                        });
+                    }
+                }
+                
+                Response.Cookies.Delete("BloodDonationAuth", new CookieOptions
+                {
+                    Path = "/",
+                    Secure = Request.IsHttps,
+                    SameSite = SameSiteMode.Lax
+                });
+                
+                _logger.LogInformation("User {Email} (ID: {UserId}) performed quick logout. Cookies cleared.", userEmail, userId);
+                
+                if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+                {
+                    return Json(new { success = true, message = "Đăng xuất thành công!" });
+                }
+                
+                TempData["SuccessMessage"] = "Bạn đã đăng xuất thành công!";
+                return RedirectToAction("Index", "Home");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during quick logout for user {Email}", User.Identity?.Name);
+                
+                if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra khi đăng xuất." });
+                }
+                
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost("ping")]
+        public IActionResult Ping()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return Json(new { success = true, timestamp = DateTime.UtcNow });
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost("CheckEmailExists")]
+        public async Task<IActionResult> CheckEmailExists([FromBody] string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return Json(new { exists = false });
+                }
+
+                var exists = await _accountService.IsEmailExistsAsync(email);
+                return Json(new { exists = exists });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking if email exists: {Email}", email);
+                return Json(new { exists = false });
+            }
+        }
+
         private IActionResult RedirectToLocal(string? returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))

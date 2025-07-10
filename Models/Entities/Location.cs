@@ -23,8 +23,6 @@ namespace Blood_Donation_Website.Models.Entities
         public int Capacity { get; set; } = 50;
         public bool IsActive { get; set; } = true;
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-
-        // Navigation properties
         public virtual ICollection<BloodDonationEvent> Events { get; set; } = new List<BloodDonationEvent>();
     }
 }

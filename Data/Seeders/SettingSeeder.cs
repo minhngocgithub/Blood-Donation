@@ -13,7 +13,6 @@ namespace Blood_Donation_Website.Data.Seeders
                 var settings = new List<Setting>
                 {
                     new Setting { SettingKey = "SiteName", SettingValue = "BloodLife" },
-                    // Add more as needed
                 };
                 context.Settings.AddRange(settings);
                 context.SaveChanges();
