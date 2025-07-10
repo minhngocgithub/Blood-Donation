@@ -9,8 +9,8 @@
     <div class="auth-card">
         <div class="auth-card-body">
             <div class="auth-card-header">
-                <h1 class="auth-card-title">Welcome Back!</h1>
-                <p class="auth-card-subtitle">Enter your personal details to use all of site features</p>
+                <h1 class="auth-card-title">Chào Mừng Trở Lại!</h1>
+                <p class="auth-card-subtitle">Đăng nhập để sử dụng tất cả tính năng của trang web</p>
             </div>
 
             <!-- Social Login Options -->
@@ -30,7 +30,7 @@
             </div>
 
             <div class="divider">
-                <span>or use your email for login</span>
+                <span>hoặc sử dụng email để đăng nhập</span>
             </div>
 
             <form asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" novalidate class="compact-form">
@@ -38,13 +38,13 @@
 
                 <div class="mb-3">
                     <input asp-for="Email" class="form-control" 
-                           placeholder="Email" autocomplete="username" />
+                           placeholder="Địa chỉ email" autocomplete="username" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <input asp-for="Password" type="password" class="form-control" 
-                           placeholder="Password" autocomplete="current-password" />
+                           placeholder="Mật khẩu" autocomplete="current-password" />
                     <span asp-validation-for="Password" class="text-danger small"></span>
                 </div>
 
@@ -52,26 +52,26 @@
                     <div class="form-check">
                         <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
                         <label asp-for="RememberMe" class="form-check-label small text-muted">
-                            Remember me
+                            Ghi nhớ đăng nhập
                         </label>
                     </div>
                     <a href="#" class="text-decoration-none small" style="color: #667eea;">
-                        Forgot Password?
+                        Quên mật khẩu?
                     </a>
                 </div>
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        SIGN IN
+                        ĐĂNG NHẬP
                     </button>
                 </div>
             </form>
 
             <div class="text-center mt-3">
                 <p class="mb-0 text-muted">
-                    Don't have an account? 
+                    Chưa có tài khoản? 
                     <a asp-action="Register" class="text-decoration-none fw-bold" style="color: #667eea;">
-                        Sign Up
+                        Đăng ký
                     </a>
                 </p>
             </div>
