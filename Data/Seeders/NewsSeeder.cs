@@ -14,7 +14,6 @@ namespace Blood_Donation_Website.Data.Seeders
                 var news = new List<News>
                 {
                     new News { Title = "Blood Drive Success", Content = "Our recent blood drive was a huge success!", CategoryId = 1, CreatedDate = DateTime.Now },
-                    // Add more as needed
                 };
                 context.News.AddRange(news);
                 context.SaveChanges();

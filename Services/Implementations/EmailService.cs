@@ -20,7 +20,6 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
-                // Lấy cấu hình email từ appsettings.json
                 var smtpHost = _configuration["EmailSettings:SmtpHost"] ?? "smtp.gmail.com";
                 var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
                 var smtpUsername = _configuration["EmailSettings:Username"] ?? "";
@@ -28,14 +27,12 @@ namespace Blood_Donation_Website.Services.Implementations
                 var fromEmail = _configuration["EmailSettings:FromEmail"] ?? smtpUsername;
                 var fromName = _configuration["EmailSettings:FromName"] ?? "BloodLife";
 
-                // Nếu không có cấu hình email, log và return true để không block flow
                 if (string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
                 {
                     _logger.LogWarning("Email configuration not found. Email sending is disabled.");
-                    return true; // Return true để không block registration flow
+                    return true;
                 }
 
-                // Tạo email message với MimeKit
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(fromName, fromEmail));
                 message.To.Add(new MailboxAddress("", to));
@@ -52,7 +49,6 @@ namespace Blood_Donation_Website.Services.Implementations
                 }
                 message.Body = bodyBuilder.ToMessageBody();
 
-                // Gửi email với MailKit
                 using var client = new SmtpClient();
                 await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(smtpUsername, smtpPassword);

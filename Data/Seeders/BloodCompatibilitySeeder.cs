@@ -10,7 +10,6 @@ namespace Blood_Donation_Website.Data.Seeders
         {
             if (!context.BloodCompatibilities.Any())
             {
-                // Blood compatibility matrix - who can donate to whom
                 var compatibilities = new List<BloodCompatibility>
                 {
                     // O- can donate to everyone (Universal donor)

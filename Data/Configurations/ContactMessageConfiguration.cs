@@ -33,7 +33,6 @@ namespace Blood_Donation_Website.Data.Configurations
                 .WithMany(u => u.ResolvedContactMessages)
                 .HasForeignKey(c => c.ResolvedBy);
 
-            // Indexes
             builder.HasIndex(c => c.Status)
                 .HasDatabaseName("IX_ContactMessages_Status");
 

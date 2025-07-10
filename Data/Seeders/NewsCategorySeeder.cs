@@ -6,7 +6,6 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
             {
-                // Kiểm tra xem đã có dữ liệu chưa
                 if (context.NewsCategories.Any()) return;
 
                 var categories = new List<NewsCategory>

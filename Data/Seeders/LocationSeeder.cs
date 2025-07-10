@@ -9,7 +9,6 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            // Check if locations already exist
             if (context.Locations.Any()) return;
 
             var locations = new List<Location>

@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Đăng Xuất";
+    Layout = "_AuthLayout";
+}
+
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body text-center p-5">
+                    <!-- Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-sign-out-alt text-warning" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="card-title text-dark mb-3">Xác nhận đăng xuất</h3>
+                    
+                    <!-- Message -->
+                    <p class="text-muted mb-4">
+                        Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?
+                    </p>
+                    
+                    <!-- User Info -->
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user-circle text-danger me-2" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <div class="fw-bold">@(User.FindFirst("FullName")?.Value ?? User.Identity?.Name ?? "Người dùng")</div>
+                                <div class="text-muted small">@(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "Email không xác định")</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-center">
+                        <!-- Cancel Button -->
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Hủy bỏ
+                        </a>
+                        
+                        <!-- Logout Button -->
+                        <form asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Additional Info -->
+                    <div class="mt-4 pt-3 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Sau khi đăng xuất, bạn sẽ cần đăng nhập lại để sử dụng các tính năng của hệ thống.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Section -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center">
+                <h5 class="text-muted mb-3">Hoặc bạn có thể:</h5>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a asp-controller="User" asp-action="Profile" class="btn btn-outline-primary">
+                        <i class="fas fa-user me-2"></i>Xem thông tin cá nhân
+                    </a>
+                    <a asp-controller="BloodDonationEvent" asp-action="Index" class="btn btn-outline-success">
+                        <i class="fas fa-calendar me-2"></i>Xem sự kiện hiến máu
+                    </a>
+                    <a asp-controller="News" asp-action="Index" class="btn btn-outline-info">
+                        <i class="fas fa-newspaper me-2"></i>Đọc tin tức
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto focus on cancel button for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
+            if (cancelBtn) {
+                cancelBtn.focus();
+            }
+        });
+        
+        // Add confirmation dialog for extra safety
+        document.querySelector('form[asp-action="Logout"] button').addEventListener('click', function(e) {
+            const confirmed = confirm('Bạn có chắc chắn muốn đăng xuất không?');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

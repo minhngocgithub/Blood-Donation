@@ -9,15 +9,12 @@ namespace Blood_Donation_Website.Services.Utilities
         {
             using (var sha256 = SHA256.Create())
             {
-                // Tạo salt ngẫu nhiên
                 var salt = GenerateSalt();
                 var saltedPassword = password + salt;
 
-                // Hash password với salt
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(saltedPassword));
                 var hashedPassword = Convert.ToBase64String(hashedBytes);
 
-                // Kết hợp salt và hash
                 return $"{salt}:{hashedPassword}";
             }
         }

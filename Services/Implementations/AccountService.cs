@@ -58,11 +58,17 @@ namespace Blood_Donation_Website.Services.Implementations
                     Username = model.Email,
                     Email = model.Email,
                     FullName = model.FullName,
+                    Phone = model.Phone,
+                    Address = model.Address, // Can be null/empty
+                    DateOfBirth = model.DateOfBirth, // Can be null
+                    Gender = model.Gender, // Can be null/empty
+                    BloodTypeId = model.BloodTypeId, // Can be null
                     PasswordHash = await HashPasswordAsync(model.Password),
                     RoleId = 2,
                     IsActive = true,
                     EmailVerified = true,
-                    CreatedDate = DateTime.Now
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now
                 };
 
                 _context.Users.Add(user);
@@ -82,10 +88,32 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> LogoutAsync()
+        public async Task<bool> LogoutAsync(string userId)
         {
-            // Implement logout logic if needed
-            return await Task.FromResult(true);
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                    return false;
+
+                var user = await GetUserByIdAsync(userId);
+                if (user == null) return false;
+
+                // Update last logout time (you can add LastLogoutDate to User entity if needed)
+                user.UpdatedDate = DateTime.Now;
+                
+                // You can add additional logout logic here such as:
+                // - Invalidating refresh tokens
+                // - Logging logout activity
+                // - Updating session tracking
+                // - Clearing user-specific cache
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> ForgotPasswordAsync(ForgotPasswordViewModel model)
@@ -296,7 +324,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 Username = u.Username,
                 Email = u.Email,
                 FullName = u.FullName,
-                Phone = u.Phone,  // Changed from PhoneNumber to Phone
+                Phone = u.Phone,
                 DateOfBirth = u.DateOfBirth,
                 Gender = u.Gender,
                 Address = u.Address,
@@ -329,7 +357,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        // Helper methods
         private async Task<bool> VerifyPasswordAsync(string password, string hashedPassword)
         {
             return await Task.FromResult(PasswordHelper.VerifyPassword(password, hashedPassword));
