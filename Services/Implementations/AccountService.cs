@@ -59,10 +59,10 @@ namespace Blood_Donation_Website.Services.Implementations
                     Email = model.Email,
                     FullName = model.FullName,
                     Phone = model.Phone,
-                    Address = model.Address, // Can be null/empty
-                    DateOfBirth = model.DateOfBirth, // Can be null
-                    Gender = model.Gender, // Can be null/empty
-                    BloodTypeId = model.BloodTypeId, // Can be null
+                    Address = model.Address,
+                    DateOfBirth = model.DateOfBirth,
+                    Gender = model.Gender,
+                    BloodTypeId = model.BloodTypeId,
                     PasswordHash = await HashPasswordAsync(model.Password),
                     RoleId = 2,
                     IsActive = true,
