@@ -9,11 +9,11 @@
     <div class="auth-card">
         <div class="auth-card-body">
             <div class="auth-card-header">
-                <h1 class="auth-card-title">Join Our Mission</h1>
-                <p class="auth-card-subtitle">Every drop counts - Help save lives through blood donation</p>
+                <h1 class="auth-card-title">Tham Gia Cùng Chúng Tôi</h1>
+                <p class="auth-card-subtitle">Mỗi giọt máu đều quý giá - Chung tay cứu sống nhiều người</p>
                 <p class="text-muted small mb-0">
                     <i class="fas fa-info-circle"></i>
-                    Quick registration - complete your profile later
+                    Đăng ký nhanh - Hoàn thiện hồ sơ sau
                 </p>
             </div>
 
@@ -34,7 +34,7 @@
             </div>
 
             <div class="divider">
-                <span>or use your email for registration</span>
+                <span>hoặc sử dụng email để đăng ký</span>
             </div>
 
             <form asp-action="Register" method="post" novalidate class="compact-form">
@@ -42,31 +42,31 @@
 
                 <div class="mb-3">
                     <input asp-for="FullName" class="form-control" 
-                           placeholder="Name" autocomplete="name" />
+                           placeholder="Họ và tên" autocomplete="name" />
                     <span asp-validation-for="FullName" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <input asp-for="Email" class="form-control" 
-                           placeholder="Email" autocomplete="email" />
+                           placeholder="Địa chỉ email" autocomplete="email" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <input asp-for="Phone" class="form-control" 
-                           placeholder="Phone" autocomplete="tel" />
+                           placeholder="Số điện thoại" autocomplete="tel" />
                     <span asp-validation-for="Phone" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <input asp-for="Password" type="password" class="form-control" 
-                           placeholder="Password" autocomplete="new-password" />
+                           placeholder="Mật khẩu" autocomplete="new-password" />
                     <span asp-validation-for="Password" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
                     <input asp-for="ConfirmPassword" type="password" class="form-control" 
-                           placeholder="Confirm Password" autocomplete="new-password" />
+                           placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
                     <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
                 </div>
 
@@ -74,14 +74,14 @@
                     <input asp-for="AgreeToTerms" type="checkbox" class="form-check-input" id="agreeToTerms" value="true" />
                     <input name="AgreeToTerms" type="hidden" value="false" />
                     <label class="form-check-label small" for="agreeToTerms">
-                        I agree to the <a href="#" class="text-decoration-none" style="color: #dc3545;">Terms of Service</a> and <a href="#" class="text-decoration-none" style="color: #dc3545;">Privacy Policy</a>
+                        Tôi đồng ý với <a asp-controller="Legal" asp-action="Terms" class="text-decoration-none" style="color: #dc3545;">Điều khoản dịch vụ</a> và <a asp-controller="Legal" asp-action="Privacy" class="text-decoration-none" style="color: #dc3545;">Chính sách bảo mật</a>
                     </label>
                     <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
                 </div>
 
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
-                        SIGN UP
+                        ĐĂNG KÝ
                     </button>
                 </div>
             </form>
@@ -89,12 +89,12 @@
             <div class="text-center mt-3">
                 <p class="mb-2 text-muted small">
                     <i class="fas fa-heart text-danger me-1"></i>
-                    "Your single donation can save up to 3 lives"
+                    "Một lần hiến máu có thể cứu sống 3 người"
                 </p>
                 <p class="mb-0 text-muted">
-                    Already have an account? 
+                    Đã có tài khoản? 
                     <a asp-action="Login" class="text-decoration-none fw-bold" style="color: #dc3545;">
-                        Sign In
+                        Đăng nhập
                     </a>
                 </p>
             </div>
@@ -106,23 +106,11 @@
     <partial name="_ValidationScriptsPartial" />
     
     <script>
-        // Add form validation and debugging
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
             const submitBtn = document.querySelector('button[type="submit"]');
             
-            // Add form submission debugging
             form.addEventListener('submit', function(e) {
-                console.log('Form submitting...');
-                
-                // Debug: Log all form data
-                const formData = new FormData(form);
-                console.log('Form data:');
-                for (let [key, value] of formData.entries()) {
-                    console.log(key + ': ' + value);
-                }
-                
-                // Check if all required fields are filled (only essential registration fields)
                 const requiredFields = ['FullName', 'Email', 'Phone', 'Password', 'ConfirmPassword'];
                 const missingFields = [];
                 
@@ -133,28 +121,30 @@
                     }
                 });
                 
-                // Check terms agreement
                 const agreeToTermsCheckbox = document.querySelector('#agreeToTerms');
-                console.log('Checkbox checked:', agreeToTermsCheckbox.checked);
-                console.log('Checkbox value:', agreeToTermsCheckbox.value);
-                
                 if (!agreeToTermsCheckbox.checked) {
                     missingFields.push('AgreeToTerms');
                 }
                 
                 if (missingFields.length > 0) {
-                    console.log('Missing required fields:', missingFields);
                     e.preventDefault();
-                    alert('Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFields.join(', '));
+                    const fieldNames = {
+                        'FullName': 'Họ và tên',
+                        'Email': 'Email',
+                        'Phone': 'Số điện thoại',
+                        'Password': 'Mật khẩu',
+                        'ConfirmPassword': 'Xác nhận mật khẩu',
+                        'AgreeToTerms': 'Đồng ý điều khoản'
+                    };
+                    const missingFieldsVi = missingFields.map(field => fieldNames[field] || field);
+                    alert('Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFieldsVi.join(', '));
                     return false;
                 }
                 
-                // Disable submit button to prevent double submission
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = 'Đang đăng ký...';
             });
             
-            // Phone number formatting
             const phoneInput = document.querySelector('[name="Phone"]');
             if (phoneInput) {
                 phoneInput.addEventListener('input', function (e) {
