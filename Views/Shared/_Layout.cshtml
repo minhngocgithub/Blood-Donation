@@ -91,7 +91,7 @@
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="User" asp-action="Profile">
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
                                             <i class="fas fa-user me-2 text-primary"></i>Thông tin cá nhân
                                         </a>
                                     </li>
@@ -125,18 +125,11 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <div class="dropdown-item-group">
-                                            <!-- Quick Logout -->
                                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
                                                 <button type="submit" class="dropdown-item text-danger">
                                                     <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                                 </button>
                                             </form>
-                                            <!-- Alternative: Logout with confirmation page -->
-                                            <!--
-                                            <a class="dropdown-item text-danger" asp-controller="Account" asp-action="LogoutConfirmation">
-                                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
-                                            </a>
-                                            -->
                                         </div>
                                     </li>
                                 </ul>
