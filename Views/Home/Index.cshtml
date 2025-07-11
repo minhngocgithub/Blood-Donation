@@ -183,7 +183,8 @@
 </div>
 
 @section Scripts {
-<script>
+    @await Html.PartialAsync("_NotificationScripts")
+    <script>
     $(document).ready(function () {
         $.get('/BloodDonationEvent/GetTop3', function (events) {
             let html = '';
