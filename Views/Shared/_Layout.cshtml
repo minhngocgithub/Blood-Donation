@@ -19,7 +19,12 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/main-sections.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-pages.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/index-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
 
     <!-- Favicon -->
@@ -31,7 +36,7 @@
             <div class="container">
                 <!-- Brand -->
                 <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="./image/Logo.png" alt="Blood Donation Logo" height="40" class="me-2">
+                    <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="me-2 img-fluid" style="width:auto;max-width:60px;">
                     <span class="brand-text fw-bold text-danger">BloodLife</span>
                 </a>
 
@@ -69,6 +74,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Guide" ? "active" : "")"
+                               asp-controller="Home" asp-action="Guide">
+                                Hướng dẫn
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "FAQ" ? "active" : "")"
+                               asp-controller="Home" asp-action="FAQ">
+                                FAQ
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active" : "")"
                                asp-controller="Contact" asp-action="Index">
                                 Liên hệ
@@ -81,11 +98,10 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <div class="dropdown">
-                                <button class="btn btn-outline-danger dropdown-toggle d-flex align-items-center"
+                                <button class="btn btn-outline-danger dropdown-toggle d-flex align-items-center user-dropdown-btn"
                                         type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle me-2"></i>
-                                    <span class="d-none d-md-inline">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
-                                    <span class="d-md-none">Menu</span>
+                                    <span class="user-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                                     <li>
@@ -149,11 +165,11 @@
                             <div class="d-flex gap-2">
                                 <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Login">
                                     <i class="fas fa-sign-in-alt me-1"></i>
-                                    <span class="d-none d-sm-inline">Đăng nhập</span>
+                                    <span>Đăng nhập</span>
                                 </a>
                                 <a class="btn btn-danger" asp-controller="Account" asp-action="Register">
                                     <i class="fas fa-user-plus me-1"></i>
-                                    <span class="d-none d-sm-inline">Đăng ký</span>
+                                    <span>Đăng ký</span>
                                 </a>
                             </div>
                         }
@@ -235,11 +251,11 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h6 class="text-white mb-3 fw-bold">Hỗ trợ</h6>
                     <ul class="list-unstyled footer-links">
-                        <li><a href="#" class="text-muted text-decoration-none">Hướng dẫn hiến máu</a></li>
+                        <li><a asp-controller="Home" asp-action="Guide" class="text-muted text-decoration-none">Hướng dẫn hiến máu</a></li>
                         <li><a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Chính sách bảo mật</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Hotline: 1900-1234</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
+                        <li><a asp-controller="Home" asp-action="FAQ" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
+                        <li><a href="tel:1900-1234" class="text-muted text-decoration-none">Hotline: 1900-1234</a></li>
                     </ul>
                 </div>
 
@@ -303,8 +319,9 @@
 
     <!-- Custom Scripts -->
     <script>
-        // Back to top button
+        // Back to top button with improved animations
         let mybutton = document.getElementById("btn-back-to-top");
+        let isVisible = false;
 
         window.onscroll = function () {
             scrollFunction();
@@ -312,15 +329,31 @@
 
         function scrollFunction() {
             if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                mybutton.style.display = "block";
+                if (!isVisible) {
+                    mybutton.style.display = "flex";
+                    mybutton.classList.add("show");
+                    mybutton.classList.remove("hide");
+                    isVisible = true;
+                }
             } else {
-                mybutton.style.display = "none";
+                if (isVisible) {
+                    mybutton.classList.add("hide");
+                    mybutton.classList.remove("show");
+                    setTimeout(() => {
+                        if (!isVisible) return;
+                        mybutton.style.display = "none";
+                    }, 300);
+                    isVisible = false;
+                }
             }
         }
 
         mybutton.addEventListener("click", function () {
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
+            // Smooth scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
 
         // Auto-hide alerts
