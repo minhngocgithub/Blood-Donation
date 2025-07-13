@@ -1,0 +1,73 @@
+import React from 'react';
+
+const Terms: React.FC = () => {
+  return (
+    <main className="main-content py-5" style={{ paddingTop: '70px' }}>
+      <div className="container my-5">
+        <div className="row justify-content-center">
+          <div className="col-lg-10">
+            <div className="card shadow-sm">
+              <div className="card-body p-4">
+                <h1 className="text-center mb-4">Điều khoản dịch vụ</h1>
+                
+                <section className="mb-4">
+                  <h4>1. Giới thiệu</h4>
+                  <p>Chào mừng bạn đến với BloodLife - Hệ thống Hiến Máu Nhân Đạo. Bằng việc truy cập và sử dụng website của chúng tôi, bạn đồng ý tuân thủ và chịu ràng buộc bởi các điều khoản dưới đây.</p>
+                </section>
+
+                <section className="mb-4">
+                  <h4>2. Đăng ký tài khoản</h4>
+                  <p>Khi đăng ký tài khoản trên hệ thống, bạn cam kết rằng:</p>
+                  <ul>
+                    <li>Thông tin cung cấp là chính xác và trung thực</li>
+                    <li>Đủ 18 tuổi trở lên hoặc được sự đồng ý của người giám hộ</li>
+                    <li>Chịu trách nhiệm bảo mật thông tin tài khoản</li>
+                    <li>Không chia sẻ tài khoản cho người khác sử dụng</li>
+                  </ul>
+                </section>
+
+                <section className="mb-4">
+                  <h4>3. Quy định về hiến máu</h4>
+                  <p>Người tham gia hiến máu cần đảm bảo:</p>
+                  <ul>
+                    <li>Đủ điều kiện sức khỏe theo quy định của Bộ Y tế</li>
+                    <li>Tuân thủ các quy trình, hướng dẫn của nhân viên y tế</li>
+                    <li>Cung cấp thông tin sức khỏe trung thực</li>
+                    <li>Thực hiện đầy đủ các bước sàng lọc sức khỏe</li>
+                  </ul>
+                </section>
+
+                <section className="mb-4">
+                  <h4>4. Trách nhiệm của người dùng</h4>
+                  <ul>
+                    <li>Không sử dụng hệ thống cho mục đích bất hợp pháp</li>
+                    <li>Không gây rối hoặc phá hoại hệ thống</li>
+                    <li>Tôn trọng quyền riêng tư của người khác</li>
+                    <li>Không chia sẻ thông tin mật của người khác</li>
+                  </ul>
+                </section>
+
+                <section className="mb-4">
+                  <h4>5. Quyền của chúng tôi</h4>
+                  <p>BloodLife có quyền:</p>
+                  <ul>
+                    <li>Từ chối hoặc hủy bỏ tài khoản vi phạm điều khoản</li>
+                    <li>Thay đổi, cập nhật điều khoản khi cần thiết</li>
+                    <li>Bảo lưu quyền xử lý các vi phạm</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4>6. Cập nhật điều khoản</h4>
+                  <p>Chúng tôi có thể cập nhật điều khoản này theo thời gian. Mọi thay đổi sẽ được thông báo và có hiệu lực ngay sau khi được đăng tải.</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default Terms; 
