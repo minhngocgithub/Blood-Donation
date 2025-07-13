@@ -11,12 +11,16 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="~/favicon.ico">
@@ -38,7 +42,12 @@
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
     <script src="~/js/logout.js" asp-append-version="true"></script>
 
     <!-- Custom Scripts for Auth Pages -->
@@ -71,5 +80,8 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    
+    <!-- SweetAlert Notifications -->
+    @await Html.PartialAsync("_SweetAlertNotifications")
 </body>
 </html>
