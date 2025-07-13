@@ -42,7 +42,6 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<int> GetEligibleScreeningsCountAsync();
         Task<int> GetDisqualifiedScreeningsCountAsync();
         Task<int> GetScreeningsByDateAsync(DateTime date);
-        Task<int> GetScreeningsByScreenerAsync(int screenerId);
         
         // Screening search and filtering
         Task<IEnumerable<HealthScreeningDto>> SearchScreeningsAsync(string searchTerm);

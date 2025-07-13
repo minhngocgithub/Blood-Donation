@@ -137,7 +137,11 @@
                         'AgreeToTerms': 'Đồng ý điều khoản'
                     };
                     const missingFieldsVi = missingFields.map(field => fieldNames[field] || field);
-                    alert('Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFieldsVi.join(', '));
+                    
+                    showWarning(
+                        'Thông tin chưa đầy đủ',
+                        'Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFieldsVi.join(', ')
+                    );
                     return false;
                 }
                 
