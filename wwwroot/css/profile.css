@@ -2,6 +2,7 @@
     min-height: 100vh;
     background: linear-gradient(135deg, #fff5f5 0%, #fce7f3 100%);
     padding: 2rem 1rem;
+    margin: 20px;
 }
 
 .profile-wrapper {
