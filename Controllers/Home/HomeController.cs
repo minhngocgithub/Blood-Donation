@@ -2,7 +2,7 @@ using Blood_Donation_Website.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Blood_Donation_Website.Controllers
+namespace Blood_Donation_Website.Controllers.Home
 {
     public class HomeController : Controller
     {
@@ -18,7 +18,27 @@ namespace Blood_Donation_Website.Controllers
             return View();
         }
 
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        public IActionResult FAQ()
+        {
+            return View();
+        }
+
+        public IActionResult Guide()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult Terms()
         {
             return View();
         }
@@ -34,4 +54,4 @@ namespace Blood_Donation_Website.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
-}
+} 
