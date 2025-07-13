@@ -1,0 +1,336 @@
+@{
+    ViewData["Title"] = "SweetAlert Demo";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-magic me-2"></i>
+                        SweetAlert Demo - Hệ thống Hiến Máu
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Basic Alerts -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-bell text-primary me-2"></i>
+                                Thông báo cơ bản
+                            </h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" onclick="showSuccess('Hiến máu thành công!', 'Cảm ơn bạn đã cứu sống 3 người.')">
+                                    <i class="fas fa-check me-2"></i>Thành công
+                                </button>
+                                <button class="btn btn-danger" onclick="showError('Không thể hiến máu', 'Bạn chưa đủ điều kiện sức khỏe.')">
+                                    <i class="fas fa-times me-2"></i>Lỗi
+                                </button>
+                                <button class="btn btn-warning" onclick="showWarning('Cảnh báo', 'Bạn cần nghỉ ít nhất 3 tháng trước khi hiến máu tiếp.')">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo
+                                </button>
+                                <button class="btn btn-info" onclick="showInfo('Thông tin', 'Lần hiến máu tiếp theo: 15/10/2024')">
+                                    <i class="fas fa-info-circle me-2"></i>Thông tin
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation Dialogs -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-question-circle text-warning me-2"></i>
+                                Hộp thoại xác nhận
+                            </h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="confirmRegister()">
+                                    <i class="fas fa-user-plus me-2"></i>Xác nhận đăng ký
+                                </button>
+                                <button class="btn btn-danger" onclick="confirmDelete()">
+                                    <i class="fas fa-trash me-2"></i>Xác nhận xóa
+                                </button>
+                                <button class="btn btn-secondary" onclick="confirmLogout()">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Xác nhận đăng xuất
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Toast Notifications -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-bread-slice text-success me-2"></i>
+                                Toast Notifications
+                            </h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-success" onclick="showToast('success', 'Đăng ký sự kiện thành công!')">
+                                    Toast Thành công
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="showToast('error', 'Không thể kết nối máy chủ!')">
+                                    Toast Lỗi
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="showToast('warning', 'Thông tin chưa được lưu!', 5000)">
+                                    Toast Cảnh báo
+                                </button>
+                                <button class="btn btn-outline-info" onclick="showToast('info', 'Có 3 tin nhắn mới', 4000, 'bottom-end')">
+                                    Toast Thông tin (Bottom)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Features -->
+                        <div class="col-md-6 mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-cogs text-secondary me-2"></i>
+                                Tính năng nâng cao
+                            </h5>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="showInputDemo()">
+                                    <i class="fas fa-keyboard me-2"></i>Nhập liệu
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="showLoadingDemo()">
+                                    <i class="fas fa-spinner me-2"></i>Loading Demo
+                                </button>
+                                <button class="btn btn-outline-info" onclick="showProgressDemo()">
+                                    <i class="fas fa-tasks me-2"></i>Progress Bar
+                                </button>
+                                <button class="btn btn-outline-dark" onclick="showCustomHTML()">
+                                    <i class="fas fa-code me-2"></i>Custom HTML
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blood Donation Specific Examples -->
+                    <div class="mt-4 pt-4 border-top">
+                        <h5 class="mb-3">
+                            <i class="fas fa-tint text-danger me-2"></i>
+                            Ví dụ chuyên biệt cho Hiến máu
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-danger w-100" onclick="bloodDonationSuccess()">
+                                    Hiến máu thành công
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-warning w-100" onclick="healthCheckRequired()">
+                                    Cần kiểm tra sức khỏe
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-info w-100" onclick="appointmentReminder()">
+                                    Nhắc hẹn hiến máu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Confirmation examples
+        function confirmRegister() {
+            showConfirm(
+                'Xác nhận đăng ký hiến máu',
+                'Bạn có chắc chắn muốn đăng ký tham gia sự kiện hiến máu này không?',
+                'Có, đăng ký',
+                'Hủy bỏ',
+                'question'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showSuccess('Đăng ký thành công!', 'Chúng tôi sẽ liên hệ với bạn trước ngày sự kiện.');
+                }
+            });
+        }
+
+        function confirmDelete() {
+            showDeleteConfirm('thông tin người dùng này', 'Tất cả lịch sử hiến máu cũng sẽ bị xóa.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        showSuccess('Đã xóa thành công', 'Thông tin đã được xóa khỏi hệ thống.');
+                    }
+                });
+        }
+
+        function confirmLogout() {
+            showConfirm(
+                'Đăng xuất khỏi hệ thống',
+                'Bạn có chắc chắn muốn đăng xuất không?',
+                'Đăng xuất',
+                'Ở lại',
+                'warning'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading('Đang đăng xuất...', 'Vui lòng đợi');
+                    setTimeout(() => {
+                        hideLoading();
+                        showToast('success', 'Đã đăng xuất thành công!');
+                    }, 2000);
+                }
+            });
+        }
+
+        // Advanced features
+        function showInputDemo() {
+            showInputForm(
+                'Thêm ghi chú',
+                'Ghi chú cho lần hiến máu:',
+                'Nhập ghi chú của bạn...',
+                '',
+                'text'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showSuccess('Đã lưu ghi chú', `Ghi chú: "${result.value}"`);
+                }
+            });
+        }
+
+        function showLoadingDemo() {
+            showLoading('Đang xử lý yêu cầu', 'Vui lòng đợi trong giây lát...');
+            
+            setTimeout(() => {
+                hideLoading();
+                showSuccess('Hoàn thành', 'Yêu cầu đã được xử lý thành công!');
+            }, 3000);
+        }
+
+        function showProgressDemo() {
+            let progress = 0;
+            showProgress('Đang tải dữ liệu', progress);
+            
+            const interval = setInterval(() => {
+                progress += 10;
+                showProgress('Đang tải dữ liệu', progress);
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        hideLoading();
+                        showSuccess('Tải dữ liệu hoàn tất', 'Tất cả dữ liệu đã được tải thành công!');
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function showCustomHTML() {
+            const htmlContent = `
+                <div class="text-start">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-tint me-2"></i>
+                        <strong>Thông tin hiến máu</strong>
+                    </div>
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>Nhóm máu:</strong></td>
+                            <td>O+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lần cuối hiến:</strong></td>
+                            <td>15/07/2024</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tổng lần hiến:</strong></td>
+                            <td>5 lần</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tình trạng:</strong></td>
+                            <td><span class="badge bg-success">Đủ điều kiện</span></td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+            
+            showCustomHTML('Hồ sơ hiến máu', htmlContent, 'info');
+        }
+
+        // Blood donation specific examples
+        function bloodDonationSuccess() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Cảm ơn sự chia sẻ của bạn!',
+                html: `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-heart text-danger" style="font-size: 3rem;"></i>
+                        </div>
+                        <p class="mb-2">Bạn đã hiến <strong>450ml máu</strong></p>
+                        <p class="mb-3">Có thể cứu sống <strong>3 người</strong></p>
+                        <div class="alert alert-success">
+                            <small><i class="fas fa-calendar-alt me-1"></i>
+                            Lần hiến tiếp theo: <strong>15/01/2025</strong></small>
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'Tuyệt vời!',
+                customClass: {
+                    popup: 'swal-blood-theme'
+                }
+            });
+        }
+
+        function healthCheckRequired() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cần kiểm tra sức khỏe',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-3">Theo kết quả sàng lọc ban đầu, bạn cần thực hiện các kiểm tra bổ sung:</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Xét nghiệm máu tổng quát</li>
+                            <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Đo huyết áp</li>
+                            <li class="mb-2"><i class="fas fa-times-circle text-danger me-2"></i>Kiểm tra tim mạch</li>
+                        </ul>
+                        <div class="alert alert-info small mt-3">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Vui lòng liên hệ bác sĩ để được tư vấn chi tiết.
+                        </div>
+                    </div>
+                `,
+                confirmButtonText: 'Tôi hiểu rồi',
+                showCancelButton: true,
+                cancelButtonText: 'Liên hệ bác sĩ'
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    showInfo('Liên hệ bác sĩ', 'Hotline: 1900-1234\nEmail: bacsi@hienmau.vn');
+                }
+            });
+        }
+
+        function appointmentReminder() {
+            Swal.fire({
+                icon: 'info',
+                title: 'Nhắc nhở hiến máu',
+                html: `
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-check text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <p class="mb-2">Đã đến lúc bạn có thể hiến máu trở lại!</p>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Sự kiện sắp tới</h6>
+                                <p class="card-text mb-1">
+                                    <strong>Ngày hiến máu nhân đạo</strong><br>
+                                    <i class="fas fa-calendar me-1"></i>20/08/2024<br>
+                                    <i class="fas fa-map-marker-alt me-1"></i>Trung tâm Y tế Quận 1
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-calendar-plus me-1"></i>Đăng ký ngay',
+                cancelButtonText: 'Để sau',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showSuccess('Đăng ký thành công!', 'Chúng tôi sẽ gửi thông tin chi tiết qua email.');
+                }
+            });
+        }
+    </script>
+}
