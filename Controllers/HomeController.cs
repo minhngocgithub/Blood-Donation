@@ -23,6 +23,11 @@ namespace Blood_Donation_Website.Controllers
             return View();
         }
 
+        public IActionResult SweetAlertDemo()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
