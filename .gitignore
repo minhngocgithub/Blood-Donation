@@ -505,6 +505,7 @@ Thumbs.db
 *.sqlite3
 
 # Configuration files with sensitive data
+appsettings.Development.json
 appsettings.Production.json
 connectionstrings.json
 secrets.json
