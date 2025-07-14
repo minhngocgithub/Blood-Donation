@@ -200,12 +200,12 @@
 
         function showProgressDemo() {
             let progress = 0;
-            showProgress('Đang tải dữ liệu', progress);
-            
+            showProgress('Đang tải dữ liệu');
+
             const interval = setInterval(() => {
                 progress += 10;
-                showProgress('Đang tải dữ liệu', progress);
-                
+                updateProgress(progress);
+
                 if (progress >= 100) {
                     clearInterval(interval);
                     setTimeout(() => {
@@ -312,7 +312,7 @@
                         <p class="mb-2">Đã đến lúc bạn có thể hiến máu trở lại!</p>
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h6 class="card-title">Sự kiện sắp tới</h6>
+                                <h6 class="card-title text-center-block">Sự kiện sắp tới</h6>
                                 <p class="card-text mb-1">
                                     <strong>Ngày hiến máu nhân đạo</strong><br>
                                     <i class="fas fa-calendar me-1"></i>20/08/2024<br>

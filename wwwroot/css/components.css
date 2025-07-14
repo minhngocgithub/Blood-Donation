@@ -94,7 +94,6 @@
 
 /* User Dropdown Alignment */
 .navbar .d-flex {
-    align-items: flex-start !important;
     height: auto;
     margin-top: 8px;
 }
@@ -113,7 +112,7 @@
     box-shadow: none;
 }
 
-/* Auth buttons specific styles */
+/* Auth buttons specific styles aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/ 
 .navbar .btn {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
@@ -681,4 +680,32 @@
     .btn-floating i {
         font-size: 0.9rem;
     }
+}
+
+/*Other Custom*/
+.about-page .mb-3 {
+    text-align: center;
+}
+
+.events-section .event-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.events-section .event-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.events-section .event-content p.event-description {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.events-section .event-content .btn {
+    margin-top: auto;
 }
