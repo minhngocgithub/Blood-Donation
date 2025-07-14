@@ -112,7 +112,7 @@
     box-shadow: none;
 }
 
-/* Auth buttons specific styles aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/ 
+/* Auth buttons specific styles*/ 
 .navbar .btn {
     font-size: 0.9rem;
     padding: 0.5rem 1rem;
@@ -194,6 +194,7 @@
 
 .btn-outline-primary:hover {
     background: #dc3545;
+    border-color: #dc3545;
     color: white;
     transform: translateY(-2px);
 }
@@ -708,4 +709,8 @@
 
 .events-section .event-content .btn {
     margin-top: auto;
+}
+
+.cta-section .btn-light:hover {
+    color:#dc3545
 }

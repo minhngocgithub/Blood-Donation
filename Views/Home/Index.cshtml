@@ -17,11 +17,32 @@
                             Mỗi giọt máu bạn hiến tặng có thể cứu sống đến 3 người.
                             Hãy cùng chúng tôi lan tỏa tình yêu thương và cứu sống những sinh mạng quý giá.
                         </p>
+                        @* Hero Actions *@
                         <div class="hero-actions">
-                            <a href="/events" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-calendar-plus me-2"></i>
-                                Đăng ký hiến máu
-                            </a>
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a href="/events" class="btn btn-primary btn-lg me-3">
+                                    <i class="fas fa-calendar-plus me-2"></i>
+                                    Đăng ký hiến máu
+                                </a>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-primary btn-lg me-3" id="btnRegisterEvent">
+                                    <i class="fas fa-calendar-plus me-2"></i>
+                                    Đăng ký hiến máu
+                                </button>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        var btn = document.getElementById('btnRegisterEvent');
+                                        if (btn) {
+                                            btn.addEventListener('click', function () {
+                                                showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký hiến máu!');
+                                            });
+                                        }
+                                    });
+                                </script>
+                            }
                             <a href="/Home/About" class="btn btn-outline-primary btn-lg">
                                 <i class="fas fa-info-circle me-2"></i>
                                 Tìm hiểu thêm
@@ -31,7 +52,8 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="hero-image">
-                        <img src="./image/Van-dong-hien-mau-tinh-nguyen.png" alt="Blood Donation" class="img-fluid rounded-3 shadow-lg">
+                        <img src="./image/Van-dong-hien-mau-tinh-nguyen.png" alt="Blood Donation"
+                            class="img-fluid rounded-3 shadow-lg">
                     </div>
                 </div>
             </div>
@@ -252,15 +274,27 @@
             <div class="col-lg-8">
                 <h3 class="cta-title mb-3">Sẵn sàng trở thành người hùng?</h3>
                 <p class="cta-description mb-0">
-                    Đăng ký ngay hôm nay để tham gia vào cộng đồng những người hiến máu tình nguyện và cứu sống những sinh mạng quý giá.
+                    Đăng ký ngay hôm nay để tham gia vào cộng đồng những người hiến máu tình nguyện và cứu sống những
+                    sinh mạng quý giá.
                 </p>
             </div>
             <div class="col-lg-4 text-lg-end">
-                <a href="/account/register" class="btn btn-light btn-lg">
+                <button type="button" class="btn btn-light btn-lg" id="btnScrollToTop">
                     <i class="fas fa-user-plus me-2"></i>
                     Đăng ký ngay
-                </a>
+                </button>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('btnScrollToTop');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    });
+</script>
