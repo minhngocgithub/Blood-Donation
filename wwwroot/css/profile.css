@@ -65,12 +65,17 @@
 }
 
 .card-title {
-    display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
+}
+
+.text-center-block {
+    text-align: center;
+    display: block;
+    width: 100%;
 }
 
 .card-icon {

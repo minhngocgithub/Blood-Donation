@@ -1,0 +1,128 @@
+/* Guide Page Specific Styles */
+
+/* Guide Step Cards */
+.guide-page .guide-step-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.guide-page .guide-step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.guide-page .guide-step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #dc3545;
+    color: white;
+    font-weight: 700;
+    border-radius: 50%;
+    font-size: 1.2rem;
+}
+
+/* Important Notes Section */
+.guide-page .card {
+    transition: all 0.3s ease;
+}
+
+.guide-page .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.guide-page ul {
+    padding-left: 1.2rem;
+}
+
+.guide-page ul li {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+/* CTA Section Override for Guide Page */
+.guide-page .cta-section {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-radius: 15px;
+    margin: 3rem 0;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+}
+
+.guide-page .cta-section h4,
+.guide-page .cta-section p {
+    color: white;
+    position: relative;
+    z-index: 2;
+}
+
+.guide-page .cta-section .btn-danger {
+    position: relative;
+    z-index: 2;
+    background-color: white;
+    color: #dc3545;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.guide-page .cta-section .btn-danger:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Blood Drop Animation in Background */
+.guide-page .cta-section::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50% 50% 50% 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg);
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .guide-page .guide-step-card {
+        padding: 1.25rem;
+    }
+    
+    .guide-page .guide-step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .guide-page .cta-section {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .guide-page .guide-step-card {
+        padding: 1rem;
+    }
+    
+    .guide-page .guide-step-number {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+    
+    .guide-page .cta-section {
+        padding: 1.5rem;
+    }
+}

@@ -9,9 +9,9 @@ const defaultSwalConfig = {
         confirmButton: 'btn btn-primary me-2',
         cancelButton: 'btn btn-secondary',
         denyButton: 'btn btn-danger',
-        popup: 'swal-popup',
-        title: 'swal-title',
-        content: 'swal-content'
+        popup: 'swal2-popup',
+        title: 'swal2-title',
+        'html-container': 'swal2-html-container'
     },
     buttonsStyling: false,
     showCloseButton: true,
@@ -249,22 +249,31 @@ function showCustomHTML(title, html, icon = null) {
 /**
  * Hiển thị progress bar
  * @param {string} title - Tiêu đề
- * @param {number} progress - Phần trăm tiến trình (0-100)
  */
-function showProgress(title, progress = 0) {
-    return Swal.fire({
+function showProgress(title) {
+    Swal.fire({
         title: title,
         html: `
             <div class="progress mb-3">
-                <div class="progress-bar bg-primary" role="progressbar" 
-                     style="width: ${progress}%" aria-valuenow="${progress}" 
-                     aria-valuemin="0" aria-valuemax="100">${progress}%</div>
+                <div class="progress-bar bg-primary" id="progress-bar"
+                     role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100">
+                    0%
+                </div>
             </div>
         `,
         showConfirmButton: false,
         allowOutsideClick: false,
         allowEscapeKey: false
     });
+}
+
+function updateProgress(value) {
+    const bar = document.getElementById('progress-bar');
+    if (bar) {
+        bar.style.width = `${value}%`;
+        bar.setAttribute('aria-valuenow', value);
+        bar.innerText = `${value}%`;
+    }
 }
 
 // Xuất các functions để sử dụng global
@@ -280,3 +289,4 @@ window.hideLoading = hideLoading;
 window.showInputForm = showInputForm;
 window.showCustomHTML = showCustomHTML;
 window.showProgress = showProgress;
+window.updateProgress = updateProgress;
