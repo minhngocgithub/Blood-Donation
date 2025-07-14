@@ -1,0 +1,91 @@
+/* About Page Specific Styles */
+
+/* Core Values Section */
+.about-page .values-section .rounded-circle {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    transition: all 0.3s ease;
+}
+
+.about-page .values-section .rounded-circle:hover {
+    background-color: #dc3545;
+    color: white;
+    transform: translateY(-5px);
+}
+
+/* Stats Display */
+.about-page .stats-display {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.about-page .stats-display .h3 {
+    color: #dc3545;
+}
+
+/* Team Section */
+.about-page .team-section .rounded-circle {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    margin-bottom: 1.5rem;
+}
+
+/* CTA Section Override for About Page */
+.about-page .cta-section {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-radius: 15px;
+    margin: 3rem 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
+}
+
+.about-page .cta-section h3,
+.about-page .cta-section p {
+    color: white;
+    position: relative;
+    z-index: 2;
+}
+
+.about-page .cta-section .btn-outline-danger {
+    border-color: rgb(255, 255, 255);
+    color: white;
+}
+
+.about-page .cta-section .btn-outline-danger:hover {
+    background-color: white;
+    color: #dc3545;
+}
+
+.about-page .cta-section .btn-danger {
+    border-color: rgb(255, 255, 255);
+    color: white;
+}
+
+.about-page .cta-section .btn-danger:hover {
+    background-color: white;
+    color: #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .about-page .cta-section {
+        padding: 2rem;
+    }
+    
+    .about-page .values-section .rounded-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .about-page .team-section .rounded-circle {
+        width: 60px;
+        height: 60px;
+    }
+}

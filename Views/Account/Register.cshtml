@@ -11,7 +11,7 @@
             <div class="auth-card-header">
                 <h1 class="auth-card-title">Tham Gia Cùng Chúng Tôi</h1>
                 <p class="auth-card-subtitle">Mỗi giọt máu đều quý giá - Chung tay cứu sống nhiều người</p>
-                <p class="text-muted small mb-0">
+                <p class="text-dark small mb-0">
                     <i class="fas fa-info-circle"></i>
                     Đăng ký nhanh - Hoàn thiện hồ sơ sau
                 </p>
@@ -74,7 +74,7 @@
                     <input asp-for="AgreeToTerms" type="checkbox" class="form-check-input" id="agreeToTerms" value="true" />
                     <input name="AgreeToTerms" type="hidden" value="false" />
                     <label class="form-check-label small" for="agreeToTerms">
-                        Tôi đồng ý với <a asp-controller="Legal" asp-action="Terms" class="text-decoration-none" style="color: #dc3545;">Điều khoản dịch vụ</a> và <a asp-controller="Legal" asp-action="Privacy" class="text-decoration-none" style="color: #dc3545;">Chính sách bảo mật</a>
+                        Tôi đồng ý với <a asp-controller="Home" asp-action="Terms" class="text-decoration-none" style="color: #dc3545;" target="_blank">Điều khoản dịch vụ</a> và <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none" style="color: #dc3545;" target="_blank">Chính sách bảo mật</a>
                     </label>
                     <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
                 </div>
@@ -87,11 +87,11 @@
             </form>
 
             <div class="text-center mt-3">
-                <p class="mb-2 text-muted small">
+                <p class="mb-2 text-dark small">
                     <i class="fas fa-heart text-danger me-1"></i>
                     "Một lần hiến máu có thể cứu sống 3 người"
                 </p>
-                <p class="mb-0 text-muted">
+                <p class="mb-0 text-dark">
                     Đã có tài khoản? 
                     <a asp-action="Login" class="text-decoration-none fw-bold" style="color: #dc3545;">
                         Đăng nhập
@@ -137,7 +137,11 @@
                         'AgreeToTerms': 'Đồng ý điều khoản'
                     };
                     const missingFieldsVi = missingFields.map(field => fieldNames[field] || field);
-                    alert('Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFieldsVi.join(', '));
+                    
+                    showWarning(
+                        'Thông tin chưa đầy đủ',
+                        'Vui lòng điền đầy đủ các trường bắt buộc: ' + missingFieldsVi.join(', ')
+                    );
                     return false;
                 }
                 

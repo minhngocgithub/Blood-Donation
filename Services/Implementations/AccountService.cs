@@ -231,7 +231,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
             return new UserDto
             {
-                Id = user.UserId,
+                UserId = user.UserId,
                 Username = user.Username,
                 Email = user.Email,
                 FullName = user.FullName,
@@ -320,7 +320,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
             return users.Select(u => new UserDto
             {
-                Id = u.UserId,
+                UserId = u.UserId,
                 Username = u.Username,
                 Email = u.Email,
                 FullName = u.FullName,
