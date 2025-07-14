@@ -29,9 +29,9 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/account/login";
-        options.LogoutPath = "/account/logout";
-        options.AccessDeniedPath = "/account/AccessDenied";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
