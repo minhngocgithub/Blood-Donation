@@ -201,21 +201,28 @@ function setupSessionTimeout() {
     if (!isAuthenticated) return;
     
     sessionTimeoutWarning = setTimeout(() => {
-        const continueSession = confirm(
-            'Phiên đăng nhập của bạn sắp hết hạn.\n\n' +
-            'Bấm "OK" để tiếp tục sử dụng hoặc "Cancel" để đăng xuất.'
-        );
-        
-        if (continueSession) {
-            setupSessionTimeout();
-            fetch('/account/ping', { method: 'POST' }).catch(() => {});
-        } else {
-            LogoutUtils.quickLogout();
-        }
+        showConfirm(
+            'Phiên đăng nhập sắp hết hạn',
+            'Phiên đăng nhập của bạn sắp hết hạn. Bạn có muốn tiếp tục sử dụng không?',
+            'Có, tiếp tục',
+            'Đăng xuất',
+            'warning'
+        ).then((result) => {
+            if (result.isConfirmed) {
+                setupSessionTimeout();
+                fetch('/account/ping', { method: 'POST' }).catch(() => {});
+                showToast('success', 'Phiên đăng nhập đã được gia hạn');
+            } else {
+                LogoutUtils.quickLogout();
+            }
+        });
     }, 25 * 60 * 1000);
     
     sessionTimeoutTimer = setTimeout(() => {
-        LogoutUtils.showNotification('Phiên đăng nhập đã hết hạn. Bạn sẽ được đăng xuất tự động.', 'warning');
+        showWarning(
+            'Phiên đăng nhập đã hết hạn', 
+            'Bạn sẽ được đăng xuất tự động sau 3 giây.'
+        );
         setTimeout(() => {
             LogoutUtils.quickLogout();
         }, 3000);

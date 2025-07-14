@@ -4,7 +4,6 @@
     padding: 0;
     background: linear-gradient(135deg, #dc3545 0%, #c82333 50%, #a71e2a 100%);
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
     position: relative;
     overflow-x: hidden;
 }
@@ -31,103 +30,6 @@
     margin: 0;
 }
 
-.auth-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 50%, #a71e2a 100%);
-    position: relative;
-    z-index: 1;
-}
-
-.auth-left {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-    .auth-left::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("/images/blood-donation-bg.jpg") center / cover;
-        opacity: 0.1;
-    }
-
-.auth-branding {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 2rem;
-    text-align: center;
-}
-
-.auth-branding h1 {
-    color: white;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-.auth-branding p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-    max-width: 300px;
-    line-height: 1.6;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-}
-
-.auth-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.auth-form-container {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.auth-form .card {
-    border-radius: 1rem;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-}
-
-.form-control-lg {
-    border-radius: 0.5rem;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
-}
-
-    .form-control-lg:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    }
-
 .btn-danger {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
     border: none;
@@ -135,10 +37,10 @@
     transition: all 0.3s ease;
 }
 
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-    }
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
 
 .password-strength {
     margin-top: 0.25rem;
@@ -289,38 +191,6 @@
     box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
 }
 
-/* Blood Drop Animation */
-.blood-drop {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: rgba(220, 53, 69, 0.3);
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    animation: dropfall 4s infinite linear;
-}
-
-.blood-drop:nth-child(1) { left: 10%; animation-delay: 0s; }
-.blood-drop:nth-child(2) { left: 20%; animation-delay: 0.5s; }
-.blood-drop:nth-child(3) { left: 30%; animation-delay: 1s; }
-.blood-drop:nth-child(4) { left: 40%; animation-delay: 1.5s; }
-.blood-drop:nth-child(5) { left: 50%; animation-delay: 2s; }
-.blood-drop:nth-child(6) { left: 60%; animation-delay: 2.5s; }
-.blood-drop:nth-child(7) { left: 70%; animation-delay: 3s; }
-.blood-drop:nth-child(8) { left: 80%; animation-delay: 3.5s; }
-.blood-drop:nth-child(9) { left: 90%; animation-delay: 4s; }
-
-@keyframes dropfall {
-    0% {
-        top: -10px;
-        opacity: 1;
-    }
-    100% {
-        top: 100vh;
-        opacity: 0;
-    }
-}
-
 /* Motivational Quote Styling */
 .motivation-quote {
     background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(200, 35, 51, 0.1) 100%);
@@ -332,16 +202,30 @@
     color: #6c757d;
 }
 
+/* Auth Layout Navigation Button */
+.auth-main .btn-outline-light {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    border-width: 2px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.auth-main .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.8);
+    transform: translateY(-1px);
+}
+
+.auth-main .btn-outline-light i {
+    font-size: 0.8rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 991.98px) {
-    .auth-form-container {
-        padding: 1rem;
-    }
-
-    .auth-form .card-body {
-        padding: 2rem !important;
-    }
-    
     .auth-card-container {
         padding: 1rem;
     }
@@ -352,15 +236,24 @@
 }
 
 @media (max-width: 575.98px) {
-    .auth-form .card-body {
-        padding: 1.5rem !important;
-    }
-    
     .auth-card-body {
         padding: 1.5rem 1rem;
     }
     
     .auth-card-title {
         font-size: 1.5rem;
+    }
+    
+    .auth-main .btn-outline-light {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .auth-main .btn-outline-light span {
+        font-size: 0.75rem;
+    }
+    
+    .auth-main .btn-outline-light i {
+        font-size: 0.75rem;
     }
 }
