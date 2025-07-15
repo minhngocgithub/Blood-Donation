@@ -110,6 +110,36 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 
 ---
 
+## Kiến trúc dự án
+
+Dự án được phát triển theo mô hình kiến trúc MVC (Model-View-Controller) với nhiều lớp rõ ràng:
+
+### Lớp trình bày (Presentation Layer)
+- **Controllers**: Xử lý yêu cầu HTTP, điều phối luồng dữ liệu, gọi services
+- **Views**: Hiển thị giao diện người dùng bằng Razor Pages
+
+### Lớp dịch vụ (Service Layer)
+- **Interfaces**: Định nghĩa hợp đồng cho các dịch vụ
+- **Implementations**: Triển khai logic nghiệp vụ của ứng dụng
+
+### Lớp truy cập dữ liệu (Data Access Layer)
+- **ApplicationDbContext**: Quản lý kết nối database, định nghĩa DbSets
+- **Configurations**: Cấu hình Entity Framework cho các entities
+- **Seeders**: Khởi tạo dữ liệu mẫu
+
+### Lớp mô hình (Model Layer)
+- **Entities**: Định nghĩa cấu trúc dữ liệu và quan hệ
+- **DTOs**: Đối tượng chuyển dữ liệu giữa các lớp
+- **ViewModels**: Mô hình dữ liệu dành riêng cho views
+
+### Tiện ích (Utilities)
+- **Extensions**: Các phương thức mở rộng
+- **Filters**: Bộ lọc cho các controller
+
+Chi tiết kiến trúc dự án có thể xem tại [PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md).
+
+---
+
 ## Hướng dẫn cài đặt & khởi động
 
 1. **Yêu cầu hệ thống:**
@@ -149,6 +179,8 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 **Tài liệu tham khảo:**  
 - [DATABASE.md](docs/DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu  
 - [DESCRIPTION.md](docs/DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống  
+- [PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md) – Kiến trúc dự án & vai trò các thành phần  
+- [APPLICATION_WORKFLOW.md](docs/APPLICATION_WORKFLOW.md) – Luồng hoạt động chi tiết của ứng dụng  
 - [docs/](docs/) – Hướng dẫn chi tiết về các thành phần hệ thống
 
 ---
