@@ -1,0 +1,255 @@
+/* Privacy Page Styles */
+.privacy-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+    padding-top: 70px;
+}
+
+.privacy-page .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.privacy-page .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.75rem;
+}
+
+.privacy-page .justify-content-center {
+    justify-content: center;
+}
+
+.privacy-page .col-lg-10 {
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+    padding: 0 0.75rem;
+}
+
+.privacy-page .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.privacy-page .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.privacy-page .card-body {
+    padding: 2rem;
+}
+
+.privacy-page .p-4 {
+    padding: 1.5rem !important;
+}
+
+.privacy-page h1 {
+    color: #2c3e50;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.privacy-page h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    border-radius: 2px;
+}
+
+.privacy-page h4 {
+    color: #34495e;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.privacy-page h4 i {
+    color: #e74c3c;
+    font-size: 1.1rem;
+}
+
+.privacy-page .text-primary {
+    color: #e74c3c !important;
+}
+
+.privacy-page .me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.privacy-page section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #e74c3c;
+    transition: all 0.3s ease;
+}
+
+.privacy-page section:hover {
+    background: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.privacy-page section:last-child {
+    margin-bottom: 0;
+}
+
+.privacy-page p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.privacy-page ul {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1rem;
+}
+
+.privacy-page ul li {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+}
+
+.privacy-page ul li::before {
+    content: '\2022';
+    color: #e74c3c;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.privacy-page .text-center {
+    text-align: center;
+}
+
+.privacy-page .mt-5 {
+    margin-top: 3rem !important;
+}
+
+.privacy-page .alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.privacy-page .alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+}
+
+.privacy-page .alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+.privacy-page .alert strong {
+    font-weight: 600;
+}
+
+.privacy-page .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 0.75rem;
+}
+
+.privacy-page .row .col-md-6 ul {
+    margin-bottom: 0;
+}
+
+.privacy-page .row .col-md-6 ul li {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.privacy-page .row .col-md-6 ul li i {
+    color: #e74c3c;
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .privacy-page .col-lg-10 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .privacy-page .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-page h1 {
+        font-size: 2rem;
+    }
+    
+    .privacy-page .card-body {
+        padding: 1.5rem;
+    }
+    
+    .privacy-page .p-4 {
+        padding: 1rem !important;
+    }
+    
+    .privacy-page section {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .privacy-page {
+        padding: 1rem 0;
+    }
+    
+    .privacy-page h1 {
+        font-size: 1.75rem;
+    }
+    
+    .privacy-page h4 {
+        font-size: 1.1rem;
+    }
+    
+    .privacy-page .card-body {
+        padding: 1rem;
+    }
+    
+    .privacy-page section {
+        padding: 0.75rem;
+    }
+} 
