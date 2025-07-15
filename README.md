@@ -147,8 +147,8 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 ---
 
 **Tài liệu tham khảo:**  
-- [DATABASE.md](DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu  
-- [DESCRIPTION.md](DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống  
+- [DATABASE.md](docs/DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu  
+- [DESCRIPTION.md](docs/DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống  
 - [docs/](docs/) – Hướng dẫn chi tiết về các thành phần hệ thống
 
 ---
