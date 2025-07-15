@@ -31,7 +31,9 @@ namespace Blood_Donation_Website.Models.ViewModels.Account
         [DataType(DataType.Password)]
         [Display(Name = "Xác nhận mật khẩu")]
         [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp")]
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
         public string ConfirmPassword { get; set; } = string.Empty;
+        
 
         [Required]
         [Display(Name = "Đồng ý với điều khoản")]
