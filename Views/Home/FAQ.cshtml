@@ -2,115 +2,119 @@
     ViewData["Title"] = "Câu hỏi thường gặp";
 }
 
-<main class="main-content faq-page">
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h1 class="text-center mb-5">Câu hỏi thường gặp</h1>
-                        
-                        <div class="accordion faq-accordion" id="faqAccordion">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading1">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
-                                        Tôi cần chuẩn bị gì trước khi hiến máu?
-                                    </button>
-                                </h2>
-                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Trước khi hiến máu, bạn nên ăn nhẹ, tránh đồ ăn nhiều dầu mỡ. Ngủ đủ giấc và mang theo giấy tờ tùy thân.
+<link href="~/css/faq-page.css" rel="stylesheet" />
+
+<div class="faq-page">
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h1 class="text-center mb-5">Câu hỏi thường gặp</h1>
+                            
+                            <div class="accordion faq-accordion" id="faqAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading1">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                            Tôi cần chuẩn bị gì trước khi hiến máu?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="heading1" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Trước khi hiến máu, bạn nên ăn nhẹ, tránh đồ ăn nhiều dầu mỡ. Ngủ đủ giấc và mang theo giấy tờ tùy thân.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading2">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
-                                        Tôi có thể hiến máu bao nhiêu lần trong năm?
-                                    </button>
-                                </h2>
-                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Nam giới có thể hiến máu mỗi 3 tháng, nữ giới mỗi 4 tháng. Tổng cộng khoảng 3-4 lần/năm.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading2">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                            Tôi có thể hiến máu bao nhiêu lần trong năm?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="heading2" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Nam giới có thể hiến máu mỗi 3 tháng, nữ giới mỗi 4 tháng. Tổng cộng khoảng 3-4 lần/năm.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading3">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
-                                        Hiến máu có ảnh hưởng đến sức khỏe không?
-                                    </button>
-                                </h2>
-                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Không. Cơ thể sẽ nhanh chóng tái tạo lượng máu đã hiến. Hiến máu đều đặn còn tốt cho sức khỏe tim mạch.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading3">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                            Hiến máu có ảnh hưởng đến sức khỏe không?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="heading3" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Không. Cơ thể sẽ nhanh chóng tái tạo lượng máu đã hiến. Hiến máu đều đặn còn tốt cho sức khỏe tim mạch.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading4">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
-                                        Ai không nên hiến máu?
-                                    </button>
-                                </h2>
-                                <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Những người đang mắc bệnh, thiếu máu, huyết áp không ổn định, hoặc mới xăm hình/đi nước ngoài cần tạm hoãn.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading4">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                                            Ai không nên hiến máu?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="heading4" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Những người đang mắc bệnh, thiếu máu, huyết áp không ổn định, hoặc mới xăm hình/đi nước ngoài cần tạm hoãn.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading5">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
-                                        Tôi có được nhận giấy chứng nhận hay quà sau khi hiến máu không?
-                                    </button>
-                                </h2>
-                                <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Có. Bạn sẽ nhận được giấy chứng nhận hiến máu và có thể nhận quà tặng như áo, sữa, túi y tế nhỏ v.v.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading5">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                                            Tôi có được nhận giấy chứng nhận hay quà sau khi hiến máu không?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="heading5" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Có. Bạn sẽ nhận được giấy chứng nhận hiến máu và có thể nhận quà tặng như áo, sữa, túi y tế nhỏ v.v.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading6">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
-                                        Quy trình hiến máu diễn ra như thế nào?
-                                    </button>
-                                </h2>
-                                <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="heading6" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Quy trình bao gồm: đăng ký, khai báo y tế, kiểm tra sức khỏe, hiến máu, nghỉ ngơi và nhận giấy chứng nhận.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading6">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                                            Quy trình hiến máu diễn ra như thế nào?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="heading6" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Quy trình bao gồm: đăng ký, khai báo y tế, kiểm tra sức khỏe, hiến máu, nghỉ ngơi và nhận giấy chứng nhận.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading7">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
-                                        Tôi có thể hiến máu ở đâu?
-                                    </button>
-                                </h2>
-                                <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Bạn có thể hiến máu tại các trung tâm hiến máu, bệnh viện, hoặc các sự kiện hiến máu được tổ chức định kỳ.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading7">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                                            Tôi có thể hiến máu ở đâu?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="heading7" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Bạn có thể hiến máu tại các trung tâm hiến máu, bệnh viện, hoặc các sự kiện hiến máu được tổ chức định kỳ.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading8">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
-                                        Sau khi hiến máu tôi cần làm gì?
-                                    </button>
-                                </h2>
-                                <div id="collapse8" class="accordion-collapse collapse" aria-labelledby="heading8" data-bs-parent="#faqAccordion">
-                                    <div class="accordion-body">
-                                        Nghỉ ngơi tại chỗ 10-15 phút, uống nhiều nước, tránh vận động mạnh trong 24 giờ đầu, và ăn uống đầy đủ.
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading8">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8" aria-expanded="false" aria-controls="collapse8">
+                                            Sau khi hiến máu tôi cần làm gì?
+                                        </button>
+                                    </h2>
+                                    <div id="collapse8" class="accordion-collapse collapse" aria-labelledby="heading8" data-bs-parent="#faqAccordion">
+                                        <div class="accordion-body">
+                                            Nghỉ ngơi tại chỗ 10-15 phút, uống nhiều nước, tránh vận động mạnh trong 24 giờ đầu, và ăn uống đầy đủ.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -119,5 +123,5 @@
                 </div>
             </div>
         </div>
-    </div>
-</main> 
+    </main>
+</div> 

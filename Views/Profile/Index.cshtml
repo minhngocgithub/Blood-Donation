@@ -3,9 +3,9 @@
     ViewData["Title"] = "Thông Tin Cá Nhân";
 }
 
-<link href="~/css/profile.css" rel="stylesheet" />
+<link href="~/css/profile-page.css" rel="stylesheet" />
 
-<div class="profile-container">
+<div class="profile-page">
     <div class="profile-wrapper">
         <!-- Header -->
         <div class="profile-header">
@@ -18,23 +18,23 @@
 
         @if (TempData["SuccessMessage"] != null)
         {
-            <div class="alert alert-success mb-4">
-                <i class="fas fa-check-circle mr-2"></i>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle alert-icon"></i>
                 @TempData["SuccessMessage"]
             </div>
         }
 
         @if (TempData["ErrorMessage"] != null)
         {
-            <div class="alert alert-danger mb-4">
-                <i class="fas fa-exclamation-circle mr-2"></i>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle alert-icon"></i>
                 @TempData["ErrorMessage"]
             </div>
         }
 
         <form asp-action="UpdateProfile" method="post" class="profile-form">
             @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
             
             <div class="form-grid">
                 <!-- Personal Information Card -->

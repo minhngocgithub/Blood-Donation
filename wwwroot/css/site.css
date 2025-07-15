@@ -2,15 +2,16 @@
 /* ============= */
 
 :root {
-    --primary-color: #dc3545;
+    --primary-color: #e74c3c;
     --secondary-color: #6c757d;
     --success-color: #28a745;
     --info-color: #17a2b8;
     --warning-color: #ffc107;
-    --danger-color: #dc3545;
+    --danger-color: #e74c3c;
     --light-color: #f8f9fa;
     --dark-color: #343a40;
     --font-family: "Inter", sans-serif;
+    --navbar-height: 70px;
 }
 
 * {
@@ -158,12 +159,12 @@ img {
 }
 
 .text-muted {
-    color: #ffffff !important;
+    color: #6c757d !important;
 }
 
 .footer-links .text-muted:hover,
 a.text-muted:hover {
-    color: #ff0000 !important;
+    color: #e74c3c !important;
     transition: color 0.3s ease;
 }
 
@@ -296,6 +297,17 @@ a.text-muted:hover {
 .shadow-sm { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important; }
 .shadow-lg { box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important; }
 .shadow-none { box-shadow: none !important; }
+
+/* Layout & Structure */
+.main-content {
+    padding-top: var(--navbar-height); /* Đảm bảo tất cả nội dung đều cách navbar */
+}
+
+@media (max-width: 768px) {
+    :root {
+        --navbar-height: 60px; /* Navbar thấp hơn trên thiết bị di động */
+    }
+}
 
 /* Responsive Design */
 @media (max-width: 576px) {
