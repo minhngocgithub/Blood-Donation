@@ -5,98 +5,102 @@
     Layout = "_AuthLayout";
 }
 
-<div class="auth-card-container">
-    <div class="auth-card">
-        <div class="auth-card-body">
-            <div class="auth-card-header">
-                <h1 class="auth-card-title">Tham Gia Cùng Chúng Tôi</h1>
-                <p class="auth-card-subtitle">Mỗi giọt máu đều quý giá - Chung tay cứu sống nhiều người</p>
-                <p class="text-dark small mb-0">
-                    <i class="fas fa-info-circle"></i>
-                    Đăng ký nhanh - Hoàn thiện hồ sơ sau
-                </p>
-            </div>
+<link href="~/css/auth.css" rel="stylesheet" />
 
-            <!-- Social Login Options -->
-            <div class="social-login">
-                <a href="#" class="social-btn">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="social-btn">
-                    <i class="fab fa-google"></i>
-                </a>
-                <a href="#" class="social-btn">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a href="#" class="social-btn">
-                    <i class="fab fa-github"></i>
-                </a>
-            </div>
-
-            <div class="divider">
-                <span>hoặc sử dụng email để đăng ký</span>
-            </div>
-
-            <form asp-action="Register" method="post" novalidate class="compact-form">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                <div class="mb-3">
-                    <input asp-for="FullName" class="form-control" 
-                           placeholder="Họ và tên" autocomplete="name" />
-                    <span asp-validation-for="FullName" class="text-danger small"></span>
+<div class="auth-page">
+    <div class="auth-card-container">
+        <div class="auth-card">
+            <div class="auth-card-body">
+                <div class="auth-card-header">
+                    <h1 class="auth-card-title">Tham Gia Cùng Chúng Tôi</h1>
+                    <p class="auth-card-subtitle">Mỗi giọt máu đều quý giá - Chung tay cứu sống nhiều người</p>
+                    <p class="text-dark small mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Đăng ký nhanh - Hoàn thiện hồ sơ sau
+                    </p>
                 </div>
 
-                <div class="mb-3">
-                    <input asp-for="Email" class="form-control" 
-                           placeholder="Địa chỉ email" autocomplete="email" />
-                    <span asp-validation-for="Email" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <input asp-for="Phone" class="form-control" 
-                           placeholder="Số điện thoại" autocomplete="tel" />
-                    <span asp-validation-for="Phone" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <input asp-for="Password" type="password" class="form-control" 
-                           placeholder="Mật khẩu" autocomplete="new-password" />
-                    <span asp-validation-for="Password" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
-                    <input asp-for="ConfirmPassword" type="password" class="form-control" 
-                           placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3 form-check">
-                    <input asp-for="AgreeToTerms" type="checkbox" class="form-check-input" id="agreeToTerms" value="true" />
-                    <input name="AgreeToTerms" type="hidden" value="false" />
-                    <label class="form-check-label small" for="agreeToTerms">
-                        Tôi đồng ý với <a asp-controller="Home" asp-action="Terms" class="text-decoration-none" style="color: #dc3545;" target="_blank">Điều khoản dịch vụ</a> và <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none" style="color: #dc3545;" target="_blank">Chính sách bảo mật</a>
-                    </label>
-                    <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
-                </div>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        ĐĂNG KÝ
-                    </button>
-                </div>
-            </form>
-
-            <div class="text-center mt-3">
-                <p class="mb-2 text-dark small">
-                    <i class="fas fa-heart text-danger me-1"></i>
-                    "Một lần hiến máu có thể cứu sống 3 người"
-                </p>
-                <p class="mb-0 text-dark">
-                    Đã có tài khoản? 
-                    <a asp-action="Login" class="text-decoration-none fw-bold" style="color: #dc3545;">
-                        Đăng nhập
+                <!-- Social Login Options -->
+                <div class="social-login">
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-facebook-f"></i>
                     </a>
-                </p>
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-btn">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+
+                <div class="divider">
+                    <span>hoặc sử dụng email để đăng ký</span>
+                </div>
+
+                <form asp-action="Register" method="post" novalidate class="compact-form">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-3">
+                        <input asp-for="FullName" class="form-control" 
+                               placeholder="Họ và tên" autocomplete="name" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <input asp-for="Email" class="form-control" 
+                               placeholder="Địa chỉ email" autocomplete="email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <input asp-for="Phone" class="form-control" 
+                               placeholder="Số điện thoại" autocomplete="tel" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <input asp-for="Password" type="password" class="form-control" 
+                               placeholder="Mật khẩu" autocomplete="new-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <input asp-for="ConfirmPassword" type="password" class="form-control" 
+                               placeholder="Xác nhận mật khẩu" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input asp-for="AgreeToTerms" type="checkbox" class="form-check-input" id="agreeToTerms" value="true" />
+                        <input name="AgreeToTerms" type="hidden" value="false" />
+                        <label class="form-check-label small" for="agreeToTerms">
+                            Tôi đồng ý với <a asp-controller="Home" asp-action="Terms" class="text-decoration-none" style="color: #dc3545;" target="_blank">Điều khoản dịch vụ</a> và <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none" style="color: #dc3545;" target="_blank">Chính sách bảo mật</a>
+                        </label>
+                        <span asp-validation-for="AgreeToTerms" class="text-danger small d-block"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            ĐĂNG KÝ
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="mb-2 text-dark small">
+                        <i class="fas fa-heart text-danger me-1"></i>
+                        "Một lần hiến máu có thể cứu sống 3 người"
+                    </p>
+                    <p class="mb-0 text-dark">
+                        Đã có tài khoản? 
+                        <a asp-action="Login" class="text-decoration-none fw-bold" style="color: #dc3545;">
+                            Đăng nhập
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
