@@ -2,6 +2,7 @@
     ViewData["Title"] = "Trang chủ";
 }
 
+<div class="index-page">
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-background">
@@ -64,6 +65,15 @@
 <!-- Stats Section -->
 <section class="stats-section py-5">
     <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title">Tại sao nên hiến máu?</h2>
+                <p class="section-description">
+                    Hiến máu không chỉ giúp cứu sống người khác mà còn mang lại nhiều lợi ích cho chính bạn
+                </p>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="stat-card text-center">
@@ -287,14 +297,3 @@
         </div>
     </div>
 </section>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var btn = document.getElementById('btnScrollToTop');
-        if (btn) {
-            btn.addEventListener('click', function () {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    });
-</script>
