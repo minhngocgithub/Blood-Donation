@@ -522,4 +522,5 @@ secrets.json
 *.bak
 *.backup
 
+note.txt
 INSTRUCTION.md
