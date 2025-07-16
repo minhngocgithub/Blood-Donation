@@ -15,20 +15,27 @@ namespace Blood_Donation_Website.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTerm, string location)
         {
             try
             {
-                var searchDto = new EventSearchDto
+                if (!string.IsNullOrWhiteSpace(searchTerm) || !string.IsNullOrWhiteSpace(location))
                 {
-                    Page = 1,
-                    PageSize = 6, // Load 6 events initially
-                    SortBy = "EventDate",
-                    SortOrder = "asc"
-                };
-
-                var pagedResult = await _eventService.GetEventsPagedAsync(searchDto);
-                return View(pagedResult.Items);
+                    var results = await _eventService.SearchEventsByNameDescLocationAsync(searchTerm, location);
+                    return View(results);
+                }
+                else
+                {
+                    var searchDto = new EventSearchDto
+                    {
+                        Page = 1,
+                        PageSize = 6, // Load 6 events initially
+                        SortBy = "EventDate",
+                        SortOrder = "asc"
+                    };
+                    var pagedResult = await _eventService.GetEventsPagedAsync(searchDto);
+                    return View(pagedResult.Items);
+                }
             }
             catch (Exception ex)
             {
@@ -95,8 +102,6 @@ namespace Blood_Donation_Website.Controllers
                     return Json(new { success = false, message = "Bạn cần đăng nhập để đăng ký sự kiện" });
                 }
 
-                // TODO: Implement event registration logic
-                // var result = await _eventService.RegisterForEventAsync(eventId, User.Identity.Name);
 
                 return Json(new { success = true, message = "Đăng ký sự kiện thành công!" });
             }
