@@ -25,6 +25,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
