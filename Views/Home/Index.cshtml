@@ -307,5 +307,11 @@
                 showSuccess("Thành công", "@TempData["SuccessMessage"]");
             </text>
         }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                showError("Lỗi", "@TempData["ErrorMessage"]");
+            </text>
+        }
     </script>
 }

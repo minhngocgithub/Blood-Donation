@@ -12,7 +12,7 @@ namespace Blood_Donation_Website.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService, ILogger<AccountController> logger)
+        public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
         }
@@ -304,11 +304,12 @@ namespace Blood_Donation_Website.Controllers
             if (result)
             {
                 TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
-                return RedirectToAction("Index", "Home");
+                return View(model);
             }
             else
             {
-                ModelState.AddModelError("", "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại thông tin.");
+                // Thông báo lỗi rõ ràng cho SweetAlert
+                ModelState.AddModelError("", "Mật khẩu hiện tại không đúng.");
                 return View(model);
             }
         }
