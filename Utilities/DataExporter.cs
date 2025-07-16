@@ -13,7 +13,24 @@ namespace Blood_Donation_Website.Utilities
         public DataExporter(ApplicationDbContext context)
         {
             _context = context;
-            _exportDirectory = Path.GetDirectoryName(typeof(DataExporter).Assembly.Location) ?? Environment.CurrentDirectory;
+            // Use project root directory instead of assembly location
+            _exportDirectory = GetProjectRootDirectory();
+        }
+
+        private static string GetProjectRootDirectory()
+        {
+            // Start from current directory and walk up to find project root
+            var currentDir = Directory.GetCurrentDirectory();
+            var projectRoot = currentDir;
+            
+            // If we're in bin/Debug/net8.0, go up 3 levels to project root
+            if (currentDir.Contains("bin"))
+            {
+                var binIndex = currentDir.LastIndexOf("bin");
+                projectRoot = currentDir.Substring(0, binIndex).TrimEnd(Path.DirectorySeparatorChar);
+            }
+            
+            return projectRoot;
         }
 
         /// <summary>
