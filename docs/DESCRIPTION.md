@@ -73,7 +73,7 @@
 - Sau đăng nhập, mở giao diện quản trị với các menu: quản lý thành viên, sự kiện, tin tức/thông báo, báo cáo, cấu hình.
 
 ### 2.2. Quản lý người dùng và bệnh viện
-- Thêm/sửa/xóa tài khoản người dùng, thiết lập quyền hạn (người hiến, bác sĩ, y tá, bệnh viện).
+- Thêm/sửa/xóa tài khoản người dùng, thiết lập quyền hạn (người hiến, bác sĩ, bệnh viện).
 - Cập nhật trực tiếp trên bảng Users.
 - Thêm mới/ngắt kết nối các cơ sở hiến máu/ngân hàng máu (bảng liên quan “Bệnh viện”).
 - Phân quyền, chỉ định bác sĩ/nhân viên cho từng bệnh viện.
