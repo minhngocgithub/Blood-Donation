@@ -59,26 +59,6 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<Dictionary<string, int>> GetStatisticsByWeekAsync(DateTime startDate, DateTime endDate);
         Task<Dictionary<string, int>> GetStatisticsByDayAsync(DateTime startDate, DateTime endDate);
         
-        // Comparative statistics
-        Task<Dictionary<string, object>> ComparePeriodsAsync(DateTime period1Start, DateTime period1End, DateTime period2Start, DateTime period2End);
-        Task<Dictionary<string, object>> CompareLocationsAsync(List<int> locationIds);
-        Task<Dictionary<string, object>> CompareBloodTypesAsync(List<int> bloodTypeIds);
-        
-        // Growth statistics
-        Task<Dictionary<string, double>> GetGrowthRatesAsync();
-        Task<Dictionary<string, double>> GetGrowthRatesByBloodTypeAsync();
-        Task<Dictionary<string, double>> GetGrowthRatesByLocationAsync();
-        
-        // Efficiency statistics
-        Task<Dictionary<string, double>> GetRegistrationToDonationRateAsync();
-        Task<Dictionary<string, double>> GetScreeningPassRateAsync();
-        Task<Dictionary<string, double>> GetEventCapacityUtilizationAsync();
-        
-        // Predictive statistics
-        Task<Dictionary<string, int>> PredictDonationsAsync(int monthsAhead);
-        Task<Dictionary<string, int>> PredictRegistrationsAsync(int monthsAhead);
-        Task<Dictionary<string, int>> PredictBloodTypeNeedsAsync(int monthsAhead);
-        
         // Export statistics
         Task<byte[]> ExportStatisticsToExcelAsync(DateTime startDate, DateTime endDate);
         Task<byte[]> ExportStatisticsToPdfAsync(DateTime startDate, DateTime endDate);
