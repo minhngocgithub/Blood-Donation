@@ -29,12 +29,13 @@ namespace Blood_Donation_Website.Models.DTOs
 
     public class DonationSearchDto : SearchParametersDto
     {
-        public DateTime? FromDate { get; set; }
-        public DateTime? ToDate { get; set; }
         public int? UserId { get; set; }
         public int? EventId { get; set; }
         public int? BloodTypeId { get; set; }
         public string? Status { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool? CertificateIssued { get; set; }
     }
 
     public class NewsSearchDto : SearchParametersDto
