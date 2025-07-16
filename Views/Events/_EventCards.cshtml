@@ -4,19 +4,18 @@
 {
     @foreach (var eventItem in Model)
     {
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="event-card">
+        <div class="col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
+            <div class="event-card w-100 d-flex flex-column">
                 <div class="event-image">
-                    <img src="@(!string.IsNullOrEmpty(eventItem.ImageUrl) ? eventItem.ImageUrl : "/image/default-event.jpg")" 
+                    <img src="@(!string.IsNullOrEmpty(eventItem.ImageUrl) ? eventItem.ImageUrl : "./image/default-image-event")"
                          alt="@eventItem.EventName" class="img-fluid">
                     <div class="event-date">
-                        <span class="day">@eventItem.EventDate.Day</span>
-                        <span class="month">Th@eventItem.EventDate.Month</span>
+                        <span>@eventItem.EventDate.ToString("dd/MM/yyyy")</span>
                     </div>
                 </div>
-                <div class="event-content">
-                    <h5 class="event-title">@eventItem.EventName</h5>
-                    <div class="event-meta">
+                <div class="event-content d-flex flex-column flex-grow-1 justify-content-between">
+                    <h5 class="event-title text-center">@eventItem.EventName</h5>
+                    <div class="event-meta d-flex flex-wrap justify-content-center gap-2 mb-2">
                         <span class="event-location">
                             <i class="fas fa-map-marker-alt me-1"></i>
                             @(!string.IsNullOrEmpty(eventItem.LocationName) ? eventItem.LocationName : "Chưa xác định")
@@ -26,64 +25,58 @@
                             @eventItem.StartTime.ToString(@"hh\:mm") - @eventItem.EndTime.ToString(@"hh\:mm")
                         </span>
                     </div>
-                    
+
                     @if (!string.IsNullOrEmpty(eventItem.EventDescription))
                     {
-                        <p class="event-description">
+                        <p class="event-description text-center mb-2">
                             @eventItem.EventDescription
                         </p>
                     }
-                    
-                    <div class="event-actions">
+
+                    <div class="event-actions d-flex flex-wrap align-items-center justify-content-center gap-2 mt-2 mb-2">
                         @{
                             var statusClass = eventItem.Status.ToLower() switch
                             {
                                 "active" => "status-active",
-                                "full" => "status-full", 
+                                "full" => "status-full",
                                 "ended" => "status-ended",
                                 _ => "status-active"
                             };
-                            
                             var statusText = eventItem.Status.ToLower() switch
                             {
                                 "active" => "Đang mở",
                                 "full" => "Đã đủ người",
-                                "ended" => "Đã kết thúc", 
+                                "ended" => "Đã kết thúc",
                                 _ => "Đang mở"
                             };
                         }
-                        
                         <span class="event-status @statusClass">@statusText</span>
-                        
-                        <div class="ms-auto">
-                            @if (eventItem.Status.ToLower() == "active")
+                        @if (eventItem.Status.ToLower() == "active")
+                        {
+                            @if (User.Identity?.IsAuthenticated == true)
                             {
-                                @if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <button type="button" class="btn btn-register" data-event-id="@eventItem.EventId">
-                                        <i class="fas fa-calendar-plus me-1"></i>
-                                        Đăng ký
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="button" class="btn btn-register" onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
-                                        <i class="fas fa-calendar-plus me-1"></i>
-                                        Đăng ký
-                                    </button>
-                                }
+                                <button type="button" class="btn btn-register" data-event-id="@eventItem.EventId">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Đăng ký
+                                </button>
                             }
-                            
-                            <a href="/Events/Details/@eventItem.EventId" class="btn btn-outline-primary">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Chi tiết
-                            </a>
-                        </div>
+                            else
+                            {
+                                <button type="button" class="btn btn-register" onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Đăng ký
+                                </button>
+                            }
+                        }
+                        <a href="/Events/Details/@eventItem.EventId" class="btn btn-details">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Chi tiết
+                        </a>
                     </div>
-                    
+
                     @if (eventItem.MaxDonors > 0)
                     {
-                        <div class="event-progress mt-3">
+                        <div class="event-progress mt-2">
                             @{
                                 var progressPercentage = Math.Min(100, (double)eventItem.CurrentDonors / eventItem.MaxDonors * 100);
                             }
@@ -92,24 +85,24 @@
                                 <small class="text-muted">@progressPercentage.ToString("F0")%</small>
                             </div>
                             <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-danger" role="progressbar" 
-                                     style="width: @progressPercentage.ToString("F1")%" 
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                     style="width: @progressPercentage.ToString("F1")%"
                                      aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                         </div>
                     }
-                    
+
                     @if (!string.IsNullOrEmpty(eventItem.RequiredBloodTypes))
                     {
-                        <div class="blood-types mt-3">
+                        <div class="blood-types mt-3 text-center">
                             <small class="text-muted d-block mb-1">Nhóm máu cần:</small>
                             @{
                                 var bloodTypes = eventItem.RequiredBloodTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
                             }
                             @foreach (var bloodType in bloodTypes)
                             {
-                                <span class="badge bg-danger me-1">@bloodType.Trim()</span>
+                                <span class="badge bg-danger me-1 mb-1">@bloodType.Trim()</span>
                             }
                         </div>
                     }
@@ -128,3 +121,6 @@ else
         </div>
     </div>
 }
+<<style>
+    
+</style>
