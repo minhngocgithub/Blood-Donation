@@ -3,19 +3,16 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class BloodDonationEventService : IBloodDonationEventService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<BloodDonationEventService> _logger;
 
-        public BloodDonationEventService(ApplicationDbContext context, ILogger<BloodDonationEventService> logger)
+        public BloodDonationEventService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -54,7 +51,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting event by ID {EventId}: {Message}", eventId, ex.Message);
                 return null;
             }
         }
@@ -94,7 +90,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting event by name {EventName}: {Message}", eventName, ex.Message);
                 return null;
             }
         }
@@ -133,7 +128,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all events: {Message}", ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -241,7 +235,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting paged events: {Message}", ex.Message);
                 return new PagedResponseDto<BloodDonationEventDto>
                 {
                     Items = new List<BloodDonationEventDto>(),
@@ -299,7 +292,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating event: {Message}", ex.Message);
                 throw;
             }
         }
@@ -328,7 +320,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -355,7 +346,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -375,7 +365,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error activating event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -394,7 +383,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deactivating event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -413,7 +401,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -432,7 +419,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error completing event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -446,7 +432,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting status for event {EventId}: {Message}", eventId, ex.Message);
                 return "Unknown";
             }
         }
@@ -471,7 +456,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating capacity for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -487,7 +471,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting available slots for event {EventId}: {Message}", eventId, ex.Message);
                 return 0;
             }
         }
@@ -501,7 +484,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if event is full {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -525,7 +507,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error incrementing current donors for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -547,7 +528,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error decrementing current donors for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -588,7 +568,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting upcoming events: {Message}", ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -628,7 +607,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting past events: {Message}", ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -668,7 +646,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events by date range: {Message}", ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -708,7 +685,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events by location {LocationId}: {Message}", locationId, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -748,7 +724,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events by creator {CreatorId}: {Message}", creatorId, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -790,7 +765,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching events with term {SearchTerm}: {Message}", searchTerm, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -830,7 +804,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events by status {Status}: {Message}", status, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -870,7 +843,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events by blood type {RequiredBloodTypes}: {Message}", requiredBloodTypes, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -904,7 +876,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting event statistics for {EventId}: {Message}", eventId, ex.Message);
                 return new EventStatisticsDto();
             }
         }
@@ -929,7 +900,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all event statistics: {Message}", ex.Message);
                 return new List<EventStatisticsDto>();
             }
         }
@@ -944,7 +914,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration count for event {EventId}: {Message}", eventId, ex.Message);
                 return 0;
             }
         }
@@ -959,7 +928,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting donation count for event {EventId}: {Message}", eventId, ex.Message);
                 return 0;
             }
         }
@@ -973,7 +941,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if event exists {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -986,7 +953,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if event name exists {EventName}: {Message}", eventName, ex.Message);
                 return false;
             }
         }
@@ -1013,7 +979,6 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (eventEntity == null)
                 {
-                    _logger.LogWarning("Event {EventId} not found for reminders", eventId);
                     return false;
                 }
 
@@ -1024,15 +989,8 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (!registeredUsers.Any())
                 {
-                    _logger.LogInformation("No registered users found for event {EventId}", eventId);
                     return true;
-                }
-
-                // TODO: Implement actual email/SMS reminder service
-                // await _notificationService.SendEventRemindersAsync(eventEntity, registeredUsers);
-                
-                _logger.LogInformation("Sending event reminders for event {EventId} to {UserCount} users", 
-                    eventId, registeredUsers.Count);
+                }                
                 
                 // Simulate async operation
                 await Task.Delay(100);
@@ -1040,7 +998,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending event reminders for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -1056,7 +1013,6 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (eventEntity == null)
                 {
-                    _logger.LogWarning("Event {EventId} not found for updates", eventId);
                     return false;
                 }
 
@@ -1068,23 +1024,15 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (!registeredUsers.Any())
                 {
-                    _logger.LogInformation("No registered users found for event {EventId} updates", eventId);
                     return true;
                 }
 
-                // TODO: Implement actual email/SMS update service
-                // await _notificationService.SendEventUpdatesAsync(eventEntity, registeredUsers, updateMessage);
-                
-                _logger.LogInformation("Sending event updates for event {EventId} to {UserCount} users: {Message}", 
-                    eventId, registeredUsers.Count, updateMessage);
-                
                 // Simulate async operation
                 await Task.Delay(100);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending event updates for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }

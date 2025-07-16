@@ -4,19 +4,16 @@ using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Services.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<UserService> _logger;
 
-        public UserService(ApplicationDbContext context, ILogger<UserService> logger)
+        public UserService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -55,7 +52,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user by ID {UserId}: {Message}", userId, ex.Message);
                 return null;
             }
         }
@@ -95,7 +91,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user by email {Email}: {Message}", email, ex.Message);
                 return null;
             }
         }
@@ -135,7 +130,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user by username {Username}: {Message}", username, ex.Message);
                 return null;
             }
         }
@@ -174,7 +168,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all users: {Message}", ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -284,7 +277,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting paged users: {Message}", ex.Message);
                 return new PagedResponseDto<UserDto>
                 {
                     Items = new List<UserDto>(),
@@ -337,7 +329,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating user: {Message}", ex.Message);
                 throw;
             }
         }
@@ -363,7 +354,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -381,7 +371,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -401,7 +390,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error activating user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -420,7 +408,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deactivating user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -439,7 +426,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error locking user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -458,7 +444,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error unlocking user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -477,7 +462,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error verifying email for user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -500,7 +484,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning role {RoleId} to user {UserId}: {Message}", roleId, userId, ex.Message);
                 return false;
             }
         }
@@ -520,7 +503,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing role {RoleId} from user {UserId}: {Message}", roleId, userId, ex.Message);
                 return false;
             }
         }
@@ -537,7 +519,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if user {UserId} is in role {RoleName}: {Message}", userId, roleName, ex.Message);
                 return false;
             }
         }
@@ -565,7 +546,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting roles for user {UserId}: {Message}", userId, ex.Message);
                 return new List<RoleDto>();
             }
         }
@@ -588,7 +568,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating blood type for user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }
@@ -612,7 +591,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting blood type for user {UserId}: {Message}", userId, ex.Message);
                 return null;
             }
         }
@@ -649,7 +627,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting donation history for user {UserId}: {Message}", userId, ex.Message);
                 return new UserDonationHistoryDto();
             }
         }
@@ -664,7 +641,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total donations for user {UserId}: {Message}", userId, ex.Message);
                 return 0;
             }
         }
@@ -682,7 +658,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting last donation date for user {UserId}: {Message}", userId, ex.Message);
                 return null;
             }
         }
@@ -700,7 +675,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting next eligible date for user {UserId}: {Message}", userId, ex.Message);
                 return null;
             }
         }
@@ -741,7 +715,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting users by blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -781,7 +754,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting users by role {RoleId}: {Message}", roleId, ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -821,7 +793,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting active users: {Message}", ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -861,7 +832,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting users by gender {Gender}: {Message}", gender, ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -875,7 +845,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if email exists {Email}: {Message}", email, ex.Message);
                 return false;
             }
         }
@@ -888,7 +857,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if username exists {Username}: {Message}", username, ex.Message);
                 return false;
             }
         }
@@ -910,7 +878,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking donation eligibility for user {UserId}: {Message}", userId, ex.Message);
                 return false;
             }
         }

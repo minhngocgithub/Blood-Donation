@@ -12,12 +12,10 @@ namespace Blood_Donation_Website.Controllers.Account
     public class ProfileController : Controller
     {
         private readonly IProfileService _profileService;
-        private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(IProfileService profileService, ILogger<ProfileController> logger)
+        public ProfileController(IProfileService profileService)
         {
             _profileService = profileService;
-            _logger = logger;
         }
 
         private async Task LoadBloodTypesAsync()
@@ -27,7 +25,6 @@ namespace Blood_Donation_Website.Controllers.Account
                 var bloodTypes = await _profileService.GetBloodTypesAsync();
                 if (bloodTypes == null || !bloodTypes.Any())
                 {
-                    _logger.LogWarning("Không có dữ liệu nhóm máu trong hệ thống");
                     ViewBag.BloodTypes = new List<dynamic> { new { BloodTypeId = "", BloodTypeName = "Không có dữ liệu" } };
                 }
                 else
@@ -37,7 +34,6 @@ namespace Blood_Donation_Website.Controllers.Account
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi tải danh sách nhóm máu: {Message}", ex.Message);
                 ViewBag.BloodTypes = new SelectList(new[] { new { Id = "", Name = "Không thể tải dữ liệu" } }, "Id", "Name");
             }
         }
@@ -68,13 +64,11 @@ namespace Blood_Donation_Website.Controllers.Account
             }
             catch (FormatException ex)
             {
-                _logger.LogError(ex, "Lỗi định dạng userId không hợp lệ: {Message}", ex.Message);
                 TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
                 return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi tải thông tin cá nhân: {Message}", ex.Message);
                 TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
                 return RedirectToAction("Login", "Account");
             }
@@ -87,13 +81,8 @@ namespace Blood_Donation_Website.Controllers.Account
         {
             try
             {
-                _logger.LogInformation("Address data received: Province={Province}, District={District}, Ward={Ward}, AddressDetail={AddressDetail}",
-                    model.Province, model.District, model.Ward, model.AddressDetail);
-
                 if (!ModelState.IsValid)
                 {
-                    _logger.LogWarning("Model validation failed: {Errors}", 
-                        string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                     await LoadBloodTypesAsync();
                     return View("~/Views/Account/Profile/Index.cshtml", model);
                 }
@@ -118,25 +107,21 @@ namespace Blood_Donation_Website.Controllers.Account
             }
             catch (FormatException ex)
             {
-                _logger.LogError(ex, "Lỗi định dạng userId không hợp lệ: {Message}", ex.Message);
                 TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
                 return RedirectToAction("Login", "Account");
             }
             catch (ArgumentException ex)
             {
-                _logger.LogWarning(ex, "Dữ liệu không hợp lệ: {Message}", ex.Message);
                 ModelState.AddModelError("", $"Thông tin không hợp lệ: {ex.Message}");
                 await LoadBloodTypesAsync();
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, "Lỗi thao tác cập nhật: {Message}", ex.Message);
                 TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
                 return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi không xác định: {Message}", ex.Message);
                 TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
                 return RedirectToAction("Login", "Account");
             }
