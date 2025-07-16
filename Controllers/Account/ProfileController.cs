@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Blood_Donation_Website.Controllers
+namespace Blood_Donation_Website.Controllers.Account
 {
     [Authorize]
+    [Route("profile")]
     public class ProfileController : Controller
     {
         private readonly IProfileService _profileService;
@@ -42,6 +43,8 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet]
+        [Route("")]
+        [Route("index")]
         public async Task<IActionResult> Index()
         {
             try
@@ -61,7 +64,7 @@ namespace Blood_Donation_Website.Controllers
                 }
 
                 await LoadBloodTypesAsync();
-                return View(profile);
+                return View("~/Views/Account/Profile/Index.cshtml", profile);
             }
             catch (FormatException ex)
             {
@@ -78,6 +81,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost]
+        [Route("update")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
         {
@@ -91,7 +95,7 @@ namespace Blood_Donation_Website.Controllers
                     _logger.LogWarning("Model validation failed: {Errors}", 
                         string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                     await LoadBloodTypesAsync();
-                    return View("Index", model);
+                    return View("~/Views/Account/Profile/Index.cshtml", model);
                 }
 
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -106,7 +110,7 @@ namespace Blood_Donation_Website.Controllers
                 {
                     TempData["ErrorMessage"] = "Không thể cập nhật thông tin. Vui lòng thử lại sau.";
                     await LoadBloodTypesAsync();
-                    return View("Index", model);
+                    return View("~/Views/Account/Profile/Index.cshtml", model);
                 }
 
                 TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
@@ -137,7 +141,7 @@ namespace Blood_Donation_Website.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            return View("Index", model);
+            return View("~/Views/Account/Profile/Index.cshtml", model);
         }
     }
 }
