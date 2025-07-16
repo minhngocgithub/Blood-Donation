@@ -39,6 +39,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<int> GetRegistrationCountByEventAsync(int eventId);
         Task<int> GetRegistrationCountByUserAsync(int userId);
         Task<int> GetRegistrationCountByStatusAsync(string status);
+        Task<int> GetRegistrationCountByUserAndStatusAsync(int userId, string status);
         Task<int> GetRegistrationCountByDateRangeAsync(DateTime startDate, DateTime endDate);
         
         // Registration search and filtering

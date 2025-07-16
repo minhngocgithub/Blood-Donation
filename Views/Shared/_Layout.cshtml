@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="~/css/terms-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-demo-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="~/favicon.ico">
@@ -127,12 +128,12 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Registration" asp-action="MyRegistrations">
+                                        <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="MyRegistrations">
                                             <i class="fas fa-calendar-check me-2 text-success"></i>Đăng ký của tôi
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="User" asp-action="DonationHistory">
+                                        <a class="dropdown-item" asp-controller="DonationHistory" asp-action="MyHistory">
                                             <i class="fas fa-history me-2 text-info"></i>Lịch sử hiến máu
                                         </a>
                                     </li>
@@ -322,6 +323,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
     <script src="~/js/logout.js" asp-append-version="true"></script>
+    <script src="~/js/registration.js" asp-append-version="true"></script>
 
     <!-- Custom Scripts -->
     <script>
