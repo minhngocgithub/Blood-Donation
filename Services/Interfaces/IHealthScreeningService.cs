@@ -69,7 +69,6 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<bool> IsHemoglobinSufficientAsync(decimal hemoglobin);
         
         // Screening workflow
-        Task<bool> StartScreeningAsync(int registrationId, int screenerId);
         Task<bool> CompleteScreeningAsync(int screeningId);
         Task<bool> ReviewScreeningAsync(int screeningId, int reviewerId);
     }
