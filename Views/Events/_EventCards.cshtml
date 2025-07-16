@@ -1,0 +1,130 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var eventItem in Model)
+    {
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="event-card">
+                <div class="event-image">
+                    <img src="@(!string.IsNullOrEmpty(eventItem.ImageUrl) ? eventItem.ImageUrl : "/image/default-event.jpg")" 
+                         alt="@eventItem.EventName" class="img-fluid">
+                    <div class="event-date">
+                        <span class="day">@eventItem.EventDate.Day</span>
+                        <span class="month">Th@eventItem.EventDate.Month</span>
+                    </div>
+                </div>
+                <div class="event-content">
+                    <h5 class="event-title">@eventItem.EventName</h5>
+                    <div class="event-meta">
+                        <span class="event-location">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            @(!string.IsNullOrEmpty(eventItem.LocationName) ? eventItem.LocationName : "Chưa xác định")
+                        </span>
+                        <span class="event-time">
+                            <i class="fas fa-clock me-1"></i>
+                            @eventItem.StartTime.ToString(@"hh\:mm") - @eventItem.EndTime.ToString(@"hh\:mm")
+                        </span>
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(eventItem.EventDescription))
+                    {
+                        <p class="event-description">
+                            @eventItem.EventDescription
+                        </p>
+                    }
+                    
+                    <div class="event-actions">
+                        @{
+                            var statusClass = eventItem.Status.ToLower() switch
+                            {
+                                "active" => "status-active",
+                                "full" => "status-full", 
+                                "ended" => "status-ended",
+                                _ => "status-active"
+                            };
+                            
+                            var statusText = eventItem.Status.ToLower() switch
+                            {
+                                "active" => "Đang mở",
+                                "full" => "Đã đủ người",
+                                "ended" => "Đã kết thúc", 
+                                _ => "Đang mở"
+                            };
+                        }
+                        
+                        <span class="event-status @statusClass">@statusText</span>
+                        
+                        <div class="ms-auto">
+                            @if (eventItem.Status.ToLower() == "active")
+                            {
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <button type="button" class="btn btn-register" data-event-id="@eventItem.EventId">
+                                        <i class="fas fa-calendar-plus me-1"></i>
+                                        Đăng ký
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-register" onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
+                                        <i class="fas fa-calendar-plus me-1"></i>
+                                        Đăng ký
+                                    </button>
+                                }
+                            }
+                            
+                            <a href="/Events/Details/@eventItem.EventId" class="btn btn-outline-primary">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Chi tiết
+                            </a>
+                        </div>
+                    </div>
+                    
+                    @if (eventItem.MaxDonors > 0)
+                    {
+                        <div class="event-progress mt-3">
+                            @{
+                                var progressPercentage = Math.Min(100, (double)eventItem.CurrentDonors / eventItem.MaxDonors * 100);
+                            }
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">Đã đăng ký: @eventItem.CurrentDonors/@eventItem.MaxDonors</small>
+                                <small class="text-muted">@progressPercentage.ToString("F0")%</small>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: @progressPercentage.ToString("F1")%" 
+                                     aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(eventItem.RequiredBloodTypes))
+                    {
+                        <div class="blood-types mt-3">
+                            <small class="text-muted d-block mb-1">Nhóm máu cần:</small>
+                            @{
+                                var bloodTypes = eventItem.RequiredBloodTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                            }
+                            @foreach (var bloodType in bloodTypes)
+                            {
+                                <span class="badge bg-danger me-1">@bloodType.Trim()</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="col-12 no-events">
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem;"></i>
+            <h4 class="text-muted">Không có sự kiện nào</h4>
+            <p class="text-muted">Hiện tại chưa có sự kiện hiến máu nào được tổ chức.</p>
+        </div>
+    </div>
+}
