@@ -3,19 +3,16 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class DonationRegistrationService : IDonationRegistrationService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<DonationRegistrationService> _logger;
 
-        public DonationRegistrationService(ApplicationDbContext context, ILogger<DonationRegistrationService> logger)
+        public DonationRegistrationService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -52,7 +49,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration by ID {RegistrationId}: {Message}", registrationId, ex.Message);
                 return null;
             }
         }
@@ -89,7 +85,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all registrations: {Message}", ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -172,7 +167,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting paged registrations: {Message}", ex.Message);
                 return new PagedResponseDto<DonationRegistrationDto>
                 {
                     Items = new List<DonationRegistrationDto>(),
@@ -228,7 +222,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating registration: {Message}", ex.Message);
                 throw;
             }
         }
@@ -252,7 +245,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -274,7 +266,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -293,7 +284,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error approving registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -312,7 +302,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error rejecting registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -335,7 +324,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cancelling registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -354,7 +342,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking in registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -373,7 +360,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error completing registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -387,7 +373,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting status for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return "Unknown";
             }
         }
@@ -426,7 +411,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registrations for user {UserId}: {Message}", userId, ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -464,7 +448,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registrations for event {EventId}: {Message}", eventId, ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -502,7 +485,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registrations by status {Status}: {Message}", status, ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -540,7 +522,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registrations by date range: {Message}", ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -578,7 +559,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user registration for event: {Message}", ex.Message);
                 return null;
             }
         }
@@ -592,7 +572,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if registration exists {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -606,7 +585,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if user is registered for event: {Message}", ex.Message);
                 return false;
             }
         }
@@ -642,7 +620,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking user eligibility for event: {Message}", ex.Message);
                 return false;
             }
         }
@@ -656,7 +633,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if event is full {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -670,7 +646,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking registration date validity for event {EventId}: {Message}", eventId, ex.Message);
                 return false;
             }
         }
@@ -686,7 +661,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration count for event {EventId}: {Message}", eventId, ex.Message);
                 return 0;
             }
         }
@@ -701,7 +675,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration count for user {UserId}: {Message}", userId, ex.Message);
                 return 0;
             }
         }
@@ -716,7 +689,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration count by status {Status}: {Message}", status, ex.Message);
                 return 0;
             }
         }
@@ -731,7 +703,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registration count by date range: {Message}", ex.Message);
                 return 0;
             }
         }
@@ -773,7 +744,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching registrations with term {SearchTerm}: {Message}", searchTerm, ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -811,7 +781,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting registrations by blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -849,7 +818,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting pending registrations: {Message}", ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -887,7 +855,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting approved registrations: {Message}", ex.Message);
                 return new List<DonationRegistrationDto>();
             }
         }
@@ -906,14 +873,8 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (registration == null)
                 {
-                    _logger.LogWarning("Registration {RegistrationId} not found for confirmation", registrationId);
                     return false;
                 }
-
-                // TODO: Implement actual email/SMS sending service
-                // await _emailService.SendRegistrationConfirmationAsync(registration);
-                
-                _logger.LogInformation("Sending registration confirmation for registration {RegistrationId}", registrationId);
                 
                 // Simulate async operation
                 await Task.Delay(100);
@@ -921,7 +882,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending registration confirmation for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -939,14 +899,8 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (registration == null)
                 {
-                    _logger.LogWarning("Registration {RegistrationId} not found for reminder", registrationId);
                     return false;
                 }
-
-                // TODO: Implement actual email/SMS sending service
-                // await _emailService.SendRegistrationReminderAsync(registration);
-                
-                _logger.LogInformation("Sending registration reminder for registration {RegistrationId}", registrationId);
                 
                 // Simulate async operation
                 await Task.Delay(100);
@@ -954,7 +908,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending registration reminder for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -972,14 +925,8 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (registration == null)
                 {
-                    _logger.LogWarning("Registration {RegistrationId} not found for status update", registrationId);
                     return false;
                 }
-
-                // TODO: Implement actual email/SMS sending service
-                // await _emailService.SendRegistrationStatusUpdateAsync(registration);
-                
-                _logger.LogInformation("Sending registration status update for registration {RegistrationId}", registrationId);
                 
                 // Simulate async operation
                 await Task.Delay(100);
@@ -987,7 +934,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending registration status update for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -1002,7 +948,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking health screening for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -1018,7 +963,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking health screening result for registration {RegistrationId}: {Message}", registrationId, ex.Message);
                 return false;
             }
         }
@@ -1037,7 +981,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error incrementing current donors for event {EventId}: {Message}", eventId, ex.Message);
             }
         }
 
@@ -1054,7 +997,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error decrementing current donors for event {EventId}: {Message}", eventId, ex.Message);
             }
         }
     }

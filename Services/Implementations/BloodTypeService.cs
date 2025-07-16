@@ -3,19 +3,16 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class BloodTypeService : IBloodTypeService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<BloodTypeService> _logger;
 
-        public BloodTypeService(ApplicationDbContext context, ILogger<BloodTypeService> logger)
+        public BloodTypeService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -35,7 +32,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting blood type by ID {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return null;
             }
         }
@@ -58,7 +54,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting blood type by name {BloodTypeName}: {Message}", bloodTypeName, ex.Message);
                 return null;
             }
         }
@@ -80,7 +75,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all blood types: {Message}", ex.Message);
                 return new List<BloodTypeDto>();
             }
         }
@@ -112,7 +106,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating blood type: {Message}", ex.Message);
                 throw;
             }
         }
@@ -132,7 +125,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return false;
             }
         }
@@ -168,7 +160,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return false;
             }
         }
@@ -203,7 +194,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting blood type statistics for {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return new BloodTypeStatisticsDto
                 {
                     BloodTypeId = bloodTypeId,
@@ -232,7 +222,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all blood type statistics: {Message}", ex.Message);
                 return new List<BloodTypeStatisticsDto>();
             }
         }
@@ -247,7 +236,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total donations for blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return 0;
             }
         }
@@ -262,7 +250,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total volume for blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return 0;
             }
         }
@@ -277,7 +264,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user count for blood type {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return 0;
             }
         }
@@ -291,7 +277,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if blood type exists {BloodTypeId}: {Message}", bloodTypeId, ex.Message);
                 return false;
             }
         }
@@ -304,7 +289,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if blood type name exists {BloodTypeName}: {Message}", bloodTypeName, ex.Message);
                 return false;
             }
         }
@@ -329,7 +313,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching blood types with term {SearchTerm}: {Message}", searchTerm, ex.Message);
                 return new List<BloodTypeDto>();
             }
         }

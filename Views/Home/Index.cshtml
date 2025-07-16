@@ -297,3 +297,15 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                showSuccess("Thành công", "@TempData["SuccessMessage"]");
+            </text>
+        }
+    </script>
+}

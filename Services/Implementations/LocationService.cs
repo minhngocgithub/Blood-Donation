@@ -3,19 +3,16 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class LocationService : ILocationService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<LocationService> _logger;
 
-        public LocationService(ApplicationDbContext context, ILogger<LocationService> logger)
+        public LocationService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -39,7 +36,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting location by ID {LocationId}: {Message}", locationId, ex.Message);
                 return null;
             }
         }
@@ -66,7 +62,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting location by name {LocationName}: {Message}", locationName, ex.Message);
                 return null;
             }
         }
@@ -92,7 +87,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all locations: {Message}", ex.Message);
                 return new List<LocationDto>();
             }
         }
@@ -119,7 +113,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting active locations: {Message}", ex.Message);
                 return new List<LocationDto>();
             }
         }
@@ -159,7 +152,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating location: {Message}", ex.Message);
                 throw;
             }
         }
@@ -182,7 +174,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating location {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -209,7 +200,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting location {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -228,7 +218,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error activating location {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -246,7 +235,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deactivating location {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -260,7 +248,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if location is active {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -279,7 +266,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating capacity for location {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -293,7 +279,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting capacity for location {LocationId}: {Message}", locationId, ex.Message);
                 return 0;
             }
         }
@@ -313,7 +298,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting available capacity for location {LocationId}: {Message}", locationId, ex.Message);
                 return 0;
             }
         }
@@ -354,7 +338,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting events for location {LocationId}: {Message}", locationId, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -394,7 +377,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting upcoming events for location {LocationId}: {Message}", locationId, ex.Message);
                 return new List<BloodDonationEventDto>();
             }
         }
@@ -409,7 +391,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting event count for location {LocationId}: {Message}", locationId, ex.Message);
                 return 0;
             }
         }
@@ -439,7 +420,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching locations with term {SearchTerm}: {Message}", searchTerm, ex.Message);
                 return new List<LocationDto>();
             }
         }
@@ -466,7 +446,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting locations by capacity {MinCapacity}: {Message}", minCapacity, ex.Message);
                 return new List<LocationDto>();
             }
         }
@@ -493,7 +472,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting locations by address {Address}: {Message}", address, ex.Message);
                 return new List<LocationDto>();
             }
         }
@@ -507,7 +485,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if location exists {LocationId}: {Message}", locationId, ex.Message);
                 return false;
             }
         }
@@ -520,7 +497,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if location name exists {LocationName}: {Message}", locationName, ex.Message);
                 return false;
             }
         }
@@ -536,7 +512,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total events at location {LocationId}: {Message}", locationId, ex.Message);
                 return 0;
             }
         }
@@ -552,7 +527,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting total donations at location {LocationId}: {Message}", locationId, ex.Message);
                 return 0;
             }
         }
