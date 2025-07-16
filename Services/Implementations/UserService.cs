@@ -904,9 +904,9 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (lastDonation == null) return true;
 
-                // Check if enough time has passed since last donation (typically 56 days)
+                // Check if enough time has passed since last donation (typically 90 days)
                 var daysSinceLastDonation = (DateTime.Now - lastDonation.DonationDate).Days;
-                return daysSinceLastDonation >= 56;
+                return daysSinceLastDonation >= 90;
             }
             catch (Exception ex)
             {

@@ -9,9 +9,6 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<BloodTypeDto?> GetBloodTypeByIdAsync(int bloodTypeId);
         Task<BloodTypeDto?> GetBloodTypeByNameAsync(string bloodTypeName);
         Task<IEnumerable<BloodTypeDto>> GetAllBloodTypesAsync();
-        Task<BloodTypeDto> CreateBloodTypeAsync(BloodTypeCreateDto createDto);
-        Task<bool> UpdateBloodTypeAsync(int bloodTypeId, BloodTypeUpdateDto updateDto);
-        Task<bool> DeleteBloodTypeAsync(int bloodTypeId);
         
         // Blood type statistics
         Task<BloodTypeStatisticsDto> GetBloodTypeStatisticsAsync(int bloodTypeId);
