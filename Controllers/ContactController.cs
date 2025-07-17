@@ -32,8 +32,8 @@ namespace Blood_Donation_Website.Controllers
             }
             try
             {
-                var result = await _contactService.CreateContactMessageAsync(model);
-                if (result)
+                var result = await _contactService.CreateMessageAsync(model);
+                if (result != null)
                 {
                     TempData["SuccessMessage"] = "Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất.";
                     return RedirectToAction("Index");
@@ -50,4 +50,4 @@ namespace Blood_Donation_Website.Controllers
             return View(model);
         }
     }
-} 
+}

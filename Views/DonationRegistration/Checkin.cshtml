@@ -1,0 +1,108 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationRegistrationDto>
+@{
+    ViewData["Title"] = "Check-in người hiến máu";
+    ViewData["ShowBreadcrumb"] = true;
+    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item active'>Check-in người hiến máu</li>";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-info fw-bold mb-4">
+                <i class="fas fa-user-check me-2"></i>Check-in người hiến máu
+            </h2>
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form asp-action="Checkin" method="post" class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="RegistrationCode" class="form-label">Mã đăng ký</label>
+                            <input type="text" class="form-control" id="RegistrationCode" name="RegistrationCode" placeholder="Nhập mã đăng ký hoặc số điện thoại" autocomplete="off">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-search me-2"></i>Tìm
+                            </button>
+                            <button type="submit" class="btn btn-secondary" name="showAll" value="true">
+                                <i class="fas fa-list me-2"></i>Hiển thị tất cả
+                            </button>
+                        </div>
+                    </form>
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Mã đăng ký</th>
+                                        <th>Họ tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var reg in Model)
+                                    {
+                                        <tr>
+                                            <td>@reg.RegistrationCode</td>
+                                            <td>@reg.FullName</td>
+                                            <td>@reg.PhoneNumber</td>
+                                            <td>@reg.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <span class="badge @(reg.Status == "CheckedIn" ? "bg-success" : "bg-secondary")">@reg.Status</span>
+                                            </td>
+                                            <td>
+                                                @if (reg.Status != "CheckedIn")
+                                                {
+                                                    <form asp-action="ConfirmCheckin" method="post" style="display:inline;">
+                                                        <input type="hidden" name="id" value="@reg.RegistrationId" />
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-success">Check-in</button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-success">Đã check-in</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+            if (successMsg) {
+                showSuccess('Thành công');
+            }
+            if (errorMsg) {
+                showError('Lỗi');
+            }
+        });
+    </script>
+}

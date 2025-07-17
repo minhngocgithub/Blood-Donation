@@ -30,13 +30,15 @@ builder.Services.AddScoped<IBloodDonationEventService, BloodDonationEventService
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 
 builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
+
 builder.Services.AddScoped<IDonationRegistrationService, DonationRegistrationService>();
 builder.Services.AddScoped<IBloodTypeService, BloodTypeService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
 
-
+builder.Services.AddScoped<IHealthScreeningService, HealthScreeningService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

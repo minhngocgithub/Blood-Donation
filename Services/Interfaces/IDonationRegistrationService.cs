@@ -56,5 +56,19 @@ namespace Blood_Donation_Website.Services.Interfaces
         // Registration health screening
         Task<bool> HasHealthScreeningAsync(int registrationId);
         Task<bool> IsHealthScreeningPassedAsync(int registrationId);
+        
+        /// <summary>
+        /// Tìm các đăng ký theo mã đăng ký hoặc số điện thoại (cho check-in).
+        /// </summary>
+        /// <param name="code">Mã đăng ký hoặc số điện thoại</param>
+        /// <returns>Danh sách đăng ký phù hợp</returns>
+        Task<IEnumerable<DonationRegistrationDto>> SearchRegistrationsForCheckinAsync(string code);
+
+        /// <summary>
+        /// Xác nhận check-in cho một đăng ký hiến máu.
+        /// </summary>
+        /// <param name="registrationId">Id đăng ký</param>
+        /// <returns>True nếu thành công</returns>
+        Task<bool> CheckinRegistrationAsync(int registrationId);
     }
 } 
