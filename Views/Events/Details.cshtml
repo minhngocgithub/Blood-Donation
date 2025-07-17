@@ -3,6 +3,8 @@
     ViewData["Title"] = Model.EventName;
 }
 
+<link rel="stylesheet" href="~/css/event-page.css" />
+
 <div class="event-details-page">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="bg-light py-3">
@@ -90,7 +92,7 @@
                                     }
                                     @foreach (var bloodType in bloodTypes)
                                     {
-                                        <span class="badge bg-danger me-2 mb-2 px-3 py-2">@bloodType.Trim()</span>
+                                        <span class="badge bg-danger me-2 mb-2 px-3 py-2">@GetBloodTypeVi(bloodType.Trim())</span>
                                     }
                                 </div>
                             </div>
@@ -316,3 +318,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+
+@{
+    string GetBloodTypeVi(string bloodType)
+    {
+        return bloodType switch
+        {
+            "A+" => "A+",
+            "A-" => "A-",
+            "B+" => "B+",
+            "B-" => "B-",
+            "O+" => "O+",
+            "O-" => "O-",
+            "AB+" => "AB+",
+            "AB-" => "AB-",
+            "All" => "Mọi nhóm máu",
+            _ => bloodType
+        };
+    }
+}

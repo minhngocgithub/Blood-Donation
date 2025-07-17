@@ -203,11 +203,9 @@ public enum RoleType
 {
     Admin = "Quản trị viên",             // Quản trị toàn hệ thống
     Doctor = "Bác sĩ",                   // Bác sĩ sàng lọc
-    Nurse = "Y tá",                      // Y tá thực hiện hiến máu
     Staff = "Nhân viên",                 // Nhân viên tổ chức
     Hospital = "Bệnh viện",              // Đại diện bệnh viện
     User = "Người dùng",                 // Người hiến máu
-    Volunteer = "Tình nguyện viên"       // Tình nguyện viên hỗ trợ
 }
 ```
 

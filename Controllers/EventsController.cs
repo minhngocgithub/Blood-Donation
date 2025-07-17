@@ -28,7 +28,7 @@ namespace Blood_Donation_Website.Controllers
                 var pagedResult = await _eventService.GetEventsPagedAsync(searchDto);
                 return View(pagedResult.Items);
             }
-            catch (Exception ex)
+            catch
             {
                 return View(new List<BloodDonationEventDto>());
             }
@@ -56,7 +56,7 @@ namespace Blood_Donation_Website.Controllers
                 
                 return Json(pagedResult.Items);
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new List<BloodDonationEventDto>());
             }
@@ -74,14 +74,14 @@ namespace Blood_Donation_Website.Controllers
                 }
                 return View(eventDetails);
             }
-            catch (Exception ex)
+            catch
             {
                 return NotFound();
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(int eventId)
+        public IActionResult Register(int eventId)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Blood_Donation_Website.Controllers
 
                 return Json(new { success = true, message = "Đăng ký sự kiện thành công!" });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Có lỗi xảy ra khi đăng ký sự kiện" });
             }

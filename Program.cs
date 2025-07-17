@@ -26,8 +26,17 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
 builder.Services.AddScoped<IBloodDonationEventService, BloodDonationEventService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+
+builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
+builder.Services.AddScoped<IDonationRegistrationService, DonationRegistrationService>();
+builder.Services.AddScoped<IBloodTypeService, BloodTypeService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IDonationHistoryService, DonationHistoryService>();
+
+
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

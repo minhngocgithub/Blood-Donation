@@ -95,7 +95,7 @@ public class ExampleController : Controller
             this.Success("Đăng ký thành công!", "Chúng tôi sẽ liên hệ với bạn sớm nhất.");
             return RedirectToAction("Index");
         }
-        catch (Exception ex)
+        catch
         {
             this.Error("Có lỗi xảy ra", ex.Message);
             return View();
