@@ -6,11 +6,8 @@ namespace Blood_Donation_Website.Controllers.Home
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController()
         {
-            _logger = logger;
         }
 
         public IActionResult Index()
@@ -44,6 +41,7 @@ namespace Blood_Donation_Website.Controllers.Home
         }
 
         public IActionResult SweetAlertDemo()
+
         {
             return View();
         }
@@ -54,4 +52,4 @@ namespace Blood_Donation_Website.Controllers.Home
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
-} 
+}

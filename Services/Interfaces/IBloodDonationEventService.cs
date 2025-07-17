@@ -37,6 +37,10 @@ namespace Blood_Donation_Website.Services.Interfaces
         
         // Event search and filtering
         Task<IEnumerable<BloodDonationEventDto>> SearchEventsAsync(string searchTerm);
+
+
+        Task<IEnumerable<BloodDonationEventDto>> SearchEventsByNameDescLocationAsync(string searchTerm, string location);
+
         Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(string status);
         Task<IEnumerable<BloodDonationEventDto>> GetEventsByBloodTypeAsync(string requiredBloodTypes);
         

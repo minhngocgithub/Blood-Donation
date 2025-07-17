@@ -106,7 +106,6 @@ namespace Blood_Donation_Website.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Manual validation for AgreeToTerms
             if (!model.AgreeToTerms)
             {
                 ModelState.AddModelError("AgreeToTerms", "Bạn phải đồng ý với điều khoản sử dụng");
@@ -114,7 +113,6 @@ namespace Blood_Donation_Website.Controllers
 
             if (!ModelState.IsValid)
             {
-                // Log validation errors for debugging
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     _logger.LogWarning("Validation error: {Error}", error.ErrorMessage);

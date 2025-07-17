@@ -215,13 +215,6 @@
             const fullAddressInput = document.getElementById('fullAddress');
 
             if (!provinceSelect || !districtSelect || !wardSelect || !addressDetailInput || !fullAddressInput) {
-                console.error('One or more required elements not found:', {
-                    provinceSelect: !!provinceSelect,
-                    districtSelect: !!districtSelect,
-                    wardSelect: !!wardSelect,
-                    addressDetailInput: !!addressDetailInput,
-                    fullAddressInput: !!fullAddressInput
-                });
                 return;
             }
 
@@ -232,22 +225,8 @@
                 return textArea.value;
             }
 
-            function logAddressState() {
-                console.log('Current address state:', {
-                    province: provinceSelect?.value || '',
-                    provinceName: provinceSelect?.options[provinceSelect.selectedIndex]?.text || '',
-                    district: districtSelect?.value || '',
-                    districtName: districtSelect?.options[districtSelect.selectedIndex]?.text || '',
-                    ward: wardSelect?.value || '',
-                    wardName: wardSelect?.options[wardSelect.selectedIndex]?.text || '',
-                    addressDetail: addressDetailInput?.value || '',
-                    fullAddress: fullAddressInput?.value || ''
-                });
-            }
-
             async function loadProvinces() {
                 try {
-                    console.log('Loading provinces...');
                     const response = await fetch('https://provinces.open-api.vn/api/p/');
                     const provinces = await response.json();
                     
@@ -257,25 +236,17 @@
                     });
 
                     const savedProvince = decodeHTMLEntities('@Model.Province');
-                    console.log('Saved province from model (decoded):', savedProvince);
                     if (savedProvince && savedProvince.trim()) {
-                        console.log('Looking for province option:', savedProvince);
                         const options = Array.from(provinceSelect.options);
-                        console.log('Available province options:', options.map(opt => opt.text));
                         
                         const option = options.find(opt => 
                             opt.text.trim().toLowerCase() === savedProvince.trim().toLowerCase()
                         );
                         if (option) {
-                            console.log('Found matching province option:', option.text);
                             option.selected = true;
                             districtSelect.disabled = false;
                             loadDistricts(option.text);
-                        } else {
-                            console.warn('No matching province option found for:', savedProvince);
                         }
-                    } else {
-                        console.log('No saved province value');
                     }
                 } catch (error) {
                     console.error('Error loading provinces:', error);
@@ -284,7 +255,6 @@
 
             async function loadDistricts(provinceName) {
                 try {
-                    console.log('Loading districts for province:', provinceName);
                     const response = await fetch(`https://provinces.open-api.vn/api/p/search/?q=${encodeURIComponent(provinceName)}`);
                     const provinces = await response.json();
                     
@@ -299,25 +269,17 @@
                         });
 
                         const savedDistrict = decodeHTMLEntities('@Model.District');
-                        console.log('Saved district from model (decoded):', savedDistrict);
                         if (savedDistrict && savedDistrict.trim()) {
-                            console.log('Looking for district option:', savedDistrict);
                             const options = Array.from(districtSelect.options);
-                            console.log('Available district options:', options.map(opt => opt.text));
                             
                             const option = options.find(opt => 
                                 opt.text.trim().toLowerCase() === savedDistrict.trim().toLowerCase()
                             );
                             if (option) {
-                                console.log('Found matching district option:', option.text);
                                 option.selected = true;
                                 wardSelect.disabled = false;
                                 loadWards(option.text);
-                            } else {
-                                console.warn('No matching district option found for:', savedDistrict);
                             }
-                        } else {
-                            console.log('No saved district value');
                         }
                     }
                 } catch (error) {
@@ -327,7 +289,6 @@
 
             async function loadWards(districtName) {
                 try {
-                    console.log('Loading wards for district:', districtName);
                     const response = await fetch(`https://provinces.open-api.vn/api/d/search/?q=${encodeURIComponent(districtName)}`);
                     const districts = await response.json();
                     
@@ -342,24 +303,16 @@
                         });
 
                         const savedWard = decodeHTMLEntities('@Model.Ward');
-                        console.log('Saved ward from model (decoded):', savedWard);
                         if (savedWard && savedWard.trim()) {
-                            console.log('Looking for ward option:', savedWard);
                             const options = Array.from(wardSelect.options);
-                            console.log('Available ward options:', options.map(opt => opt.text));
                             
                             const option = options.find(opt => 
                                 opt.text.trim().toLowerCase() === savedWard.trim().toLowerCase()
                             );
                             if (option) {
-                                console.log('Found matching ward option:', option.text);
                                 option.selected = true;
                                 updateFullAddress();
-                            } else {
-                                console.warn('No matching ward option found for:', savedWard);
                             }
-                        } else {
-                            console.log('No saved ward value');
                         }
                     }
                 } catch (error) {
@@ -376,28 +329,16 @@
 
                     const parts = [addressDetail, ward, district, province].filter(part => part);
                     const fullAddress = parts.join(', ');
-                    
-                    console.log('Current address components:', {
-                        province: provinceSelect?.options[provinceSelect.selectedIndex]?.text,
-                        district: districtSelect?.options[districtSelect.selectedIndex]?.text,
-                        ward: wardSelect?.options[wardSelect.selectedIndex]?.text,
-                        addressDetail: addressDetail
-                    });
 
                     if (fullAddressInput) {
                         fullAddressInput.value = fullAddress;
-                        console.log('Updated full address value:', fullAddress);
                     }
-                    
-                    console.log('Updated full address:', fullAddress);
                 } catch (error) {
                     console.error('Error updating address:', error);
                 }
             }
 
             provinceSelect.addEventListener('change', async function() {
-                console.log('Province changed:', this.value);
-                
                 districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
                 wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
                 
@@ -411,8 +352,6 @@
             });
 
             districtSelect.addEventListener('change', async function() {
-                console.log('District changed:', this.value);
-                
                 wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
                 wardSelect.disabled = !this.value;
                 
@@ -423,12 +362,10 @@
             });
 
             wardSelect.addEventListener('change', function() {
-                console.log('Ward changed:', this.value);
                 updateFullAddress();
             });
 
             addressDetailInput.addEventListener('input', function() {
-                console.log('Address detail changed:', this.value);
                 updateFullAddress();
             });
 

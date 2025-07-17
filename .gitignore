@@ -522,4 +522,13 @@ secrets.json
 *.bak
 *.backup
 
+<<<<<<< HEAD
+=======
+# Data Export files
+DatabaseExport/
+*.export.json
+*.export.csv
+
+note.txt
+>>>>>>> develop
 INSTRUCTION.md
