@@ -103,7 +103,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching events by name/desc/location: {Message}", ex.Message);
+                
                 return new List<BloodDonationEventDto>();
             }
         }
