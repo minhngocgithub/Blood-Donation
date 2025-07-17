@@ -101,7 +101,6 @@ namespace Blood_Donation_Website.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Manual validation for AgreeToTerms
             if (!model.AgreeToTerms)
             {
                 ModelState.AddModelError("AgreeToTerms", "Bạn phải đồng ý với điều khoản sử dụng");
