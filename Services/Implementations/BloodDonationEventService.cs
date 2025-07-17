@@ -1,3 +1,4 @@
+
 using Blood_Donation_Website.Data;
 using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
@@ -52,6 +53,58 @@ namespace Blood_Donation_Website.Services.Implementations
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+        public async Task<IEnumerable<BloodDonationEventDto>> SearchEventsByNameDescLocationAsync(string searchTerm, string location)
+        {
+            try
+            {
+                var query = _context.BloodDonationEvents
+                    .Include(e => e.Location)
+                    .Include(e => e.Creator)
+                    .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query = query.Where(e =>
+                        e.EventName.Contains(searchTerm) ||
+                        (e.EventDescription != null && e.EventDescription.Contains(searchTerm))
+                    );
+                }
+
+                if (!string.IsNullOrWhiteSpace(location))
+                {
+                    query = query.Where(e => e.Location != null && e.Location.LocationName.Contains(location));
+                }
+
+                var events = await query.OrderByDescending(e => e.EventDate).ToListAsync();
+
+                return events.Select(e => new BloodDonationEventDto
+                {
+                    EventId = e.EventId,
+                    EventName = e.EventName,
+                    EventDescription = e.EventDescription,
+                    EventDate = e.EventDate,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    LocationId = e.LocationId,
+                    MaxDonors = e.MaxDonors,
+                    CurrentDonors = e.CurrentDonors,
+                    Status = e.Status,
+                    ImageUrl = e.ImageUrl,
+                    RequiredBloodTypes = e.RequiredBloodTypes,
+                    CreatedBy = e.CreatedBy,
+                    CreatedDate = e.CreatedDate,
+                    UpdatedDate = e.UpdatedDate,
+                    LocationName = e.Location?.LocationName,
+                    LocationAddress = e.Location?.Address,
+                    CreatorName = e.Creator?.FullName
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching events by name/desc/location: {Message}", ex.Message);
+                return new List<BloodDonationEventDto>();
             }
         }
 

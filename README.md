@@ -110,6 +110,8 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 
 ---
 
+<<<<<<< HEAD
+=======
 ## Kiến trúc dự án
 
 Dự án được phát triển theo mô hình kiến trúc MVC (Model-View-Controller) với nhiều lớp rõ ràng:
@@ -140,6 +142,7 @@ Chi tiết kiến trúc dự án có thể xem tại [PROJECT_ARCHITECTURE.md](d
 
 ---
 
+>>>>>>> develop
 ## Hướng dẫn cài đặt & khởi động
 
 1. **Yêu cầu hệ thống:**
@@ -179,8 +182,11 @@ Chi tiết kiến trúc dự án có thể xem tại [PROJECT_ARCHITECTURE.md](d
 **Tài liệu tham khảo:**  
 - [DATABASE.md](docs/DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu  
 - [DESCRIPTION.md](docs/DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống  
+<<<<<<< HEAD
+=======
 - [PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md) – Kiến trúc dự án & vai trò các thành phần  
 - [APPLICATION_WORKFLOW.md](docs/APPLICATION_WORKFLOW.md) – Luồng hoạt động chi tiết của ứng dụng  
+>>>>>>> develop
 - [docs/](docs/) – Hướng dẫn chi tiết về các thành phần hệ thống
 
 ---

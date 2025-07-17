@@ -100,6 +100,9 @@ namespace Blood_Donation_Website.Services.Interfaces
         /// <summary>
         /// Lấy danh sách sự kiện hiến máu theo trạng thái.
         /// </summary>
+
+        Task<IEnumerable<BloodDonationEventDto>> SearchEventsByNameDescLocationAsync(string searchTerm, string location);
+
         Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(string status);
         /// <summary>
         /// Lấy danh sách sự kiện hiến máu theo nhóm máu cần thiết.

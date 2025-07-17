@@ -22,25 +22,39 @@
     <section class="search-filter-section py-4 bg-light">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                     <div class="search-box">
-                        <div class="input-group">
-                            <input type="text" class="form-control form-control-lg" 
-                                   placeholder="Tìm kiếm sự kiện..." id="searchInput">
-                            <button class="btn btn-primary" type="button" id="searchBtn">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="filter-options">
-                        <select class="form-select form-select-lg" id="locationFilter">
-                            <option value="">Tất cả địa điểm</option>
-                            <option value="ho-chi-minh">TP. Hồ Chí Minh</option>
-                            <option value="ha-noi">Hà Nội</option>
-                            <option value="da-nang">Đà Nẵng</option>
-                        </select>
+                        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+                            <div class="col-lg-8 col-md-8 col-12 mb-2 mb-lg-0">
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="Tìm kiếm sự kiện..." name="searchTerm" value="@Context.Request.Query["searchTerm"]">
+                            </div>
+                            <div class="col-lg-3 col-md-4 col-8 mb-2 mb-lg-0">
+                                <select class="form-select form-select-lg" name="location">
+                                    <option value="">Tất cả địa điểm</option>
+                                    @{
+                                        var selectedLocation = (string)Context.Request.Query["location"];
+                                        var locations = new[] { "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng" };
+                                        foreach (var loc in locations)
+                                        {
+                                            if (selectedLocation == loc)
+                                            {
+                                                <option value="@loc" selected>@loc</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@loc">@loc</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-12 col-4">
+                                <button class="btn btn-primary w-100" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -294,22 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listeners
     window.addEventListener('scroll', checkScroll);
     
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    
-    function performSearch() {
-        const query = searchInput.value.trim();
-        // TODO: Implement search functionality
-        console.log('Searching for:', query);
-    }
-    
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
+    // Đã chuyển sang submit form MVC, không dùng JS tìm kiếm nữa
     
     // Filter functionality
     const locationFilter = document.getElementById('locationFilter');
