@@ -16,16 +16,14 @@ Quản lý người dùng toàn diện bao gồm:
 
 ### 2. **IBloodTypeService.cs**
 Quản lý nhóm máu:
-- **CRUD**: Quản lý thực thể nhóm máu
 - **Thống kê**: Số lượt hiến, thể tích, số người
-- **Xác thực**: Kiểm tra tồn tại, tên nhóm máu
 - **Tìm kiếm**
 
 ### 3. **IRoleService.cs**
 Quản lý truy cập theo vai trò:
 - **CRUD**: Quản lý vai trò
 - **Gán vai trò**: Gán / huỷ vai trò cho người dùng
-- **Người dùng theo vai trò**
+- **Lọc theo vai trò**
 - **Xác thực**: Kiểm tra tên và tồn tại vai trò
 - **Thống kê**: Số người dùng theo vai trò
 
@@ -47,12 +45,12 @@ Quản lý sự kiện hiến máu:
 - **Lịch**: Tương lai, quá khứ, theo khoảng ngày
 - **Thống kê**
 - **Xác thực**
-- **Thông báo**
+- **Thông báo**: Thông báo cho người dùng gần địa điểm
 
 ### 6. **IDonationRegistrationService.cs**
 Quản lý đăng ký hiến máu:
 - **CRUD**
-- **Trạng thái**: Duyệt, huỷ, check-in...
+- **Trạng thái**: (Các trạng thái xem trong TABLE_ENUM)
 - **Truy vấn**: Theo người, theo sự kiện
 - **Xác thực**: Kiểm tra điều kiện và số lượng
 - **Thống kê**
@@ -60,8 +58,7 @@ Quản lý đăng ký hiến máu:
 
 ### 7. **IDonationHistoryService.cs**
 Theo dõi lịch sử hiến máu:
-- **CRUD**
-- **Trạng thái**
+- **Trạng thái**: (Các trạng thái xem trong TABLE_ENUM)
 - **Truy vấn**
 - **Thống kê**
 - **Điều kiện đủ**
@@ -72,18 +69,17 @@ Theo dõi lịch sử hiến máu:
 Quản lý sàng lọc sức khoẻ:
 - **CRUD**
 - **Truy vấn**
-- **Trạng thái**
-- **Xác thực**
+- **Trạng thái**: (Các trạng thái xem trong TABLE_ENUM)
+- **Check-in**
 - **Thống kê**
 - **Báo cáo**
-- **Quy trình**
 
 ## Giao Diện Quản Lý Nội Dung
 
 ### 9. **INewsService.cs**
 Quản lý tin tức:
 - **CRUD**
-- **Trạng thái**: Phát hành / gỡ bài
+- **Trạng thái**: (Các trạng thái xem trong TABLE_ENUM)
 - **Truy vấn**
 - **Thống kê**
 - **Theo dõi lượt xem**
@@ -97,7 +93,6 @@ Quản lý danh mục tin tức:
 - **Trạng thái**
 - **Thống kê**
 - **Quản lý bài viết**
-- **Cấu trúc phân cấp**
 
 ## Giao Diện Giao Tiếp
 
@@ -129,14 +124,10 @@ Quản lý liên hệ:
 
 ### 13. **IBloodCompatibilityService.cs**
 Quản lý tương thích nhóm máu:
-- **CRUD**
 - **Truy vấn**
-- **Xác thực**
 - **Ma trận tương thích**
 - **Thống kê**
 - **Gợi ý**
-- **Khẩn cấp**
-- **Thông tin giáo dục**
 
 ### 14. **ISettingService.cs**
 Quản lý thiết lập hệ thống:
@@ -176,7 +167,7 @@ Quản lý tài khoản:
 ### 17. **IProfileService.cs**
 Quản lý hồ sơ người dùng:
 - **Xem / cập nhật**
-- **Lấy nhóm máu khả dụng**
+- **Cập nhật nhóm máu**: (Quyền của Bệnh viện, Bác sĩ và Admin)
 
 ### 18. **IEmailService.cs**
 Gửi email:

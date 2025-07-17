@@ -8,12 +8,10 @@ namespace Blood_Donation_Website.Services.Implementations
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+        public EmailService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _logger = logger;
         }
 
         public async Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true)
@@ -29,7 +27,6 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (string.IsNullOrEmpty(smtpUsername) || string.IsNullOrEmpty(smtpPassword))
                 {
-                    _logger.LogWarning("Email configuration not found. Email sending is disabled.");
                     return true;
                 }
 
@@ -55,12 +52,10 @@ namespace Blood_Donation_Website.Services.Implementations
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
 
-                _logger.LogInformation($"Email sent successfully to {to}");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to send email to {to}");
                 return false;
             }
         }

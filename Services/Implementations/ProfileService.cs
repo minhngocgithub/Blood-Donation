@@ -9,12 +9,10 @@ namespace Blood_Donation_Website.Services.Implementations
     public class ProfileService : IProfileService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<ProfileService> _logger;
 
-        public ProfileService(ApplicationDbContext context, ILogger<ProfileService> logger)
+        public ProfileService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<BloodType>> GetBloodTypesAsync()
@@ -28,7 +26,6 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 if (!int.TryParse(userId, out int id))
                 {
-                    _logger.LogWarning("Invalid userId format: {UserId}", userId);
                     throw new ArgumentException("Invalid user ID format");
                 }
 
@@ -38,7 +35,6 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (user == null)
                 {
-                    _logger.LogWarning("User not found with ID: {UserId}", userId);
                     throw new InvalidOperationException("User not found");
                 }
 
@@ -49,9 +45,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 string province = "", district = "", ward = "", addressDetail = "";
                 if (!string.IsNullOrEmpty(user.Address))
                 {
-                    _logger.LogInformation("Parsing address from database: {Address}", user.Address);
                     var addressParts = user.Address.Split(',').Select(p => p.Trim()).ToList();
-                    _logger.LogInformation("Address parts count: {Count}", addressParts.Count);
 
                     if (addressParts.Count >= 4)
                     {
@@ -59,19 +53,14 @@ namespace Blood_Donation_Website.Services.Implementations
                         ward = addressParts[1];
                         district = addressParts[2];
                         province = addressParts[3];
-                        
-                        _logger.LogInformation("Parsed address components: AddressDetail={AddressDetail}, Ward={Ward}, District={District}, Province={Province}",
-                            addressDetail, ward, district, province);
                     }
                     else
                     {
                         addressDetail = user.Address;
-                        _logger.LogWarning("Address format is not as expected. Full address stored in AddressDetail: {Address}", user.Address);
                     }
                 }
                 else
                 {
-                    _logger.LogInformation("No address found in database for user {UserId}", userId);
                 }
 
                 return new ProfileViewModel
@@ -93,7 +82,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting profile for user {UserId}: {Message}", userId, ex.Message);
                 throw;
             }
         }
@@ -104,14 +92,12 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 if (!int.TryParse(userId, out int id))
                 {
-                    _logger.LogWarning("Invalid userId format: {UserId}", userId);
                     throw new ArgumentException("Invalid user ID format");
                 }
 
                 var user = await _context.Users.FindAsync(id);
                 if (user == null)
                 {
-                    _logger.LogWarning("User not found with ID: {UserId}", userId);
                     throw new InvalidOperationException("User not found");
                 }
 
@@ -137,14 +123,12 @@ namespace Blood_Donation_Website.Services.Implementations
                     user.BloodTypeId = bloodTypeId;
                 }
                 
-                _logger.LogInformation("Updating address for user {UserId}. New address: {Address}", userId, user.Address);
 
                 await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating profile for user {UserId}: {Message}", userId, ex.Message);
                 throw;
             }
         }

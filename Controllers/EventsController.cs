@@ -7,12 +7,10 @@ namespace Blood_Donation_Website.Controllers
     public class EventsController : Controller
     {
         private readonly IBloodDonationEventService _eventService;
-        private readonly ILogger<EventsController> _logger;
 
-        public EventsController(IBloodDonationEventService eventService, ILogger<EventsController> logger)
+        public EventsController(IBloodDonationEventService eventService)
         {
             _eventService = eventService;
-            _logger = logger;
         }
 
         public async Task<IActionResult> Index(string searchTerm, string location)
@@ -39,7 +37,6 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading events page");
                 return View(new List<BloodDonationEventDto>());
             }
         }
@@ -68,7 +65,6 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading more events");
                 return Json(new List<BloodDonationEventDto>());
             }
         }
@@ -87,7 +83,6 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading event details for ID: {EventId}", id);
                 return NotFound();
             }
         }
@@ -107,7 +102,6 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error registering for event ID: {EventId}", eventId);
                 return Json(new { success = false, message = "Có lỗi xảy ra khi đăng ký sự kiện" });
             }
         }
