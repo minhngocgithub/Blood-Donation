@@ -17,6 +17,73 @@ namespace Blood_Donation_Website.Controllers
             _registrationService = registrationService;
         }
 
+        // GET: /DonationRegistration/Checkin
+        [HttpGet]
+        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        public IActionResult Checkin()
+        {
+            // Trang check-in ban đầu, không có dữ liệu
+            return View(new List<DonationRegistrationDto>());
+        }
+
+        // POST: /DonationRegistration/Checkin
+        [HttpPost]
+        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Checkin(string RegistrationCode)
+        {
+            var showAll = Request.Form["showAll"].ToString();
+            IEnumerable<DonationRegistrationDto> results;
+            if (!string.IsNullOrEmpty(showAll) && showAll == "true")
+            {
+                // Hiển thị tất cả đăng ký chưa check-in
+                results = await _registrationService.GetRegistrationsByStatusAsync("Registered");
+            }
+            else if (!string.IsNullOrWhiteSpace(RegistrationCode))
+            {
+                results = await _registrationService.SearchRegistrationsForCheckinAsync(RegistrationCode);
+                if (results == null || !results.Any())
+                {
+                    TempData["Error"] = "Không tìm thấy đăng ký phù hợp.";
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Vui lòng nhập mã đăng ký hoặc số điện thoại hoặc chọn 'Hiển thị tất cả'.";
+                results = new List<DonationRegistrationDto>();
+            }
+            return View(results);
+        }
+
+        // POST: /DonationRegistration/ConfirmCheckin
+        [HttpPost]
+        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmCheckin(int id)
+        {
+            var registration = await _registrationService.GetRegistrationByIdAsync(id);
+            if (registration == null)
+            {
+                TempData["Error"] = "Không tìm thấy đăng ký.";
+                return RedirectToAction("Checkin");
+            }
+            if (registration.Status == "CheckedIn")
+            {
+                TempData["Error"] = "Người này đã được check-in.";
+                return RedirectToAction("Checkin");
+            }
+            var success = await _registrationService.CheckinRegistrationAsync(id);
+            if (success)
+            {
+                TempData["Success"] = "Check-in thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi check-in.";
+            }
+            return RedirectToAction("Checkin");
+        }
+
         // GET: /DonationRegistration/MyRegistrations
         public async Task<IActionResult> MyRegistrations()
         {

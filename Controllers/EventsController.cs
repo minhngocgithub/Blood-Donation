@@ -7,10 +7,12 @@ namespace Blood_Donation_Website.Controllers
     public class EventsController : Controller
     {
         private readonly IBloodDonationEventService _eventService;
+        private readonly IDonationRegistrationService _registrationService;
 
-        public EventsController(IBloodDonationEventService eventService)
+        public EventsController(IBloodDonationEventService eventService, IDonationRegistrationService registrationService)
         {
             _eventService = eventService;
+            _registrationService = registrationService;
         }
 
         public async Task<IActionResult> Index()
@@ -72,6 +74,17 @@ namespace Blood_Donation_Website.Controllers
                 {
                     return NotFound();
                 }
+                bool userHasRegistered = false;
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+                    {
+                        var reg = await _registrationService.GetUserRegistrationForEventAsync(userId, id);
+                        userHasRegistered = reg != null && (reg.Status == "Registered" || reg.Status == "CheckedIn");
+                    }
+                }
+                ViewBag.UserHasRegistered = userHasRegistered;
                 return View(eventDetails);
             }
             catch
@@ -81,24 +94,45 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(int eventId)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(int eventId)
         {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {
+                TempData["Error"] = "Bạn cần đăng nhập để đăng ký sự kiện.";
+                return RedirectToAction("Details", new { id = eventId });
+            }
+
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                TempData["Error"] = "Không xác định được người dùng.";
+                return RedirectToAction("Details", new { id = eventId });
+            }
+
             try
             {
-                if (User.Identity == null || !User.Identity.IsAuthenticated)
+                var createDto = new DonationRegistrationCreateDto
                 {
-                    return Json(new { success = false, message = "Bạn cần đăng nhập để đăng ký sự kiện" });
+                    UserId = userId,
+                    EventId = eventId,
+                    Notes = null
+                };
+                var result = await _registrationService.CreateRegistrationAsync(createDto);
+                if (result != null && result.RegistrationId > 0)
+                {
+                    TempData["Success"] = "Đăng ký sự kiện thành công!";
                 }
-
-                // TODO: Implement event registration logic
-                // var result = await _eventService.RegisterForEventAsync(eventId, User.Identity.Name);
-
-                return Json(new { success = true, message = "Đăng ký sự kiện thành công!" });
+                else
+                {
+                    TempData["Error"] = "Đăng ký thất bại hoặc bạn đã đăng ký sự kiện này.";
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Có lỗi xảy ra khi đăng ký sự kiện" });
+                TempData["Error"] = ex.Message;
             }
+            return RedirectToAction("Details", new { id = eventId });
         }
     }
 }

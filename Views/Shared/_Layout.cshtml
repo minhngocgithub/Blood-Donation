@@ -145,7 +145,7 @@
                                     @if (User.IsInRole("Quản trị viên") || User.IsInRole("Bệnh viện") || User.IsInRole("Bác sĩ") || User.IsInRole("Nhân viên"))
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="CheckIn">
+                                            <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
                                                 <i class="fas fa-user-check me-2 text-info"></i>Check-in người hiến máu
                                             </a>
                                         </li>
@@ -170,12 +170,12 @@
                                     @if (User.IsInRole("Bệnh viện"))
                                     {
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Events" asp-action="Manage">
+                                            <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
                                                 <i class="fas fa-calendar-alt me-2 text-danger"></i>Quản lý sự kiện
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" asp-controller="Location" asp-action="Manage">
+                                            <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
                                                 <i class="fas fa-map-marker-alt me-2 text-success"></i>Quản lý địa điểm
                                             </a>
                                         </li>
@@ -245,7 +245,7 @@
                 <!-- Brand Column -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="footer-brand mb-3">
-                        <img src="./images/logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
+                        <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
                         <h5 class="text-white fw-bold">BloodLife</h5>
                     </div>
                     <p class="text-muted mb-3">
