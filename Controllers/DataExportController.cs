@@ -7,7 +7,7 @@ using System.IO.Compression;
 
 namespace Blood_Donation_Website.Controllers.Admin
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Quản trị viên")]
     [Route("admin/data-export")]
     public class DataExportController : Controller
     {
@@ -148,7 +148,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                 
                 return File(fileBytes, contentType, fileName);
             }
-            catch (Exception ex)
+            catch 
             {
                 return NotFound("Error downloading file.");
             }

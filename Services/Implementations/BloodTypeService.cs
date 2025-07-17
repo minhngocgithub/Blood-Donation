@@ -30,7 +30,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Description = bloodType.Description
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -52,7 +52,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Description = bloodType.Description
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -73,7 +73,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Description = b.Description
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<BloodTypeDto>();
             }
@@ -104,7 +104,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Description = bloodType.Description
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -123,7 +123,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -158,7 +158,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -192,7 +192,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserCount = userCount
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new BloodTypeStatisticsDto
                 {
@@ -220,7 +220,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return statistics.OrderByDescending(s => s.TotalDonations);
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<BloodTypeStatisticsDto>();
             }
@@ -234,7 +234,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.BloodTypeId == bloodTypeId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -248,7 +248,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.BloodTypeId == bloodTypeId)
                     .SumAsync(d => d.Volume);
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -262,7 +262,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(u => u.BloodTypeId == bloodTypeId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -275,7 +275,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.BloodTypes.AnyAsync(b => b.BloodTypeId == bloodTypeId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -287,7 +287,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.BloodTypes.AnyAsync(b => b.BloodTypeName == bloodTypeName);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -311,7 +311,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Description = b.Description
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<BloodTypeDto>();
             }

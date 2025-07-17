@@ -47,7 +47,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = registration.Event?.Location?.LocationName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -83,7 +83,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -165,7 +165,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     HasNextPage = pageNumber < totalPages
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new PagedResponseDto<DonationRegistrationDto>
                 {
@@ -220,7 +220,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -243,7 +243,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -264,7 +264,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -282,7 +282,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -300,7 +300,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -322,7 +322,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -340,7 +340,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -358,7 +358,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -371,7 +371,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 return registration?.Status ?? "Unknown";
             }
-            catch (Exception ex)
+            catch
             {
                 return "Unknown";
             }
@@ -409,7 +409,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -446,7 +446,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -483,7 +483,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -520,7 +520,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -557,7 +557,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = registration.Event?.Location?.LocationName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -570,7 +570,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.DonationRegistrations.AnyAsync(r => r.RegistrationId == registrationId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -583,7 +583,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 return await _context.DonationRegistrations
                     .AnyAsync(r => r.UserId == userId && r.EventId == eventId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -618,7 +618,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -631,7 +631,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 return eventEntity?.CurrentDonors >= eventEntity?.MaxDonors;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -644,7 +644,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 return eventEntity?.EventDate > DateTime.Now;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -659,7 +659,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(r => r.EventId == eventId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -673,7 +673,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(r => r.UserId == userId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -687,7 +687,21 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(r => r.Status == status)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> GetRegistrationCountByUserAndStatusAsync(int userId, string status)
+        {
+            try
+            {
+                return await _context.DonationRegistrations
+                    .Where(r => r.UserId == userId && r.Status == status)
+                    .CountAsync();
+            }
+            catch
             {
                 return 0;
             }
@@ -701,7 +715,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(r => r.RegistrationDate >= startDate && r.RegistrationDate <= endDate)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -742,7 +756,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -779,7 +793,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -816,7 +830,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -853,7 +867,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationName = r.Event?.Location?.LocationName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationRegistrationDto>();
             }
@@ -880,7 +894,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -906,7 +920,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -932,7 +946,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -946,7 +960,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 return await _context.HealthScreenings
                     .AnyAsync(h => h.RegistrationId == registrationId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -961,7 +975,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return screening?.IsEligible ?? false;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -979,7 +993,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     await _context.SaveChangesAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
             }
         }
@@ -995,7 +1009,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     await _context.SaveChangesAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
             }
         }

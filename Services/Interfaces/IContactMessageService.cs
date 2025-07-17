@@ -10,6 +10,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<IEnumerable<ContactMessageDto>> GetAllMessagesAsync();
         Task<PagedResponseDto<ContactMessageDto>> GetMessagesPagedAsync(SearchParametersDto searchDto);
         Task<ContactMessageDto> CreateMessageAsync(ContactMessageCreateDto createDto);
+        Task<bool> CreateContactMessageAsync(ContactMessageDto model);
         Task<bool> UpdateMessageAsync(int messageId, ContactMessageUpdateDto updateDto);
         Task<bool> DeleteMessageAsync(int messageId);
         

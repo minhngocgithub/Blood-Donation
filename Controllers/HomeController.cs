@@ -1,18 +1,26 @@
 using Blood_Donation_Website.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Blood_Donation_Website.Services.Interfaces;
+using Blood_Donation_Website.Models.DTOs;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Blood_Donation_Website.Controllers.Home
 {
     public class HomeController : Controller
     {
-        public HomeController()
+        private readonly IBloodDonationEventService _eventService;
+
+        public HomeController(IBloodDonationEventService eventService)
         {
+            _eventService = eventService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var upcomingEvents = (await _eventService.GetUpcomingEventsAsync()).Take(3).ToList();
+            return View(upcomingEvents);
         }
 
         public IActionResult About()

@@ -11,7 +11,7 @@
                          alt="@eventItem.EventName" class="img-fluid">
                     <div class="event-date">
                         <span class="day">@eventItem.EventDate.Day</span>
-                        <span class="month">Th@eventItem.EventDate.Month</span>
+                        <span class="month">Th@(eventItem.EventDate.Month)</span>
                     </div>
                 </div>
                 <div class="event-content">
@@ -56,24 +56,6 @@
                         <span class="event-status @statusClass">@statusText</span>
                         
                         <div class="ms-auto">
-                            @if (eventItem.Status.ToLower() == "active")
-                            {
-                                @if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <button type="button" class="btn btn-register" data-event-id="@eventItem.EventId">
-                                        <i class="fas fa-calendar-plus me-1"></i>
-                                        Đăng ký
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="button" class="btn btn-register" onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
-                                        <i class="fas fa-calendar-plus me-1"></i>
-                                        Đăng ký
-                                    </button>
-                                }
-                            }
-                            
                             <a href="/Events/Details/@eventItem.EventId" class="btn btn-outline-primary">
                                 <i class="fas fa-info-circle me-1"></i>
                                 Chi tiết
@@ -109,7 +91,7 @@
                             }
                             @foreach (var bloodType in bloodTypes)
                             {
-                                <span class="badge bg-danger me-1">@bloodType.Trim()</span>
+                                <span class="badge bg-danger me-1">@GetBloodTypeVi(bloodType.Trim())</span>
                             }
                         </div>
                     }
@@ -127,4 +109,23 @@ else
             <p class="text-muted">Hiện tại chưa có sự kiện hiến máu nào được tổ chức.</p>
         </div>
     </div>
+}
+
+@{
+    string GetBloodTypeVi(string bloodType)
+    {
+        return bloodType switch
+        {
+            "A+" => "A+",
+            "A-" => "A-",
+            "B+" => "B+",
+            "B-" => "B-",
+            "O+" => "O+",
+            "O-" => "O-",
+            "AB+" => "AB+",
+            "AB-" => "AB-",
+            "All" => "Mọi nhóm máu",
+            _ => bloodType
+        };
+    }
 }

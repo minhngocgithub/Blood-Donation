@@ -80,7 +80,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     TotalDonations = user.DonationHistories.Count
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -127,7 +127,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
