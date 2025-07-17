@@ -1,0 +1,199 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.LocationDto>
+@{
+    ViewData["Title"] = "Quản lý địa điểm hiến máu";
+    ViewData["ShowBreadcrumb"] = true;
+    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item active'>Quản lý địa điểm</li>";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger fw-bold">
+                    <i class="fas fa-map-marker-alt me-2"></i>Quản lý địa điểm hiến máu
+                </h2>
+                <a asp-action="Create" class="btn btn-danger">
+                    <i class="fas fa-plus me-2"></i>Thêm địa điểm mới
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-map-marker-slash fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có địa điểm nào</h5>
+                            <p class="text-muted">Bắt đầu thêm địa điểm hiến máu đầu tiên.</p>
+                            <a asp-action="Create" class="btn btn-danger">
+                                <i class="fas fa-plus me-2"></i>Thêm địa điểm
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th>Tên địa điểm</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Sức chứa</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var location in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-info rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-map-marker-alt text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">@location.LocationName</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">@location.Address</span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(location.ContactPhone))
+                                                {
+                                                    <a href="tel:@location.ContactPhone" class="text-decoration-none">
+                                                        <i class="fas fa-phone me-1"></i>@location.ContactPhone
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa có</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">@location.Capacity người</span>
+                                            </td>
+                                            <td>
+                                                @if (location.IsActive)
+                                                {
+                                                    <span class="badge bg-success">Hoạt động</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">Tạm ngưng</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@location.CreatedDate.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Edit" asp-route-id="@location.LocationId" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" title="Đổi trạng thái" 
+                                                            onclick="toggleStatus(@location.LocationId, @location.IsActive.ToString().ToLower())">
+                                                        <i class="fas fa-toggle-on"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" 
+                                                            onclick="confirmDelete(@location.LocationId, '@location.LocationName')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa địa điểm "<span id="locationName"></span>"?</p>
+                <p class="text-danger"><small>Hành động này không thể hoàn tác.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Status Modal -->
+<div class="modal fade" id="toggleStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận thay đổi trạng thái</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn <span id="statusAction"></span> địa điểm "<span id="toggleLocationName"></span>"?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="toggleStatusForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(locationId, locationName) {
+            document.getElementById('locationName').textContent = locationName;
+            document.getElementById('deleteForm').action = `/admin/locations/delete/${locationId}`;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        function toggleStatus(locationId, isActive) {
+            const locationName = event.target.closest('tr').querySelector('h6').textContent;
+            const statusAction = isActive === 'true' ? 'tạm ngưng' : 'kích hoạt';
+            
+            document.getElementById('toggleLocationName').textContent = locationName;
+            document.getElementById('statusAction').textContent = statusAction;
+            document.getElementById('toggleStatusForm').action = `/admin/locations/toggle-status/${locationId}`;
+            new bootstrap.Modal(document.getElementById('toggleStatusModal')).show();
+        }
+    </script>
+} 

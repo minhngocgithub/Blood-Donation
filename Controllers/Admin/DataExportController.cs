@@ -13,13 +13,11 @@ namespace Blood_Donation_Website.Controllers.Admin
     {
         private readonly ApplicationDbContext _context;
         private readonly DataExporter _dataExporter;
-        private readonly ILogger<DataExportController> _logger;
 
-        public DataExportController(ApplicationDbContext context, DataExporter dataExporter, ILogger<DataExportController> logger)
+        public DataExportController(ApplicationDbContext context, DataExporter dataExporter)
         {
             _context = context;
             _dataExporter = dataExporter;
-            _logger = logger;
         }
 
         [HttpGet]
@@ -32,34 +30,26 @@ namespace Blood_Donation_Website.Controllers.Admin
         public async Task<IActionResult> ExportAll(string format = "json")
         {
             try
-            {
-                _logger.LogInformation("Starting export all data with format: {Format}", format);
-                
+            {                
                 // Ensure DatabaseExport directory exists
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
                 {
                     Directory.CreateDirectory(dataExportPath);
-                    _logger.LogInformation("Created DatabaseExport directory: {Path}", dataExportPath);
                 }
 
                 // Perform export
                 if (format.ToLower() == "csv")
                 {
-                    _logger.LogInformation("Exporting to CSV...");
                     await _dataExporter.ExportAllDataToCsvAsync();
                 }
                 else
                 {
-                    _logger.LogInformation("Exporting to JSON...");
                     await _dataExporter.ExportAllDataAsync();
                 }
 
-                _logger.LogInformation("Export completed, checking for output files...");
-
                 // Find the latest export folder
                 var directories = Directory.GetDirectories(dataExportPath);
-                _logger.LogInformation("Found {Count} directories in export path", directories.Length);
                 
                 var latestFolder = directories
                     .OrderByDescending(d => Directory.GetCreationTime(d))
@@ -67,14 +57,11 @@ namespace Blood_Donation_Website.Controllers.Admin
 
                 if (latestFolder == null)
                 {
-                    _logger.LogWarning("No export folder found after export operation");
                     TempData["ErrorMessage"] = "No export data found. The export may have failed. Check logs for details.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                _logger.LogInformation("Latest export folder: {Folder}", latestFolder);
                 var files = Directory.GetFiles(latestFolder);
-                _logger.LogInformation("Found {Count} files in latest folder", files.Length);
 
                 // Create ZIP file
                 var tempPath = Path.GetTempPath();
@@ -90,7 +77,6 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during data export");
                 TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -112,7 +98,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                 if (!Directory.Exists(dataExportPath))
                 {
                     Directory.CreateDirectory(dataExportPath);
-                    _logger.LogInformation("Created DatabaseExport directory: {Path}", dataExportPath);
                 }
 
                 await _dataExporter.ExportTableAsync(tableName);
@@ -140,7 +125,6 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during table export for {TableName}", tableName);
                 TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -166,7 +150,6 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error downloading file {FileName}", fileName);
                 return NotFound("Error downloading file.");
             }
         }
@@ -198,7 +181,6 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting export status");
                 return Json(new { hasExports = false, exports = new object[0], error = ex.Message });
             }
         }
@@ -207,22 +189,18 @@ namespace Blood_Donation_Website.Controllers.Admin
         public async Task<IActionResult> RunTests()
         {
             try
-            {
-                _logger.LogInformation("Starting DataExporter tests...");
-                
+            {                
                 // Chạy các test methods
                 await Blood_Donation_Website.Tests.DataExporterTest.TestDataExportAsync(_context);
                 await Blood_Donation_Website.Tests.DataExporterTest.TestExtensionMethodsAsync(_context);
                 await Blood_Donation_Website.Tests.DataExporterTest.TestTablesWithDataAsync(_context);
                 
                 TempData["SuccessMessage"] = "All tests completed successfully! Check the DatabaseExport folder and console output.";
-                _logger.LogInformation("DataExporter tests completed successfully");
                 
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during DataExporter tests");
                 TempData["ErrorMessage"] = $"Tests failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -233,14 +211,12 @@ namespace Blood_Donation_Website.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Starting export test...");
                 await Blood_Donation_Website.Tests.DataExporterTest.TestDataExportAsync(_context);
                 TempData["SuccessMessage"] = "Export test completed successfully!";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during export test");
                 TempData["ErrorMessage"] = $"Export test failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -251,14 +227,12 @@ namespace Blood_Donation_Website.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Starting extension methods test...");
                 await Blood_Donation_Website.Tests.DataExporterTest.TestExtensionMethodsAsync(_context);
                 TempData["SuccessMessage"] = "Extension methods test completed successfully!";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during extension test");
                 TempData["ErrorMessage"] = $"Extension test failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -268,15 +242,11 @@ namespace Blood_Donation_Website.Controllers.Admin
         public async Task<IActionResult> TestSimple()
         {
             try
-            {
-                _logger.LogInformation("Starting simple test...");
-                
+            {                
                 // Test database connection
                 var userCount = await _context.Users.CountAsync();
                 var roleCount = await _context.Roles.CountAsync();
-                
-                _logger.LogInformation("Database test - Users: {UserCount}, Roles: {RoleCount}", userCount, roleCount);
-                
+                                
                 // Test directory creation
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
@@ -284,12 +254,9 @@ namespace Blood_Donation_Website.Controllers.Admin
                     Directory.CreateDirectory(dataExportPath);
                 }
                 
-                _logger.LogInformation("Export directory: {Path}", dataExportPath);
-                
                 // Simple test - try to export roles table
                 if (roleCount > 0)
                 {
-                    _logger.LogInformation("Attempting to export Roles table...");
                     await _dataExporter.ExportTableAsync("Roles");
                     
                     // Check if file was created
@@ -299,18 +266,15 @@ namespace Blood_Donation_Website.Controllers.Admin
                     if (latestFolder != null)
                     {
                         var files = Directory.GetFiles(latestFolder);
-                        _logger.LogInformation("Export successful! Created {Count} files in {Folder}", files.Length, latestFolder);
                         TempData["SuccessMessage"] = $"Simple test passed! Created {files.Length} files. Check console for details.";
                     }
                     else
                     {
-                        _logger.LogWarning("No export folder created");
                         TempData["ErrorMessage"] = "Export folder was not created. Check DataExporter implementation.";
                     }
                 }
                 else
                 {
-                    _logger.LogWarning("No roles found in database");
                     TempData["ErrorMessage"] = "No roles found in database. Please seed data first.";
                 }
                 
@@ -318,7 +282,6 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during simple test");
                 TempData["ErrorMessage"] = $"Simple test failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }
@@ -329,14 +292,12 @@ namespace Blood_Donation_Website.Controllers.Admin
         {
             try
             {
-                _logger.LogInformation("Starting tables test...");
                 await Blood_Donation_Website.Tests.DataExporterTest.TestTablesWithDataAsync(_context);
                 TempData["SuccessMessage"] = "Tables test completed successfully!";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during tables test");
                 TempData["ErrorMessage"] = $"Tables test failed: {ex.Message}";
                 return RedirectToAction(nameof(Index));
             }

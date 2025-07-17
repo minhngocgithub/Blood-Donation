@@ -1,0 +1,113 @@
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventDto
+@{
+    ViewData["Title"] = "Tạo sự kiện mới";
+    ViewData["ShowBreadcrumb"] = true;
+    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item'><a asp-action='Index'>Quản lý sự kiện</a></li><li class='breadcrumb-item active'>Tạo mới</li>";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>Tạo sự kiện hiến máu mới
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventName" class="form-label">Tên sự kiện <span class="text-danger">*</span></label>
+                                <input asp-for="EventName" class="form-control" placeholder="Nhập tên sự kiện">
+                                <span asp-validation-for="EventName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventDate" class="form-label">Ngày diễn ra <span class="text-danger">*</span></label>
+                                <input asp-for="EventDate" type="date" class="form-control">
+                                <span asp-validation-for="EventDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartTime" class="form-label">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                <input asp-for="StartTime" type="time" class="form-control">
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndTime" class="form-label">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                <input asp-for="EndTime" type="time" class="form-control">
+                                <span asp-validation-for="EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationId" class="form-label">Địa điểm <span class="text-danger">*</span></label>
+                                <select asp-for="LocationId" class="form-select">
+                                    <option value="">Chọn địa điểm</option>
+                                    @if (ViewBag.Locations != null)
+                                    {
+                                        @foreach (var location in ViewBag.Locations)
+                                        {
+                                            <option value="@location.LocationId">@location.LocationName</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="LocationId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaxDonors" class="form-label">Số lượng tối đa <span class="text-danger">*</span></label>
+                                <input asp-for="MaxDonors" type="number" class="form-control" placeholder="100">
+                                <span asp-validation-for="MaxDonors" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EventDescription" class="form-label">Mô tả sự kiện</label>
+                            <textarea asp-for="EventDescription" class="form-control" rows="4" placeholder="Mô tả chi tiết về sự kiện hiến máu"></textarea>
+                            <span asp-validation-for="EventDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RequiredBloodTypes" class="form-label">Nhóm máu cần thiết</label>
+                                <input asp-for="RequiredBloodTypes" class="form-control" placeholder="A+, B+, O+, AB+">
+                                <span asp-validation-for="RequiredBloodTypes" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label">Trạng thái</label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="Draft">Nháp</option>
+                                    <option value="Published">Đã xuất bản</option>
+                                    <option value="Active">Đang hoạt động</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i>Tạo sự kiện
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

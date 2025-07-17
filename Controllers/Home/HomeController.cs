@@ -49,6 +49,7 @@ namespace Blood_Donation_Website.Controllers.Home
         }
 
         public IActionResult SweetAlertDemo()
+
         {
             return View();
         }
