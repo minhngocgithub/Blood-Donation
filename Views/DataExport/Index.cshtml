@@ -1,0 +1,242 @@
+@{
+    ViewData["Title"] = "Data Export Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-download mr-2"></i>
+                        Data Export Management
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    <!-- Export All Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-database mr-2"></i>
+                                Export All Database Data
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Export all database tables to a compressed file.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form asp-action="ExportAll" method="post" class="d-inline">
+                                        <input type="hidden" name="format" value="json" />
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-file-code mr-2"></i>
+                                            Export as JSON
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form asp-action="ExportAll" method="post" class="d-inline">
+                                        <input type="hidden" name="format" value="csv" />
+                                        <button type="submit" class="btn btn-success btn-block">
+                                            <i class="fas fa-file-csv mr-2"></i>
+                                            Export as CSV
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Single Table Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-table mr-2"></i>
+                                Export Single Table
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Export data from a specific table.</p>
+                            <form asp-action="ExportTable" method="post">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="tableName">Table Name:</label>
+                                            <select name="tableName" id="tableName" class="form-control" required>
+                                                <option value="">Select a table...</option>
+                                                <option value="Users">Users</option>
+                                                <option value="Roles">Roles</option>
+                                                <option value="BloodTypes">Blood Types</option>
+                                                <option value="Locations">Locations</option>
+                                                <option value="BloodDonationEvents">Blood Donation Events</option>
+                                                <option value="DonationRegistrations">Donation Registrations</option>
+                                                <option value="DonationHistory">Donation History</option>
+                                                <option value="HealthScreenings">Health Screenings</option>
+                                                <option value="News">News</option>
+                                                <option value="NewsCategories">News Categories</option>
+                                                <option value="ContactMessages">Contact Messages</option>
+                                                <option value="Notifications">Notifications</option>
+                                                <option value="Settings">Settings</option>
+                                                <option value="BloodCompatibilities">Blood Compatibilities</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-info btn-block">
+                                            <i class="fas fa-download mr-2"></i>
+                                            Export Table
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Testing Tools Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tools mr-2"></i>
+                                Testing Tools
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Run tests to verify DataExporter functionality.</p>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <form asp-action="RunTests" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            <i class="fas fa-play mr-2"></i>
+                                            Run All Tests
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestSimple" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-info btn-block">
+                                            <i class="fas fa-vial mr-2"></i>
+                                            Test Simple
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestExport" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-download mr-2"></i>
+                                            Test Export
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestExtensions" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-cogs mr-2"></i>
+                                            Test Extensions
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form asp-action="TestTables" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-table mr-2"></i>
+                                            Test Tables
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Status Section -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Export Status
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="exportStatus">
+                                <p class="text-muted">Loading export status...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            loadExportStatus();
+            
+            // Auto refresh status every 30 seconds
+            setInterval(loadExportStatus, 30000);
+        });
+
+        function loadExportStatus() {
+            $.get('@Url.Action("GetExportStatus")', function(data) {
+                var html = '';
+                if (data.hasExports) {
+                    html = '<div class="table-responsive"><table class="table table-striped">';
+                    html += '<thead><tr><th>Export Name</th><th>Created Date</th><th>Files</th><th>Size</th></tr></thead><tbody>';
+                    
+                    data.exports.forEach(function(exportItem) {
+                        var size = formatBytes(exportItem.size);
+                        var date = new Date(exportItem.createdDate).toLocaleString();
+                        html += '<tr>';
+                        html += '<td>' + exportItem.name + '</td>';
+                        html += '<td>' + date + '</td>';
+                        html += '<td>' + exportItem.fileCount + '</td>';
+                        html += '<td>' + size + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                } else {
+                    html = '<p class="text-muted">No exports found.</p>';
+                }
+                
+                $('#exportStatus').html(html);
+            }).fail(function() {
+                $('#exportStatus').html('<p class="text-danger">Failed to load export status.</p>');
+            });
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    </script>
+}

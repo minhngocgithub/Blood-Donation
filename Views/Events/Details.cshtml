@@ -1,0 +1,318 @@
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventDto
+@{
+    ViewData["Title"] = Model.EventName;
+}
+
+<div class="event-details-page">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/Events">Sự kiện</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@Model.EventName</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Event Details -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <!-- Event Image and Basic Info -->
+                <div class="col-lg-8">
+                    <div class="event-hero mb-4">
+                        <img src="@(!string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : "/image/default-event.jpg")" 
+                             alt="@Model.EventName" class="img-fluid rounded-3 shadow">
+                    </div>
+                    
+                    <div class="event-content">
+                        <h1 class="event-title mb-3">@Model.EventName</h1>
+                        
+                        <div class="event-meta-detailed mb-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-item">
+                                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                        <strong>Ngày tổ chức:</strong>
+                                        <span>@Model.EventDate.ToString("dd/MM/yyyy")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock text-primary me-2"></i>
+                                        <strong>Thời gian:</strong>
+                                        <span>@Model.StartTime.ToString(@"hh\:mm") - @Model.EndTime.ToString(@"hh\:mm")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-item">
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                        <strong>Địa điểm:</strong>
+                                        <span>@(!string.IsNullOrEmpty(Model.LocationName) ? Model.LocationName : "Chưa xác định")</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-item">
+                                        <i class="fas fa-users text-primary me-2"></i>
+                                        <strong>Số lượng:</strong>
+                                        <span>@Model.CurrentDonors/@Model.MaxDonors người</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(Model.LocationAddress))
+                        {
+                            <div class="location-details mb-4">
+                                <h5><i class="fas fa-map text-primary me-2"></i>Địa chỉ chi tiết</h5>
+                                <p class="text-muted">@Model.LocationAddress</p>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.EventDescription))
+                        {
+                            <div class="event-description mb-4">
+                                <h5><i class="fas fa-info-circle text-primary me-2"></i>Mô tả sự kiện</h5>
+                                <div class="description-content">
+                                    @Html.Raw(Model.EventDescription.Replace("\n", "<br>"))
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.RequiredBloodTypes))
+                        {
+                            <div class="blood-types-required mb-4">
+                                <h5><i class="fas fa-tint text-primary me-2"></i>Nhóm máu cần thiết</h5>
+                                <div class="blood-types-list">
+                                    @{
+                                        var bloodTypes = Model.RequiredBloodTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                                    }
+                                    @foreach (var bloodType in bloodTypes)
+                                    {
+                                        <span class="badge bg-danger me-2 mb-2 px-3 py-2">@bloodType.Trim()</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <div class="event-sidebar">
+                        <!-- Registration Card -->
+                        <div class="card registration-card mb-4">
+                            <div class="card-body text-center">
+                                @{
+                                    var statusClass = Model.Status.ToLower() switch
+                                    {
+                                        "active" => "text-success",
+                                        "full" => "text-warning",
+                                        "ended" => "text-danger",
+                                        _ => "text-success"
+                                    };
+                                    
+                                    var statusText = Model.Status.ToLower() switch
+                                    {
+                                        "active" => "Đang mở đăng ký",
+                                        "full" => "Đã đủ số lượng",
+                                        "ended" => "Đã kết thúc",
+                                        _ => "Đang mở đăng ký"
+                                    };
+                                }
+                                
+                                <h6 class="@statusClass mb-3">
+                                    <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>
+                                    @statusText
+                                </h6>
+                                
+                                @if (Model.Status.ToLower() == "active")
+                                {
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <button type="button" class="btn btn-primary btn-lg w-100 mb-3" id="registerBtn">
+                                            <i class="fas fa-calendar-plus me-2"></i>
+                                            Đăng ký tham gia
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-primary btn-lg w-100 mb-3" 
+                                                onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
+                                            <i class="fas fa-calendar-plus me-2"></i>
+                                            Đăng ký tham gia
+                                        </button>
+                                    }
+                                }
+                                
+                                <!-- Progress Bar -->
+                                @if (Model.MaxDonors > 0)
+                                {
+                                    var progressPercentage = Math.Min(100, (double)Model.CurrentDonors / Model.MaxDonors * 100);
+                                    <div class="registration-progress">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <small class="text-muted">Đã đăng ký</small>
+                                            <small class="text-muted">@Model.CurrentDonors/@Model.MaxDonors</small>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" 
+                                                 style="width: @progressPercentage.ToString("F1")%" 
+                                                 aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">@progressPercentage.ToString("F0")% đã đăng ký</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        <!-- Event Info Card -->
+                        <div class="card info-card">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin sự kiện</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="info-item mb-3">
+                                    <small class="text-muted d-block">Ngày tạo</small>
+                                    <span>@Model.CreatedDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(Model.CreatorName))
+                                {
+                                    <div class="info-item mb-3">
+                                        <small class="text-muted d-block">Người tổ chức</small>
+                                        <span>@Model.CreatorName</span>
+                                    </div>
+                                }
+                                
+                                <div class="info-item">
+                                    <small class="text-muted d-block">Cập nhật lần cuối</small>
+                                    <span>@Model.UpdatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .event-details-page {
+        min-height: 100vh;
+    }
+    
+    .event-hero img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+    
+    .event-title {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .description-content {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #dc3545;
+    }
+    
+    .registration-card {
+        border: 2px solid #dc3545;
+        border-radius: 15px;
+    }
+    
+    .registration-card .card-body {
+        padding: 2rem;
+    }
+    
+    .info-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .info-item {
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .blood-types-list .badge {
+        font-size: 1rem;
+    }
+    
+    @* Media query trong CSS *@
+    <style>
+        @@media (max-width: 768px) {
+            .event-hero img {
+                height: 250px;
+            }
+            
+            .registration-card .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const registerBtn = document.getElementById('registerBtn');
+    
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function() {
+            const eventId = @Model.EventId;
+            registerForEvent(eventId);
+        });
+    }
+    
+    function registerForEvent(eventId) {
+        registerBtn.disabled = true;
+        registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng ký...';
+        
+        fetch('/Events/Register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+            },
+            body: JSON.stringify({ eventId: eventId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                registerBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã đăng ký';
+                registerBtn.classList.remove('btn-primary');
+                registerBtn.classList.add('btn-success');
+            } else {
+                showWarning('Thông báo', data.message);
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Đăng ký tham gia';
+            }
+        })
+        .catch(error => {
+            console.error('Error registering for event:', error);
+            showError('Có lỗi xảy ra khi đăng ký sự kiện');
+            registerBtn.disabled = false;
+            registerBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Đăng ký tham gia';
+        });
+    }
+});
+</script>
