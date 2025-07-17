@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@{
     ViewData["Title"] = "Trang chủ";
 }
 
@@ -22,7 +23,7 @@
                         <div class="hero-actions">
                             @if (User.Identity?.IsAuthenticated == true)
                             {
-                                <a href="/events" class="btn btn-primary btn-lg me-3">
+                                <a href="#events-section" class="btn btn-primary btn-lg me-3">
                                     <i class="fas fa-calendar-plus me-2"></i>
                                     Đăng ký hiến máu
                                 </a>
@@ -179,94 +180,46 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="event-card">
-                    <div class="event-image">
-                        <img src="/placeholder.svg?height=200&width=350" alt="Event" class="img-fluid">
-                        <div class="event-date">
-                            <span class="day">15</span>
-                            <span class="month">Th12</span>
+        <div class="row" id="events-section">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var eventItem in Model)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="event-card">
+                            <div class="event-image">
+                                <img src="@(string.IsNullOrEmpty(eventItem.ImageUrl) ? "/placeholder.svg?height=200&width=350" : eventItem.ImageUrl)" alt="@eventItem.EventName" class="img-fluid">
+                                <div class="event-date">
+                                        <span>@eventItem.EventDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                            <div class="event-content">
+                                <h5 class="event-title">@eventItem.EventName</h5>
+                                <div class="event-meta">
+                                    <span class="event-location">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        @(string.IsNullOrEmpty(eventItem.LocationName) ? "Chưa xác định" : eventItem.LocationName)
+                                    </span>
+                                    <span class="event-time">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @eventItem.StartTime.ToString("hh\\:mm") - @eventItem.EndTime.ToString("hh\\:mm")
+                                    </span>
+                                </div>
+                                <p class="event-description">
+                                    @eventItem.EventDescription
+                                </p>
+                                <a href="/events/details/@eventItem.EventId" class="btn btn-primary">Đăng ký ngay</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="event-content">
-                        <h5 class="event-title">Ngày hội hiến máu tại ĐH Bách Khoa</h5>
-                        <div class="event-meta">
-                            <span class="event-location">
-                                <i class="fas fa-map-marker-alt me-1"></i>
-                                ĐH Bách Khoa TP.HCM
-                            </span>
-                            <span class="event-time">
-                                <i class="fas fa-clock me-1"></i>
-                                8:00 - 17:00
-                            </span>
-                        </div>
-                        <p class="event-description">
-                            Sự kiện hiến máu lớn nhất trong năm tại trường Đại học Bách Khoa TP.HCM.
-                        </p>
-                        <a href="/events/details/1" class="btn btn-primary">Đăng ký ngay</a>
-                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p class="text-muted">Không có sự kiện sắp tới.</p>
                 </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="event-card">
-                    <div class="event-image">
-                        <img src="/placeholder.svg?height=200&width=350" alt="Event" class="img-fluid">
-                        <div class="event-date">
-                            <span class="day">20</span>
-                            <span class="month">Th12</span>
-                        </div>
-                    </div>
-                    <div class="event-content">
-                        <h5 class="event-title">Hiến máu cộng đồng Quận 1</h5>
-                        <div class="event-meta">
-                            <span class="event-location">
-                                <i class="fas fa-map-marker-alt me-1"></i>
-                                Công viên 23/9
-                            </span>
-                            <span class="event-time">
-                                <i class="fas fa-clock me-1"></i>
-                                7:00 - 16:00
-                            </span>
-                        </div>
-                        <p class="event-description">
-                            Chương trình hiến máu nhân đạo tại công viên 23/9, Quận 1.
-                        </p>
-                        <a href="/events/details/2" class="btn btn-primary">Đăng ký ngay</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="event-card">
-                    <div class="event-image">
-                        <img src="/placeholder.svg?height=200&width=350" alt="Event" class="img-fluid">
-                        <div class="event-date">
-                            <span class="day">25</span>
-                            <span class="month">Th12</span>
-                        </div>
-                    </div>
-                    <div class="event-content">
-                        <h5 class="event-title">Hiến máu tại Bệnh viện Chợ Rẫy</h5>
-                        <div class="event-meta">
-                            <span class="event-location">
-                                <i class="fas fa-map-marker-alt me-1"></i>
-                                BV Chợ Rẫy
-                            </span>
-                            <span class="event-time">
-                                <i class="fas fa-clock me-1"></i>
-                                6:00 - 18:00
-                            </span>
-                        </div>
-                        <p class="event-description">
-                            Chương trình hiến máu thường xuyên tại Bệnh viện Chợ Rẫy.
-                        </p>
-                        <a href="/events/details/3" class="btn btn-primary">Đăng ký ngay</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+            }
 
         <div class="text-center mt-4">
             <a href="/events" class="btn btn-outline-primary btn-lg">
@@ -301,6 +254,19 @@
 @section Scripts {
     <script src="~/js/sweetalert-helper.js"></script>
     <script>
+        // Smooth scroll for anchor links
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href').substring(1);
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
         @if (TempData["SuccessMessage"] != null)
         {
             <text>

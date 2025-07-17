@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models;
+using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -6,13 +7,20 @@ namespace Blood_Donation_Website.Controllers.Home
 {
     public class HomeController : Controller
     {
-        public HomeController()
+
+        private readonly IBloodDonationEventService _eventService;
+
+        public HomeController(IBloodDonationEventService eventService)
         {
+            _eventService = eventService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Lấy 3 sự kiện sắp tới
+            var events = await _eventService.GetUpcomingEventsAsync();
+            var top3Events = events.OrderBy(e => e.EventDate).ThenBy(e => e.StartTime).Take(3).ToList();
+            return View(top3Events);
         }
 
         public IActionResult About()
