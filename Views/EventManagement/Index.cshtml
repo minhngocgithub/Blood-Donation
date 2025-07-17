@@ -1,0 +1,174 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@{
+    ViewData["Title"] = "Quản lý sự kiện hiến máu";
+    ViewData["ShowBreadcrumb"] = true;
+    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item active'>Quản lý sự kiện</li>";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger fw-bold">
+                    <i class="fas fa-calendar-plus me-2"></i>Quản lý sự kiện hiến máu
+                </h2>
+                <a asp-action="Create" class="btn btn-danger">
+                    <i class="fas fa-plus me-2"></i>Tạo sự kiện mới
+                </a>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có sự kiện nào</h5>
+                            <p class="text-muted">Bắt đầu tạo sự kiện hiến máu đầu tiên của bạn.</p>
+                            <a asp-action="Create" class="btn btn-danger">
+                                <i class="fas fa-plus me-2"></i>Tạo sự kiện
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th>Tên sự kiện</th>
+                                        <th>Địa điểm</th>
+                                        <th>Ngày diễn ra</th>
+                                        <th>Thời gian</th>
+                                        <th>Số lượng</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var eventItem in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(eventItem.ImageUrl))
+                                                    {
+                                                        <img src="@eventItem.ImageUrl" alt="Event" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-calendar text-muted"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-0">@eventItem.EventName</h6>
+                                                        <small class="text-muted">@eventItem.EventDescription?.Substring(0, Math.Min(50, eventItem.EventDescription.Length))...</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@eventItem.LocationName</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-primary fw-bold">@eventItem.EventDate.ToString("dd/MM/yyyy")</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @eventItem.StartTime.ToString("HH:mm") - @eventItem.EndTime.ToString("HH:mm")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">@eventItem.CurrentDonors/@eventItem.MaxDonors</span>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var statusClass = eventItem.Status switch
+                                                    {
+                                                        "Active" => "bg-success",
+                                                        "Draft" => "bg-secondary",
+                                                        "Published" => "bg-primary",
+                                                        "Completed" => "bg-info",
+                                                        "Cancelled" => "bg-danger",
+                                                        "Postponed" => "bg-warning",
+                                                        "Full" => "bg-dark",
+                                                        "Closed" => "bg-secondary",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                }
+                                                <span class="badge @statusClass">@eventItem.Status</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Edit" asp-route-id="@eventItem.EventId" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Details" asp-route-id="@eventItem.EventId" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" 
+                                                            onclick="confirmDelete(@eventItem.EventId, '@eventItem.EventName')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sự kiện "<span id="eventName"></span>"?</p>
+                <p class="text-danger"><small>Hành động này không thể hoàn tác.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(eventId, eventName) {
+            document.getElementById('eventName').textContent = eventName;
+            document.getElementById('deleteForm').action = `/admin/events/delete/${eventId}`;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+} 
