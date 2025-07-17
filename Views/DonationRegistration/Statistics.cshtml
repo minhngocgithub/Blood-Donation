@@ -1,0 +1,275 @@
+@model Blood_Donation_Website.Models.ViewModels.RegistrationStatisticsViewModel
+@{
+    ViewData["Title"] = "Thống kê đăng ký";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Thống kê đăng ký hiến máu
+                        </h4>
+                        <a href="@Url.Action("MyRegistrations", "DonationRegistration")" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Thống kê tổng quan -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Tổng số đăng ký
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalRegistrations</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Hoàn thành
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.CompletedRegistrations</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Chờ duyệt
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.PendingRegistrations</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Đã duyệt
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ApprovedRegistrations</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-thumbs-up fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Biểu đồ -->
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-pie me-2 text-primary"></i>Phân bố trạng thái đăng ký
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="statusChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-info-circle me-2 text-info"></i>Thông tin bổ sung
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <h6 class="text-primary">Tỷ lệ hoàn thành</h6>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: @Model.CompletionRate%" 
+                                                 aria-valuenow="@Model.CompletionRate" aria-valuemin="0" aria-valuemax="100">
+                                                @Model.CompletionRate%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">@Model.CompletedRegistrations / @Model.TotalRegistrations đăng ký</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">Tỷ lệ chờ duyệt</h6>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-warning" role="progressbar" 
+                                                 style="width: @Model.PendingRate%" 
+                                                 aria-valuenow="@Model.PendingRate" aria-valuemin="0" aria-valuemax="100">
+                                                @Model.PendingRate%
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">@Model.PendingRegistrations / @Model.TotalRegistrations đăng ký</small>
+                                    </div>
+                                    
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        <strong>Gợi ý:</strong> Hãy tham gia thêm các sự kiện hiến máu để tăng số lượng đăng ký hoàn thành!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bảng chi tiết -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-table me-2 text-secondary"></i>Chi tiết thống kê
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Chỉ số</th>
+                                            <th>Số lượng</th>
+                                            <th>Tỷ lệ</th>
+                                            <th>Mô tả</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Tổng đăng ký</strong></td>
+                                            <td>@Model.TotalRegistrations</td>
+                                            <td>100%</td>
+                                            <td>Tổng số lần đăng ký hiến máu</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td><strong>Hoàn thành</strong></td>
+                                            <td>@Model.CompletedRegistrations</td>
+                                            <td>@Model.CompletionRate%</td>
+                                            <td>Số lần hiến máu thành công</td>
+                                        </tr>
+                                        <tr class="table-warning">
+                                            <td><strong>Chờ duyệt</strong></td>
+                                            <td>@Model.PendingRegistrations</td>
+                                            <td>@Model.PendingRate%</td>
+                                            <td>Đăng ký đang chờ xử lý</td>
+                                        </tr>
+                                        <tr class="table-info">
+                                            <td><strong>Đã duyệt</strong></td>
+                                            <td>@Model.ApprovedRegistrations</td>
+                                            <td>@Model.ApprovedRate%</td>
+                                            <td>Đăng ký đã được phê duyệt</td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td><strong>Đã hủy</strong></td>
+                                            <td>@Model.CancelledRegistrations</td>
+                                            <td>@Model.CancelledRate%</td>
+                                            <td>Đăng ký đã bị hủy</td>
+                                        </tr>
+                                        <tr class="table-secondary">
+                                            <td><strong>Từ chối</strong></td>
+                                            <td>@Model.RejectedRegistrations</td>
+                                            <td>@Model.RejectedRate%</td>
+                                            <td>Đăng ký bị từ chối</td>
+                                        </tr>
+                                        <tr class="table-primary">
+                                            <td><strong>Đã check-in</strong></td>
+                                            <td>@Model.CheckedInRegistrations</td>
+                                            <td>@Model.CheckedInRate%</td>
+                                            <td>Đã có mặt tại sự kiện</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dữ liệu cho biểu đồ
+        const statusData = {
+            labels: ['Hoàn thành', 'Chờ duyệt', 'Đã duyệt', 'Đã check-in', 'Đã hủy', 'Từ chối'],
+            datasets: [{
+                data: [@Model.CompletedRegistrations, @Model.PendingRegistrations, @Model.ApprovedRegistrations, @Model.CheckedInRegistrations, @Model.CancelledRegistrations, @Model.RejectedRegistrations],
+                backgroundColor: [
+                    '#28a745', // Success
+                    '#ffc107', // Warning
+                    '#17a2b8', // Info
+                    '#007bff', // Primary
+                    '#dc3545', // Danger
+                    '#6c757d'  // Secondary
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+
+        // Tạo biểu đồ
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: statusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+} 

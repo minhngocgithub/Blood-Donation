@@ -12,11 +12,13 @@ namespace Blood_Donation_Website.Services.Implementations
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IUserService _userService;
 
-        public AccountService(ApplicationDbContext context, IEmailService emailService)
+        public AccountService(ApplicationDbContext context, IEmailService emailService, IUserService userService)
         {
             _context = context;
             _emailService = emailService;
+            _userService = userService;
         }
 
         
@@ -97,15 +99,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 var user = await GetUserByIdAsync(userId);
                 if (user == null) return false;
-
-                // Update last logout time (you can add LastLogoutDate to User entity if needed)
                 user.UpdatedDate = DateTime.Now;
-                
-                // You can add additional logout logic here such as:
-                // - Invalidating refresh tokens
-                // - Logging logout activity
-                // - Updating session tracking
-                // - Clearing user-specific cache
 
                 await _context.SaveChangesAsync();
                 return true;
@@ -120,7 +114,7 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
-                var user = await GetUserByEmailAsync(model.Email);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null) return false;
 
                 // Generate reset token and send email
@@ -139,7 +133,7 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
-                var user = await GetUserByEmailAsync(model.Email);
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null) return false;
 
                 user.PasswordHash = await HashPasswordAsync(model.Password);
@@ -176,11 +170,9 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<User?> GetUserByEmailAsync(string email)
+        public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
-            return await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == email);
+            return await _userService.GetUserByEmailAsync(email);
         }
 
         public async Task<User?> GetUserByIdAsync(string userId)

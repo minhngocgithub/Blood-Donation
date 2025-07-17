@@ -12,11 +12,9 @@ namespace Blood_Donation_Website.Controllers
     public class AccountController : Controller
     {
         private readonly IAccountService _accountService;
-        private readonly ILogger<AccountController> _logger;
-        public AccountController(IAccountService accountService, ILogger<AccountController> logger)
+        public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
-            _logger = logger;
         }
 
         [HttpGet("login")]
@@ -62,7 +60,7 @@ namespace Blood_Donation_Website.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
+                    new Claim(ClaimTypes.Role, user.RoleName ?? "User")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -75,8 +73,6 @@ namespace Blood_Donation_Website.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity), authProperties);
 
-                _logger.LogInformation("User {Email} logged in.", user.Email);
-
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
                     return Redirect(returnUrl);
@@ -86,7 +82,6 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login for user {Email}", model.Email);
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.");
                 return View(model);
             }
@@ -113,10 +108,6 @@ namespace Blood_Donation_Website.Controllers
 
             if (!ModelState.IsValid)
             {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    _logger.LogWarning("Validation error: {Error}", error.ErrorMessage);
-                }
                 return View(model);
             }
 
@@ -133,18 +124,14 @@ namespace Blood_Donation_Website.Controllers
                 
                 if (!result)
                 {
-                    _logger.LogWarning("Registration failed for email: {Email}", model.Email);
                     ModelState.AddModelError(string.Empty, "Đăng ký thất bại. Vui lòng thử lại.");
                     return View(model);
                 }
-
-                _logger.LogInformation("User registered successfully: {Email}", model.Email);
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
                 return RedirectToAction(nameof(Login));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during registration for user {Email}", model.Email);
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.");
                 return View(model);
             }
@@ -197,16 +184,13 @@ namespace Blood_Donation_Website.Controllers
                     Secure = Request.IsHttps,
                     SameSite = SameSiteMode.Lax
                 });
-                
-                _logger.LogInformation("User {Email} (ID: {UserId}) logged out successfully. Cookies cleared.", userEmail, userId);
-                
+                                
                 TempData["SuccessMessage"] = "Bạn đã đăng xuất thành công!";
                 
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during logout for user {Email}", User.Identity?.Name);
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.";
                 return RedirectToAction("Index", "Home");
             }
@@ -249,9 +233,7 @@ namespace Blood_Donation_Website.Controllers
                     Secure = Request.IsHttps,
                     SameSite = SameSiteMode.Lax
                 });
-                
-                _logger.LogInformation("User {Email} (ID: {UserId}) performed quick logout. Cookies cleared.", userEmail, userId);
-                
+                                
                 if (Request.Headers.XRequestedWith == "XMLHttpRequest")
                 {
                     return Json(new { success = true, message = "Đăng xuất thành công!" });
@@ -261,9 +243,7 @@ namespace Blood_Donation_Website.Controllers
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during quick logout for user {Email}", User.Identity?.Name);
-                
+            {                
                 if (Request.Headers.XRequestedWith == "XMLHttpRequest")
                 {
                     return Json(new { success = false, message = "Có lỗi xảy ra khi đăng xuất." });
@@ -299,8 +279,37 @@ namespace Blood_Donation_Website.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if email exists: {Email}", email);
                 return Json(new { exists = false });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Lấy userId đúng từ Claims
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var result = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+                return View(model);
+            }
+            else
+            {
+                // Thông báo lỗi rõ ràng cho SweetAlert
+                ModelState.AddModelError("", "Mật khẩu hiện tại không đúng.");
+                return View(model);
             }
         }
 

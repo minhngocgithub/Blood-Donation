@@ -3,19 +3,16 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class RoleService : IRoleService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<RoleService> _logger;
 
-        public RoleService(ApplicationDbContext context, ILogger<RoleService> logger)
+        public RoleService(ApplicationDbContext context)
         {
             _context = context;
-            _logger = logger;
         }
 
         // Basic CRUD operations
@@ -36,7 +33,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting role by ID {RoleId}: {Message}", roleId, ex.Message);
                 return null;
             }
         }
@@ -60,7 +56,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting role by name {RoleName}: {Message}", roleName, ex.Message);
                 return null;
             }
         }
@@ -83,7 +78,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting all roles: {Message}", ex.Message);
                 return new List<RoleDto>();
             }
         }
@@ -117,7 +111,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating role: {Message}", ex.Message);
                 throw;
             }
         }
@@ -137,7 +130,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating role {RoleId}: {Message}", roleId, ex.Message);
                 return false;
             }
         }
@@ -164,7 +156,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting role {RoleId}: {Message}", roleId, ex.Message);
                 return false;
             }
         }
@@ -187,7 +178,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error assigning role {RoleId} to user {UserId}: {Message}", roleId, userId, ex.Message);
                 return false;
             }
         }
@@ -207,7 +197,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error removing role {RoleId} from user {UserId}: {Message}", roleId, userId, ex.Message);
                 return false;
             }
         }
@@ -221,7 +210,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if user {UserId} is in role {RoleId}: {Message}", userId, roleId, ex.Message);
                 return false;
             }
         }
@@ -238,7 +226,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if user {UserId} is in role {RoleName}: {Message}", userId, roleName, ex.Message);
                 return false;
             }
         }
@@ -278,7 +265,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting users by role {RoleId}: {Message}", roleId, ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -318,7 +304,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting users by role name {RoleName}: {Message}", roleName, ex.Message);
                 return new List<UserDto>();
             }
         }
@@ -332,7 +317,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if role exists {RoleId}: {Message}", roleId, ex.Message);
                 return false;
             }
         }
@@ -345,7 +329,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if role name exists {RoleName}: {Message}", roleName, ex.Message);
                 return false;
             }
         }
@@ -371,7 +354,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching roles with term {SearchTerm}: {Message}", searchTerm, ex.Message);
                 return new List<RoleDto>();
             }
         }
@@ -387,7 +369,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user count for role {RoleId}: {Message}", roleId, ex.Message);
                 return 0;
             }
         }
@@ -403,7 +384,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting user count for role name {RoleName}: {Message}", roleName, ex.Message);
                 return 0;
             }
         }
