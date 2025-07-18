@@ -72,14 +72,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+// using (var scope = app.Services.CreateScope())
+// {
+//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     
-    context.Database.EnsureCreated();
+//     context.Database.EnsureCreated();
     
-    context.SeedData();
-}
+//     context.SeedData();
+// }
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

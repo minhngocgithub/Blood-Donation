@@ -3,26 +3,29 @@ using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Blood_Donation_Website.Controllers.Doctor
 {
-    [Authorize(Roles = "Doctor")]
-    [DoctorOnly]
-    [Route("doctor/screening")]
+    [Authorize(Roles = "Doctor,Hospital")]
+    [Route("screening")]
     public class HealthScreeningController : Controller
     {
         private readonly IHealthScreeningService _screeningService;
         private readonly IDonationRegistrationService _registrationService;
         private readonly IUserService _userService;
+        private readonly IBloodTypeService _bloodTypeService;
 
         public HealthScreeningController(
             IHealthScreeningService screeningService,
             IDonationRegistrationService registrationService,
-            IUserService userService)
+            IUserService userService,
+            IBloodTypeService bloodTypeService)
         {
             _screeningService = screeningService;
             _registrationService = registrationService;
             _userService = userService;
+            _bloodTypeService = bloodTypeService;
         }
 
         [HttpGet]
@@ -49,8 +52,11 @@ namespace Blood_Donation_Website.Controllers.Doctor
             }
 
             var user = await _userService.GetUserByIdAsync(registration.UserId);
+            var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
+            
             ViewBag.Registration = registration;
             ViewBag.User = user;
+            ViewBag.BloodTypes = bloodTypes;
 
             return View();
         }
@@ -75,6 +81,10 @@ namespace Blood_Donation_Website.Controllers.Doctor
             }
 
             var registration = await _registrationService.GetRegistrationByIdAsync(registrationId);
+            if (registration == null)
+            {
+                return NotFound();
+            }
             var user = await _userService.GetUserByIdAsync(registration.UserId);
             ViewBag.Registration = registration;
             ViewBag.User = user;
@@ -92,9 +102,16 @@ namespace Blood_Donation_Website.Controllers.Doctor
             }
 
             var registration = await _registrationService.GetRegistrationByIdAsync(screening.RegistrationId);
+            if (registration == null)
+            {
+                return NotFound();
+            }
             var user = await _userService.GetUserByIdAsync(registration.UserId);
+            var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
+            
             ViewBag.Registration = registration;
             ViewBag.User = user;
+            ViewBag.BloodTypes = bloodTypes;
 
             return View(screening);
         }
@@ -125,6 +142,10 @@ namespace Blood_Donation_Website.Controllers.Doctor
             }
 
             var registration = await _registrationService.GetRegistrationByIdAsync(screeningDto.RegistrationId);
+            if (registration == null)
+            {
+                return NotFound();
+            }
             var user = await _userService.GetUserByIdAsync(registration.UserId);
             ViewBag.Registration = registration;
             ViewBag.User = user;
@@ -142,6 +163,10 @@ namespace Blood_Donation_Website.Controllers.Doctor
             }
 
             var registration = await _registrationService.GetRegistrationByIdAsync(screening.RegistrationId);
+            if (registration == null)
+            {
+                return NotFound();
+            }
             var user = await _userService.GetUserByIdAsync(registration.UserId);
             ViewBag.Registration = registration;
             ViewBag.User = user;
@@ -196,5 +221,140 @@ namespace Blood_Donation_Website.Controllers.Doctor
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost("update-blood-type/{userId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBloodType(int userId, int bloodTypeId)
+        {
+            try
+            {
+                var success = await _userService.UpdateBloodTypeAsync(userId, bloodTypeId);
+                if (success)
+                {
+                    TempData["SuccessMessage"] = "Nhóm máu đã được cập nhật thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể cập nhật nhóm máu.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("update-blood-type/{userId?}")]
+        public async Task<IActionResult> UpdateBloodTypeForm(int userId = 0)
+        {
+            if (userId == 0)
+            {
+                // Hiển thị form tìm kiếm user
+                return View("SelectUser");
+            }
+
+            try
+            {
+                Console.WriteLine($"Looking for user with ID: {userId}");
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user == null)
+                {
+                    Console.WriteLine($"User with ID {userId} not found");
+                    TempData["ErrorMessage"] = $"Không tìm thấy người dùng với ID: {userId}";
+                    return RedirectToAction("Index");
+                }
+                
+                Console.WriteLine($"Found user: {user.FullName} (ID: {user.UserId})");
+
+                var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
+                
+                ViewBag.User = user;
+                ViewBag.BloodTypes = bloodTypes;
+
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi tải thông tin người dùng: {ex.Message}";
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpGet("search-user")]
+        public async Task<IActionResult> SearchUser(string email = null, string phone = null)
+        {
+            try
+            {
+                var users = new List<UserDto>();
+                
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var user = await _userService.GetUserByEmailAsync(email);
+                    if (user != null)
+                    {
+                        users.Add(user);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(phone))
+                {
+                    // Tìm theo phone - cần implement trong UserService
+                    var allUsers = await _userService.GetAllUsersAsync();
+                    users = allUsers.Where(u => u.Phone == phone).ToList();
+                }
+
+                return Json(users);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("debug-users")]
+        public async Task<IActionResult> DebugUsers()
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                var userList = users.Select(u => new { 
+                    u.UserId, 
+                    u.FullName, 
+                    u.Email, 
+                    u.Phone,
+                    BloodType = u.BloodTypeName ?? "Chưa cập nhật"
+                }).ToList();
+                
+                return Json(new { 
+                    totalUsers = userList.Count,
+                    users = userList
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("get-all-users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                Console.WriteLine($"Found {users.Count()} users in database");
+                foreach (var user in users.Take(5))
+                {
+                    Console.WriteLine($"User ID: {user.UserId}, Name: {user.FullName}, Email: {user.Email}");
+                }
+                return Json(users);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting users: {ex.Message}");
+                return Json(new { error = ex.Message });
+            }
+        }
     }
-} 
+}

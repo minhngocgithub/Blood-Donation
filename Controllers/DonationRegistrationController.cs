@@ -19,7 +19,7 @@ namespace Blood_Donation_Website.Controllers
 
         // GET: /DonationRegistration/Checkin
         [HttpGet]
-        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
         public IActionResult Checkin()
         {
             // Trang check-in ban đầu, không có dữ liệu
@@ -28,7 +28,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Checkin
         [HttpPost]
-        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkin(string RegistrationCode)
         {
@@ -57,7 +57,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/ConfirmCheckin
         [HttpPost]
-        [Authorize(Roles = "Quản trị viên,Bệnh viện,Nhân viên")]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmCheckin(int id)
         {
@@ -141,19 +141,27 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Cancel/{id}
         [HttpPost]
-        public async Task<IActionResult> Cancel(int id, string reason)
+        public async Task<IActionResult> Cancel(int id, string reason = null)
         {
             try
             {
                 var userId = GetCurrentUserId();
                 if (userId == 0)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Bạn cần đăng nhập để thực hiện thao tác này." });
+                    }
                     return RedirectToAction("Login", "Account");
                 }
 
                 var registration = await _registrationService.GetRegistrationByIdAsync(id);
                 if (registration == null)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy đăng ký." });
+                    }
                     TempData["Error"] = "Không tìm thấy đăng ký.";
                     return RedirectToAction(nameof(MyRegistrations));
                 }
@@ -161,6 +169,10 @@ namespace Blood_Donation_Website.Controllers
                 // Kiểm tra xem đăng ký có thuộc về user hiện tại không
                 if (registration.UserId != userId)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Bạn không có quyền hủy đăng ký này." });
+                    }
                     TempData["Error"] = "Bạn không có quyền hủy đăng ký này.";
                     return RedirectToAction(nameof(MyRegistrations));
                 }
@@ -168,6 +180,10 @@ namespace Blood_Donation_Website.Controllers
                 // Kiểm tra xem đăng ký có thể hủy không
                 if (registration.Status != "Registered" && registration.Status != "Approved")
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Đăng ký này không thể hủy." });
+                    }
                     TempData["Error"] = "Đăng ký này không thể hủy.";
                     return RedirectToAction(nameof(Details), new { id });
                 }
@@ -175,17 +191,33 @@ namespace Blood_Donation_Website.Controllers
                 var success = await _registrationService.CancelRegistrationAsync(id, reason);
                 if (success)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                    }
                     TempData["Success"] = "Đã hủy đăng ký thành công.";
                 }
                 else
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                    }
                     TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                 }
 
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                }
                 return RedirectToAction(nameof(MyRegistrations));
             }
             catch
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                }
                 TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                 return RedirectToAction(nameof(MyRegistrations));
             }

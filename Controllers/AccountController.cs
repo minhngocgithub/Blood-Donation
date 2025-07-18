@@ -60,7 +60,7 @@ namespace Blood_Donation_Website.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.RoleDescription ?? "Người dùng")
+                    new Claim(ClaimTypes.Role, user.RoleName ?? "User")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

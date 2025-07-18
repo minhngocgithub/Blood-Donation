@@ -7,7 +7,7 @@ namespace Blood_Donation_Website.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.HttpContext.User.IsInRole("Bệnh viện") && !context.HttpContext.User.IsInRole("Quản trị viên"))
+            if (!context.HttpContext.User.IsInRole("Hospital") && !context.HttpContext.User.IsInRole("Admin"))
             {
                 context.Result = new RedirectToActionResult("AccessDenied", "Account", null);
             }
