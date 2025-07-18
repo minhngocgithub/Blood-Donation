@@ -126,6 +126,40 @@
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
 }
 
+/* Form styling in SweetAlert */
+.swal2-popup .form-group {
+    margin-bottom: 1rem !important;
+}
+
+.swal2-popup .form-label {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 500 !important;
+    color: #2d3748 !important;
+    font-size: 0.9rem !important;
+}
+
+.swal2-popup .form-control {
+    width: 100% !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    font-size: 1rem !important;
+    transition: border-color 0.2s ease !important;
+    background-color: #fff !important;
+}
+
+.swal2-popup .form-control:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+    outline: none !important;
+}
+
+.swal2-popup textarea.form-control {
+    resize: vertical !important;
+    min-height: 80px !important;
+}
+
 /* Validation message styling */
 .swal2-validation-message {
     background-color: #f8d7da !important;

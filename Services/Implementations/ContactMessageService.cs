@@ -272,15 +272,15 @@ namespace Blood_Donation_Website.Services.Implementations
         }
 
         // Since ContactMessage doesn't have Category property, we'll return empty list
-        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByCategoryAsync(string category)
+        public Task<IEnumerable<ContactMessageDto>> GetMessagesByCategoryAsync(string category)
         {
-            return new List<ContactMessageDto>();
+            return Task.FromResult<IEnumerable<ContactMessageDto>>(new List<ContactMessageDto>());
         }
 
         // Since ContactMessage doesn't have Priority property, we'll return empty list
-        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByPriorityAsync(string priority)
+        public Task<IEnumerable<ContactMessageDto>> GetMessagesByPriorityAsync(string priority)
         {
-            return new List<ContactMessageDto>();
+            return Task.FromResult<IEnumerable<ContactMessageDto>>(new List<ContactMessageDto>());
         }
 
         // Reply functionality - Since ContactMessage doesn't have Response property,

@@ -932,28 +932,21 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> IsDonationDateValidAsync(DateTime donationDate)
+        public Task<bool> IsDonationDateValidAsync(DateTime donationDate)
         {
             try
             {
-                return donationDate <= DateTime.Now && donationDate >= DateTime.Now.AddYears(-10);
+                return Task.FromResult(donationDate <= DateTime.Now && donationDate >= DateTime.Now.AddYears(-10));
             }
             catch
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public async Task<bool> IsDonationVolumeValidAsync(int volume)
+        public Task<bool> IsDonationVolumeValidAsync(int volume)
         {
-            try
-            {
-                return volume >= 200 && volume <= 500;
-            }
-            catch
-            {
-                return false;
-            }
+            return Task.FromResult(volume >= 200 && volume <= 500);
         }
 
         // Donation reporting

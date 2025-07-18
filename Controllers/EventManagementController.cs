@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Bệnh viện, Quản trị viên")]
+    [Authorize(Roles = "Hospital,Admin")]
     [HospitalAdminOnly]
     [Route("admin/events")]
     public class EventManagementController : Controller

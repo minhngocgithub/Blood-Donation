@@ -1,0 +1,208 @@
+@{
+    ViewData["Title"] = "Chọn người dùng cập nhật nhóm máu";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Tìm kiếm người dùng
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="searchEmail" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    Tìm theo Email
+                                </label>
+                                <input type="email" id="searchEmail" class="form-control" placeholder="Nhập email người dùng">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="searchPhone" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>
+                                    Tìm theo SĐT
+                                </label>
+                                <input type="tel" id="searchPhone" class="form-control" placeholder="Nhập số điện thoại">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button type="button" class="btn btn-primary me-2" onclick="searchByEmail()">
+                            <i class="fas fa-search me-1"></i>
+                            Tìm theo Email
+                        </button>
+                        <button type="button" class="btn btn-info me-2" onclick="searchByPhone()">
+                            <i class="fas fa-search me-1"></i>
+                            Tìm theo SĐT
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="loadAllUsers()">
+                            <i class="fas fa-users me-1"></i>
+                            Xem tất cả
+                        </button>
+                    </div>
+
+                    <div class="mt-4" id="userResults" style="display: none;">
+                        <h6 class="text-muted">Kết quả tìm kiếm:</h6>
+                        <div id="userList" class="list-group">
+                            <!-- Kết quả sẽ được hiển thị ở đây -->
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Hướng dẫn:</strong> Chọn người dùng cần cập nhật nhóm máu từ danh sách hoặc sử dụng tìm kiếm nâng cao.
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Quay lại sàng lọc
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        function searchByEmail() {
+            const email = document.getElementById('searchEmail').value.trim();
+            if (!email) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Vui lòng nhập email',
+                    text: 'Bạn cần nhập email để tìm kiếm.'
+                });
+                return;
+            }
+            
+            console.log('Searching by email:', email);
+            
+            fetch(`/screening/search-user?email=${encodeURIComponent(email)}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search results:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    displayUsers(Array.isArray(data) ? data : []);
+                })
+                .catch(error => {
+                    console.error('Error searching users:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: `Không thể tìm kiếm người dùng: ${error.message}`
+                    });
+                });
+        }
+
+        function searchByPhone() {
+            const phone = document.getElementById('searchPhone').value.trim();
+            if (!phone) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Vui lòng nhập số điện thoại',
+                    text: 'Bạn cần nhập số điện thoại để tìm kiếm.'
+                });
+                return;
+            }
+            
+            console.log('Searching by phone:', phone);
+            
+            fetch(`/screening/search-user?phone=${encodeURIComponent(phone)}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search results:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    displayUsers(Array.isArray(data) ? data : []);
+                })
+                .catch(error => {
+                    console.error('Error searching users:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: `Không thể tìm kiếm người dùng: ${error.message}`
+                    });
+                });
+        }
+
+        function loadAllUsers() {
+            console.log('Loading all users...');
+            
+            fetch('/screening/get-all-users')
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('All users:', data);
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    displayUsers(Array.isArray(data) ? data : []);
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: `Không thể tải danh sách người dùng: ${error.message}`
+                    });
+                });
+        }
+
+        function displayUsers(users) {
+            const userList = document.getElementById('userList');
+            const userResults = document.getElementById('userResults');
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<div class="alert alert-info">Không tìm thấy người dùng nào.</div>';
+            } else {
+                userList.innerHTML = users.map(user => `
+                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${user.fullName}</h6>
+                            <small class="text-muted">${user.email}</small>
+                            <br>
+                            <span class="badge bg-info">${user.bloodTypeName || 'Chưa cập nhật'}</span>
+                        </div>
+                        <a href="/screening/update-blood-type/${user.userId}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-edit me-1"></i>Cập nhật
+                        </a>
+                    </div>
+                `).join('');
+            }
+            
+            userResults.style.display = 'block';
+        }
+    </script>
+} 

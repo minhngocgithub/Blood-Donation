@@ -117,12 +117,6 @@
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
                                     <li>
-                                        <h6 class="dropdown-header">
-                                            <i class="fas fa-user me-2"></i>@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
-                                        </h6>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
                                         <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
                                             <i class="fas fa-user me-2 text-primary"></i>Thông tin cá nhân
                                         </a>
@@ -142,7 +136,7 @@
                                             <i class="fas fa-history me-2 text-info"></i>Lịch sử hiến máu
                                         </a>
                                     </li>
-                                    @if (User.IsInRole("Quản trị viên") || User.IsInRole("Bệnh viện") || User.IsInRole("Bác sĩ") || User.IsInRole("Nhân viên"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
@@ -150,7 +144,7 @@
                                             </a>
                                         </li>
                                     }
-                                    @if (User.IsInRole("Quản trị viên"))
+                                    @if (User.IsInRole("Admin"))
                                     {
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
@@ -159,15 +153,20 @@
                                             </a>
                                         </li>
                                     }
-                                    @if (User.IsInRole("Bác sĩ"))
+                                    @if (User.IsInRole("Doctor") || User.IsInRole("Hospital"))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Index">
                                                 <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
                                             </a>
                                         </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="HealthScreening" asp-action="UpdateBloodTypeForm" asp-route-userId="0">
+                                                <i class="fas fa-tint me-2 text-info"></i>Cập nhật nhóm máu
+                                            </a>
+                                        </li>
                                     }
-                                    @if (User.IsInRole("Bệnh viện"))
+                                    @if (User.IsInRole("Hospital"))
                                     {
                                         <li>
                                             <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">

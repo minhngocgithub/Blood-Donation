@@ -123,7 +123,7 @@
                             <div class="input-with-icon">
                                 <i class="fas fa-tint input-icon blood-icon"></i>
                                 @{
-                                    string bloodTypeName = Model.BloodType;
+                                    string bloodTypeName = Model.BloodType ?? "";
                                     if (ViewBag.BloodTypes != null)
                                     {
                                         foreach (var bt in ViewBag.BloodTypes)
