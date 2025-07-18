@@ -3,11 +3,16 @@
     ViewData["Title"] = "Thống kê đăng ký";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/registration-statistics-page.css" asp-append-version="true" />
+}
+
+<div class="statistics-container">
+    <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card statistics-main-card">
+                <div class="card-header statistics-card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">
                             <i class="fas fa-chart-bar me-2"></i>Thống kê đăng ký hiến máu
@@ -20,72 +25,72 @@
                 <div class="card-body">
                     <!-- Thống kê tổng quan -->
                     <div class="row mb-4">
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
-                                <div class="card-body">
+                        <div class="col-xl-3 col-md-6 mb-4 stagger-in">
+                            <div class="card stat-card border-left-primary">
+                                <div class="card-body stat-card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            <div class="stat-label text-primary">
                                                 Tổng số đăng ký
                                             </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalRegistrations</div>
+                                            <div class="stat-value">@Model.TotalRegistrations</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                            <i class="fas fa-calendar stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
+                        <div class="col-xl-3 col-md-6 mb-4 stagger-in">
+                            <div class="card stat-card border-left-success">
+                                <div class="card-body stat-card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            <div class="stat-label text-success">
                                                 Hoàn thành
                                             </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.CompletedRegistrations</div>
+                                            <div class="stat-value">@Model.CompletedRegistrations</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                            <i class="fas fa-check-circle stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
+                        <div class="col-xl-3 col-md-6 mb-4 stagger-in">
+                            <div class="card stat-card border-left-warning">
+                                <div class="card-body stat-card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            <div class="stat-label text-warning">
                                                 Chờ duyệt
                                             </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.PendingRegistrations</div>
+                                            <div class="stat-value">@Model.PendingRegistrations</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                            <i class="fas fa-clock stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
+                        <div class="col-xl-3 col-md-6 mb-4 stagger-in">
+                            <div class="card stat-card border-left-info">
+                                <div class="card-body stat-card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            <div class="stat-label text-info">
                                                 Đã duyệt
                                             </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ApprovedRegistrations</div>
+                                            <div class="stat-value">@Model.ApprovedRegistrations</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-thumbs-up fa-2x text-gray-300"></i>
+                                            <i class="fas fa-thumbs-up stat-icon"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -95,53 +100,46 @@
 
                     <!-- Biểu đồ -->
                     <div class="row">
-                        <div class="col-lg-8">
-                            <div class="card shadow-sm mb-4">
-                                <div class="card-header bg-light">
+                        <div class="col-lg-8 slide-in-up">
+                            <div class="card chart-container">
+                                <div class="card-header chart-header">
                                     <h6 class="mb-0">
                                         <i class="fas fa-chart-pie me-2 text-primary"></i>Phân bố trạng thái đăng ký
                                     </h6>
                                 </div>
-                                <div class="card-body">
-                                    <canvas id="statusChart" width="400" height="200"></canvas>
+                                <div class="card-body chart-body">
+                                    <canvas id="statusChart" class="chart-canvas" width="400" height="200"></canvas>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="card shadow-sm mb-4">
-                                <div class="card-header bg-light">
+                        <div class="col-lg-4 slide-in-up">
+                            <div class="card chart-container">
+                                <div class="card-header chart-header">
                                     <h6 class="mb-0">
                                         <i class="fas fa-info-circle me-2 text-info"></i>Thông tin bổ sung
                                     </h6>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <h6 class="text-primary">Tỷ lệ hoàn thành</h6>
-                                        <div class="progress mb-2">
-                                            <div class="progress-bar bg-success" role="progressbar" 
-                                                 style="width: @Model.CompletionRate%" 
-                                                 aria-valuenow="@Model.CompletionRate" aria-valuemin="0" aria-valuemax="100">
-                                                @Model.CompletionRate%
-                                            </div>
+                                <div class="card-body chart-body">
+                                    <div class="progress-container">
+                                        <div class="progress-label">
+                                            <i class="fas fa-chart-line text-primary"></i>
+                                            <span>Tỷ lệ hoàn thành</span>
                                         </div>
-                                        <small class="text-muted">@Model.CompletedRegistrations / @Model.TotalRegistrations đăng ký</small>
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill bg-success" style="width: @Model.CompletionRate%"></div>
+                                        </div>
+                                        <div class="progress-text">@Model.CompletedRegistrations / @Model.TotalRegistrations đăng ký</div>
                                     </div>
                                     
-                                    <div class="mb-3">
-                                        <h6 class="text-warning">Tỷ lệ chờ duyệt</h6>
-                                        <div class="progress mb-2">
-                                            <div class="progress-bar bg-warning" role="progressbar" 
-                                                 style="width: @Model.PendingRate%" 
-                                                 aria-valuenow="@Model.PendingRate" aria-valuemin="0" aria-valuemax="100">
-                                                @Model.PendingRate%
-                                            </div>
+                                    <div class="progress-container">
+                                        <div class="progress-label">
+                                            <i class="fas fa-clock text-warning"></i>
+                                            <span>Tỷ lệ chờ duyệt</span>
                                         </div>
-                                        <small class="text-muted">@Model.PendingRegistrations / @Model.TotalRegistrations đăng ký</small>
-                                    </div>
-                                    
-                                    <div class="alert alert-info mb-0">
-                                        <i class="fas fa-lightbulb me-1"></i>
-                                        <strong>Gợi ý:</strong> Hãy tham gia thêm các sự kiện hiến máu để tăng số lượng đăng ký hoàn thành!
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill bg-warning" style="width: @Model.PendingRate%"></div>
+                                        </div>
+                                        <div class="progress-text">@Model.PendingRegistrations / @Model.TotalRegistrations đăng ký</div>
                                     </div>
                                 </div>
                             </div>
@@ -149,16 +147,16 @@
                     </div>
 
                     <!-- Bảng chi tiết -->
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-light">
+                    <div class="card stats-table-container fade-in">
+                        <div class="card-header stats-table-header">
                             <h6 class="mb-0">
                                 <i class="fas fa-table me-2 text-secondary"></i>Chi tiết thống kê
                             </h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
+                                <table class="table stats-table">
+                                    <thead>
                                         <tr>
                                             <th>Chỉ số</th>
                                             <th>Số lượng</th>

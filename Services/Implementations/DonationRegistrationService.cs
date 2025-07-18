@@ -248,7 +248,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     RegistrationDate = DateTime.Now,
                     Status = "Registered",
                     Notes = createDto.Notes,
-                    IsEligible = true
+                    IsEligible = false // Chưa đủ điều kiện cho đến khi qua health screening
                 };
 
                 _context.DonationRegistrations.Add(registration);
@@ -572,11 +572,15 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
+                // Chỉ lấy bản ghi có trạng thái còn hiệu lực, mới nhất
+                var validStatuses = new[] { "Registered", "Approved", "CheckedIn", "Completed" };
                 var registration = await _context.DonationRegistrations
                     .Include(r => r.User)
                     .Include(r => r.Event)
                     .ThenInclude(e => e.Location)
-                    .FirstOrDefaultAsync(r => r.UserId == userId && r.EventId == eventId);
+                    .Where(r => r.UserId == userId && r.EventId == eventId && validStatuses.Contains(r.Status))
+                    .OrderByDescending(r => r.RegistrationDate)
+                    .FirstOrDefaultAsync();
 
                 if (registration == null) return null;
 
@@ -622,8 +626,10 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
+                // Chỉ tính các trạng thái còn hiệu lực
+                var validStatuses = new[] { "Registered", "Approved", "CheckedIn", "Completed" };
                 return await _context.DonationRegistrations
-                    .AnyAsync(r => r.UserId == userId && r.EventId == eventId);
+                    .AnyAsync(r => r.UserId == userId && r.EventId == eventId && validStatuses.Contains(r.Status));
             }
             catch
             {

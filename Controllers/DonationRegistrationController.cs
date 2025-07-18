@@ -85,7 +85,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         // GET: /DonationRegistration/MyRegistrations
-        public async Task<IActionResult> MyRegistrations()
+        public async Task<IActionResult> MyRegistrations(string status = "active")
         {
             try
             {
@@ -95,8 +95,26 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                var registrations = await _registrationService.GetRegistrationsByUserAsync(userId);
-                return View(registrations);
+                var allRegs = await _registrationService.GetRegistrationsByUserAsync(userId);
+                IEnumerable<DonationRegistrationDto> filtered = allRegs;
+
+                if (string.IsNullOrEmpty(status) || status == "active")
+                {
+                    var activeStatuses = new[] { "Registered", "Approved", "CheckedIn", "Screening", "Eligible", "Ineligible", "Donating" };
+                    filtered = allRegs.Where(r => activeStatuses.Contains(r.Status));
+                }
+                else if (status == "completed")
+                {
+                    filtered = allRegs.Where(r => r.Status == "Completed");
+                }
+                else if (status == "cancelled")
+                {
+                    var cancelledStatuses = new[] { "Cancelled", "Rejected", "Failed", "NoShow" };
+                    filtered = allRegs.Where(r => cancelledStatuses.Contains(r.Status));
+                }
+                // else: show all
+
+                return View(filtered);
             }
             catch
             {

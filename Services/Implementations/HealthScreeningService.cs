@@ -45,7 +45,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreeningDate = screening.ScreeningDate,
                     UserName = screening.Registration.User.FullName,
                     EventName = screening.Registration.Event.EventName,
-                    ScreenedByUserName = screening.ScreenedByUser?.FullName
+                    ScreenedByUserName = screening.ScreenedByUser?.FullName,
+                    RegistrationStatus = screening.Registration.Status,
+                    CheckInTime = screening.Registration.CheckInTime
                 };
             }
             catch
@@ -82,7 +84,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreeningDate = h.ScreeningDate,
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
-                    ScreenedByUserName = h.ScreenedByUser?.FullName
+                    ScreenedByUserName = h.ScreenedByUser?.FullName,
+                    RegistrationStatus = h.Registration.Status,
+                    CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch
@@ -237,7 +241,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreeningDate = h.ScreeningDate,
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
-                    ScreenedByUserName = h.ScreenedByUser?.FullName
+                    ScreenedByUserName = h.ScreenedByUser?.FullName,
+                    RegistrationStatus = h.Registration.Status,
+                    CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch
@@ -275,7 +281,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreeningDate = h.ScreeningDate,
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
-                    ScreenedByUserName = h.ScreenedByUser?.FullName
+                    ScreenedByUserName = h.ScreenedByUser?.FullName,
+                    RegistrationStatus = h.Registration.Status,
+                    CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch
@@ -313,7 +321,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreeningDate = h.ScreeningDate,
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
-                    ScreenedByUserName = h.ScreenedByUser?.FullName
+                    ScreenedByUserName = h.ScreenedByUser?.FullName,
+                    RegistrationStatus = h.Registration.Status,
+                    CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch

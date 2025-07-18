@@ -141,14 +141,28 @@
                                         }
                                         else
                                         {
-                                            <form asp-action="Register" asp-controller="Events" method="post">
-                                                <input type="hidden" name="eventId" value="@Model.EventId" />
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                            if (ViewBag.NextEligibleDate != null && ViewBag.DaysLeft != null && ViewBag.DaysLeft > 0)
+                                            {
+                                                <div class="alert alert-warning mb-3 text-center fw-bold">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Bạn chưa đủ điều kiện hiến máu, cần chờ @ViewBag.DaysLeft ngày nữa (đến ngày @(( (DateTime)ViewBag.NextEligibleDate ).ToString("dd/MM/yyyy")).
+                                                </div>
+                                                <button class="btn btn-secondary btn-lg w-100 mb-3" disabled>
                                                     <i class="fas fa-calendar-plus me-2"></i>
                                                     Đăng ký tham gia
                                                 </button>
-                                            </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Register" asp-controller="Events" method="post">
+                                                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                                        <i class="fas fa-calendar-plus me-2"></i>
+                                                        Đăng ký tham gia
+                                                    </button>
+                                                </form>
+                                            }
                                         }
                                     }
                                     else

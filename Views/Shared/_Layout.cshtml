@@ -20,20 +20,14 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/main-sections.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/home-pages.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/index-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/profile-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/about-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/faq-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/guide-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/privacy-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/terms-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/sweetalert-demo-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
+
+    <!-- Page-specific Styles -->
+    @await RenderSectionAsync("Styles", required: false)
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="~/favicon.ico">
