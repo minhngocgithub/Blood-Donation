@@ -1,6 +1,4 @@
 using Blood_Donation_Website.Data;
-using Blood_Donation_Website.Utilities;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Blood_Donation_Website.Utilities.Extensions
 {

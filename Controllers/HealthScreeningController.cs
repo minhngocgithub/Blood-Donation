@@ -1,9 +1,7 @@
-using Blood_Donation_Website.Filters;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace Blood_Donation_Website.Controllers.Doctor
 {
@@ -283,7 +281,7 @@ namespace Blood_Donation_Website.Controllers.Doctor
         }
 
         [HttpGet("search-user")]
-        public async Task<IActionResult> SearchUser(string email = null, string phone = null)
+        public async Task<IActionResult> SearchUser(string? email = null, string? phone = null)
         {
             try
             {

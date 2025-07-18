@@ -78,6 +78,11 @@
                                                 else
                                                 {
                                                     <span class="text-success">Đã check-in</span>
+                                                    <form asp-action="CancelCheckin" method="post" style="display:inline;" class="cancel-checkin-form">
+                                                        <input type="hidden" name="id" value="@reg.RegistrationId" />
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="button" class="btn btn-sm btn-danger ms-2 btn-cancel-checkin">Hủy check-in</button>
+                                                    </form>
                                                 }
                                             </td>
                                         </tr>
@@ -93,6 +98,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function () {
             var successMsg = '@TempData["Success"]';
@@ -103,6 +109,26 @@
             if (errorMsg) {
                 showError('Lỗi');
             }
+
+            // SweetAlert xác nhận hủy check-in
+            $(document).on('click', '.btn-cancel-checkin', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Xác nhận hủy check-in',
+                    text: 'Bạn có chắc chắn muốn hủy check-in này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Hủy check-in',
+                    cancelButtonText: 'Đóng'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
 }

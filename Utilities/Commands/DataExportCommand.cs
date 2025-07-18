@@ -1,7 +1,5 @@
 using Blood_Donation_Website.Data;
-using Blood_Donation_Website.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Blood_Donation_Website.Utilities.Commands
 {

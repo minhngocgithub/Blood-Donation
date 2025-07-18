@@ -1,4 +1,3 @@
-using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 
 namespace Blood_Donation_Website.Services.Interfaces
@@ -70,5 +69,6 @@ namespace Blood_Donation_Website.Services.Interfaces
         /// <param name="registrationId">Id đăng ký</param>
         /// <returns>True nếu thành công</returns>
         Task<bool> CheckinRegistrationAsync(int registrationId);
+        Task<bool> CancelCheckinAsync(int registrationId);
     }
 } 

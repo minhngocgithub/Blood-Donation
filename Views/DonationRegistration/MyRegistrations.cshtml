@@ -111,7 +111,7 @@
                                                 @if (registration.Status == "Registered" || registration.Status == "Approved")
                                                 {
                                                     <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                            onclick="showCancelConfirmation(@registration.RegistrationId, '@Html.Raw(registration.EventName.Replace("'", "\\'"))')">
+                                                            onclick="showCancelConfirmation(@registration.RegistrationId, '@Html.Raw(registration.EventName!.Replace("'", "\\'"))')">
                                                         <i class="fas fa-times me-1"></i>Hủy đăng ký
                                                     </button>
                                                 }

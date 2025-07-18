@@ -26,7 +26,7 @@ namespace Blood_Donation_Website.Utilities.Extensions
         /// </summary>
         /// <param name="enumValue">Enum value</param>
         /// <returns>Description hoặc null nếu không có</returns>
-        public static string GetDescription(this Enum enumValue)
+        public static string? GetDescription(this Enum enumValue)
         {
             var field = enumValue.GetType().GetField(enumValue.ToString());
             var displayAttribute = field?.GetCustomAttribute<DisplayAttribute>();
@@ -47,10 +47,14 @@ namespace Blood_Donation_Website.Utilities.Extensions
             {
                 if (field.FieldType == enumType)
                 {
-                    var enumValue = (T)field.GetValue(null);
-                    var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
-                    var displayName = displayAttribute?.Name ?? field.Name;
-                    result[enumValue] = displayName;
+                    var valueObj = field.GetValue(null);
+                    if (valueObj != null)
+                    {
+                        var enumValue = (T)valueObj;
+                        var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
+                        var displayName = displayAttribute?.Name ?? field.Name;
+                        result[enumValue] = displayName;
+                    }
                 }
             }
             
@@ -65,7 +69,7 @@ namespace Blood_Donation_Website.Utilities.Extensions
         /// <param name="includeEmptyOption">Có thêm option trống không</param>
         /// <param name="emptyOptionText">Text cho option trống</param>
         /// <returns>SelectList</returns>
-        public static SelectList ToSelectList<T>(T selectedValue = default, bool includeEmptyOption = false, string emptyOptionText = "-- Chọn --") where T : Enum
+        public static SelectList ToSelectList<T>(T? selectedValue = default, bool includeEmptyOption = false, string emptyOptionText = "-- Chọn --") where T : Enum
         {
             var items = new List<SelectListItem>();
             
