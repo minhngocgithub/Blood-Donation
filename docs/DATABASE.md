@@ -71,7 +71,7 @@ Table DonationRegistrations {
   RegistrationDate datetime [default: `getdate()`]
   Status nvarchar(20) [default: 'Registered'] // Enum: "Registered", "Confirmed", "CheckedIn", "Screening", "Eligible", "Ineligible", "Donating", "Completed", "Cancelled", "NoShow", "Failed"
   Notes nvarchar(500)
-  IsEligible bit [default: 1]
+  IsEligible bit [default: 0]
   CheckInTime datetime
   CompletionTime datetime
   CancellationReason nvarchar(200)

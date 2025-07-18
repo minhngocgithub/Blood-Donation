@@ -13,13 +13,16 @@ namespace Blood_Donation_Website.Controllers
     {
         private readonly IBloodDonationEventService _eventService;
         private readonly ILocationService _locationService;
+        private readonly IBloodTypeService _bloodTypeService;
 
         public EventManagementController(
             IBloodDonationEventService eventService,
-            ILocationService locationService)
+            ILocationService locationService,
+            IBloodTypeService bloodTypeService)
         {
             _eventService = eventService;
             _locationService = locationService;
+            _bloodTypeService = bloodTypeService;
         }
 
         [HttpGet]
@@ -33,7 +36,9 @@ namespace Blood_Donation_Website.Controllers
         public async Task<IActionResult> Create()
         {
             var locations = await _locationService.GetAllLocationsAsync();
+            var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             ViewBag.Locations = locations;
+            ViewBag.BloodTypes = bloodTypes;
             return View();
         }
 
@@ -56,7 +61,9 @@ namespace Blood_Donation_Website.Controllers
             }
 
             var locations = await _locationService.GetAllLocationsAsync();
+            var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             ViewBag.Locations = locations;
+            ViewBag.BloodTypes = bloodTypes;
             return View(eventDto);
         }
 

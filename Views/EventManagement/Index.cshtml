@@ -1,8 +1,10 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
 @{
     ViewData["Title"] = "Quản lý sự kiện hiến máu";
-    ViewData["ShowBreadcrumb"] = true;
-    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item active'>Quản lý sự kiện</li>";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/event-management-page.css" asp-append-version="true" />
 }
 
 <div class="container py-5">
@@ -33,7 +35,7 @@
                 </div>
             }
 
-            <div class="card shadow-sm">
+            <div class="card shadow-lg">
                 <div class="card-body">
                     @if (!Model.Any())
                     {

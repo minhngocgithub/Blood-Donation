@@ -14,6 +14,8 @@ namespace Blood_Donation_Website.Models.DTOs
         public string? DisqualifyReason { get; set; }
         public int? ScreenedBy { get; set; }
         public DateTime ScreeningDate { get; set; }
+        public string? RegistrationStatus { get; set; }
+        public DateTime? CheckInTime { get; set; }
         
         // Navigation properties
         public string? UserName { get; set; }

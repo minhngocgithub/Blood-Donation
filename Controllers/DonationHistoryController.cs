@@ -39,6 +39,45 @@ namespace Blood_Donation_Website.Controllers
                 TempData["Error"] = "Không tìm thấy lịch sử hiến máu này.";
                 return RedirectToAction(nameof(MyHistory));
             }
+
+            // Luôn cập nhật NextEligibleDate = DonationDate + 90 ngày
+            if (donation.DonationDate != null)
+            {
+                var newNextEligibleDate = donation.DonationDate.AddDays(90);
+                await _donationHistoryService.UpdateDonationAsync(donation.DonationId, new Blood_Donation_Website.Models.DTOs.DonationHistoryUpdateDto {
+                    Status = donation.Status,
+                    Notes = donation.Notes,
+                    NextEligibleDate = newNextEligibleDate,
+                    CertificateIssued = donation.CertificateIssued
+                });
+                donation.NextEligibleDate = newNextEligibleDate;
+            }
+
+            // Lấy ngày đủ điều kiện hiến máu tiếp theo (90 ngày sau lần hiến gần nhất)
+            var nextEligibleDate = await _donationHistoryService.GetUserNextEligibleDateAsync(userId);
+            int? daysLeft = null;
+            string eligibleMessage = string.Empty;
+            if (nextEligibleDate.HasValue)
+            {
+                var now = DateTime.Now.Date;
+                if (now >= nextEligibleDate.Value.Date)
+                {
+                    eligibleMessage = "Bạn đã có thể hiến máu.";
+                }
+                else
+                {
+                    daysLeft = (nextEligibleDate.Value.Date - now).Days;
+                    eligibleMessage = $"Bạn cần chờ {daysLeft} ngày nữa để hiến máu.";
+                }
+            }
+            else
+            {
+                eligibleMessage = "Bạn đã có thể hiến máu.";
+            }
+            ViewBag.NextEligibleDate = nextEligibleDate;
+            ViewBag.DaysLeft = daysLeft;
+            ViewBag.EligibleMessage = eligibleMessage;
+
             return View(donation);
         }
 

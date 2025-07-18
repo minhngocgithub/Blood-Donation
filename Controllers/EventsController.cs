@@ -8,11 +8,13 @@ namespace Blood_Donation_Website.Controllers
     {
         private readonly IBloodDonationEventService _eventService;
         private readonly IDonationRegistrationService _registrationService;
+        private readonly IDonationHistoryService _donationHistoryService;
 
-        public EventsController(IBloodDonationEventService eventService, IDonationRegistrationService registrationService)
+        public EventsController(IBloodDonationEventService eventService, IDonationRegistrationService registrationService, IDonationHistoryService donationHistoryService)
         {
             _eventService = eventService;
             _registrationService = registrationService;
+            _donationHistoryService = donationHistoryService;
         }
 
         public async Task<IActionResult> Index(string searchTerm, string location)
@@ -88,7 +90,33 @@ namespace Blood_Donation_Website.Controllers
                     if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
                     {
                         var reg = await _registrationService.GetUserRegistrationForEventAsync(userId, id);
-                        userHasRegistered = reg != null && (reg.Status == "Registered" || reg.Status == "CheckedIn");
+                        // Chỉ tính các trạng thái còn hiệu lực
+                        userHasRegistered = reg != null && (reg.Status == "Registered" || reg.Status == "Approved" || reg.Status == "CheckedIn" || reg.Status == "Completed");
+
+                        // Lấy ngày đủ điều kiện hiến máu tiếp theo
+                        var nextEligibleDate = await _donationHistoryService.GetUserNextEligibleDateAsync(userId);
+                        int? daysLeft = null;
+                        string eligibleMessage = string.Empty;
+                        if (nextEligibleDate.HasValue)
+                        {
+                            var now = DateTime.Now.Date;
+                            if (now >= nextEligibleDate.Value.Date)
+                            {
+                                eligibleMessage = "Bạn đã có thể hiến máu.";
+                            }
+                            else
+                            {
+                                daysLeft = (nextEligibleDate.Value.Date - now).Days;
+                                eligibleMessage = $"Bạn cần chờ {daysLeft} ngày nữa để hiến máu.";
+                            }
+                        }
+                        else
+                        {
+                            eligibleMessage = "Bạn đã có thể hiến máu.";
+                        }
+                        ViewBag.NextEligibleDate = nextEligibleDate;
+                        ViewBag.DaysLeft = daysLeft;
+                        ViewBag.EligibleMessage = eligibleMessage;
                     }
                 }
                 ViewBag.UserHasRegistered = userHasRegistered;

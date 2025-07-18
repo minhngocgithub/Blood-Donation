@@ -1,0 +1,63 @@
+/* event-management-page.css - Style cho trang quản lý sự kiện hiến máu */
+
+.container {
+    max-width: 1100px;
+}
+
+.card {
+    width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(220,53,69,0.07);
+}
+
+.card-body {
+    width: 100%;
+    overflow-x: auto;
+    padding: 24px 18px;
+}
+
+.table-responsive {
+    width: 100%;
+}
+
+.table thead.table-danger th {
+    background: linear-gradient(90deg, #dc3545 60%, #ff6f61 100%);
+    color: #fff;
+    border: none;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #fff3f3;
+}
+
+.table td, .table th {
+    vertical-align:top;
+}
+
+.badge.bg-info, .badge.bg-success, .badge.bg-primary, .badge.bg-danger, .badge.bg-warning, .badge.bg-dark, .badge.bg-secondary {
+    font-size: 0.95em;
+    padding: 0.5em 0.9em;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+
+h2.text-danger {
+    letter-spacing: 0.5px;
+}
+
+.modal-content {
+    border-radius: 12px;
+}
+
+@media (max-width: 767.98px) {
+    .container {
+        padding: 0 8px;
+    }
+    .card {
+        padding: 0 2px;
+    }
+    .table-responsive {
+        font-size: 0.97em;
+    }
+} 

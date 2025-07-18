@@ -8,11 +8,16 @@
     var token = Html.AntiForgeryToken();
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/registration-details-page.css" asp-append-version="true" />
+}
+
+<div class="registration-details-container">
+    <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+            <div class="card details-main-card">
+                <div class="card-header details-card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">
                             <i class="fas fa-calendar-check me-2"></i>Chi tiết đăng ký hiến máu
@@ -25,36 +30,40 @@
                 <div class="card-body">
                     <div class="row">
                         <!-- Thông tin sự kiện -->
-                        <div class="col-lg-8">
-                            <div class="card border-0 shadow-sm mb-4">
-                                <div class="card-header bg-light">
+                        <div class="col-lg-8 slide-in-left">
+                            <div class="card content-card">
+                                <div class="card-header content-card-header">
                                     <h5 class="mb-0">
                                         <i class="fas fa-calendar-alt me-2 text-primary"></i>Thông tin sự kiện
                                     </h5>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body content-card-body">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Tên sự kiện</label>
-                                            <p class="h6 text-primary mb-0">@Model.EventName</p>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Địa điểm</label>
-                                            <p class="h6 mb-0">
-                                                <i class="fas fa-map-marker-alt me-1 text-danger"></i>@Model.LocationName
+                                            <label class="form-label">Tên sự kiện</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-calendar-alt text-primary"></i>
+                                                <span>@Model.EventName</span>
                                             </p>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Ngày sự kiện</label>
-                                            <p class="h6 mb-0">
-                                                <i class="fas fa-calendar me-1 text-info"></i>
-                                                @(Model.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                                            <label class="form-label">Địa điểm</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                <span>@Model.LocationName</span>
                                             </p>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Trạng thái</label>
+                                            <label class="form-label">Ngày sự kiện</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-calendar text-info"></i>
+                                                <span>@(Model.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Trạng thái</label>
                                             <div>
-                                                <span class="badge @GetStatusBadgeClass(Model.Status) fs-6">
+                                                <span class="badge status-badge @GetStatusBadgeClass(Model.Status)">
                                                     @GetStatusText(Model.Status)
                                                 </span>
                                             </div>
@@ -64,34 +73,43 @@
                             </div>
 
                             <!-- Thông tin đăng ký -->
-                            <div class="card border-0 shadow-sm mb-4">
-                                <div class="card-header bg-light">
+                            <div class="card content-card">
+                                <div class="card-header content-card-header">
                                     <h5 class="mb-0">
                                         <i class="fas fa-user-check me-2 text-success"></i>Thông tin đăng ký
                                     </h5>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body content-card-body">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Ngày đăng ký</label>
-                                            <p class="h6 mb-0">
-                                                <i class="fas fa-clock me-1 text-warning"></i>
-                                                @Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")
+                                            <label class="form-label">Ngày đăng ký</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-clock text-warning"></i>
+                                                <span>@Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")</span>
                                             </p>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted">Tình trạng đủ điều kiện</label>
+                                            <label class="form-label">Tình trạng đủ điều kiện</label>
                                             <div>
                                                 @if (Model.IsEligible)
                                                 {
-                                                    <span class="badge bg-success fs-6">
-                                                        <i class="fas fa-check me-1"></i>Đủ điều kiện
+                                                    <span class="badge status-badge bg-success">
+                                                        <i class="fas fa-check"></i>
+                                                        <span>Đủ điều kiện</span>
+                                                    </span>
+                                                }
+                                                else if (Model.Status == "Screening")
+                                                {
+                                                    <span class="badge status-badge bg-warning text-dark">
+                                                        <i class="fas fa-stethoscope"></i>
+                                                        <span>Chờ khám sức khỏe</span>
                                                     </span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-danger fs-6">
-                                                        <i class="fas fa-times me-1"></i>Không đủ điều kiện
+                                                    <span class="badge status-badge bg-secondary">
+                                                        <i class="fas fa-question"></i>
+                                                        <span>Chưa xác định</span>
                                                     </span>
                                                 }
                                             </div>
@@ -99,39 +117,40 @@
                                         @if (Model.CheckInTime.HasValue)
                                         {
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted">Thời gian check-in</label>
-                                                <p class="h6 mb-0">
-                                                    <i class="fas fa-sign-in-alt me-1 text-primary"></i>
-                                                    @Model.CheckInTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                                <label class="form-label">Thời gian check-in</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-sign-in-alt text-primary"></i>
+                                                    <span>@Model.CheckInTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
                                                 </p>
                                             </div>
                                         }
                                         @if (Model.CompletionTime.HasValue)
                                         {
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted">Thời gian hoàn thành</label>
-                                                <p class="h6 mb-0">
-                                                    <i class="fas fa-check-circle me-1 text-success"></i>
-                                                    @Model.CompletionTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                                <label class="form-label">Thời gian hoàn thành</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                    <span>@Model.CompletionTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
                                                 </p>
                                             </div>
                                         }
                                         @if (!string.IsNullOrEmpty(Model.Notes))
                                         {
                                             <div class="col-12 mb-3">
-                                                <label class="form-label text-muted">Ghi chú</label>
-                                                <div class="alert alert-info mb-0">
-                                                    <i class="fas fa-sticky-note me-1"></i>@Model.Notes
+                                                <label class="form-label">Ghi chú</label>
+                                                <div class="info-alert">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                    <span>@Model.Notes</span>
                                                 </div>
                                             </div>
                                         }
                                         @if (!string.IsNullOrEmpty(Model.CancellationReason))
                                         {
                                             <div class="col-12 mb-3">
-                                                <label class="form-label text-muted">Lý do hủy</label>
-                                                <div class="alert alert-warning mb-0">
-                                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                                    <strong>Lý do:</strong> @Model.CancellationReason
+                                                <label class="form-label">Lý do hủy</label>
+                                                <div class="warning-alert">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span><strong>Lý do:</strong> @Model.CancellationReason</span>
                                                 </div>
                                             </div>
                                         }
@@ -141,55 +160,56 @@
                         </div>
 
                         <!-- Sidebar -->
-                        <div class="col-lg-4">
+                        <div class="col-lg-4 slide-in-right">
                             <!-- Thông tin người đăng ký -->
-                            <div class="card border-0 shadow-sm mb-4">
-                                <div class="card-header bg-light">
+                            <div class="card sidebar-card">
+                                <div class="card-header content-card-header">
                                     <h6 class="mb-0">
                                         <i class="fas fa-user me-2 text-info"></i>Thông tin cá nhân
                                     </h6>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted">Họ tên</label>
-                                        <p class="h6 mb-0">@Model.UserName</p>
+                                <div class="card-body content-card-body">
+                                    <div class="user-info-item">
+                                        <div class="user-info-label">Họ tên</div>
+                                        <div class="user-info-value">@Model.UserName</div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label text-muted">Email</label>
-                                        <p class="h6 mb-0">@Model.UserEmail</p>
+                                    <div class="user-info-item">
+                                        <div class="user-info-label">Email</div>
+                                        <div class="user-info-value">@Model.UserEmail</div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Hành động -->
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-header bg-light">
+                            <div class="card sidebar-card">
+                                <div class="card-header content-card-header">
                                     <h6 class="mb-0">
                                         <i class="fas fa-cogs me-2 text-secondary"></i>Hành động
                                     </h6>
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body content-card-body">
                                     @if (Model.Status == "Registered" || Model.Status == "Approved")
                                     {
-                                        <button type="button" class="btn btn-danger w-100 mb-2" 
+                                        <button type="button" class="action-button btn-cancel-registration" 
                                                 onclick="showCancelConfirmation(@Model.RegistrationId, '@Html.Raw(Model.EventName!.Replace("'", "\\'"))')">
-                                            <i class="fas fa-times me-1"></i>Hủy đăng ký
+                                            <i class="fas fa-times"></i>
+                                            <span>Hủy đăng ký</span>
                                         </button>
                                     }
                                     
                                     @if (Model.Status == "Completed")
                                     {
-                                        <div class="alert alert-success mb-0">
-                                            <i class="fas fa-trophy me-1"></i>
-                                            <strong>Chúc mừng!</strong> Bạn đã hoàn thành hiến máu thành công.
+                                        <div class="success-alert">
+                                            <i class="fas fa-trophy"></i>
+                                            <span><strong>Chúc mừng!</strong> Bạn đã hoàn thành hiến máu thành công.</span>
                                         </div>
                                     }
                                     
                                     @if (Model.Status == "Cancelled" || Model.Status == "Rejected")
                                     {
-                                        <div class="alert alert-warning mb-0">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Đăng ký này đã bị @(Model.Status == "Cancelled" ? "hủy" : "từ chối").
+                                        <div class="warning-alert">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Đăng ký này đã bị @(Model.Status == "Cancelled" ? "hủy" : "từ chối").</span>
                                         </div>
                                     }
                                 </div>

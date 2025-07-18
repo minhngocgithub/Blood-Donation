@@ -2,33 +2,36 @@
 @{
     ViewData["Title"] = "Lịch sử hiến máu của tôi";
 }
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">
-                            <i class="fas fa-history me-2"></i>Lịch sử hiến máu của tôi
-                        </h4>
+<link rel="stylesheet" href="~/css/my-history-page.css" asp-append-version="true" />
+
+<div class="my-history-container">
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="history-main-card">
+                    <div class="history-card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-history me-2"></i>Lịch sử hiến máu của tôi
+                            </h4>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
+                    <div class="card-body">
                     @if (!Model.Any())
                     {
-                        <div class="text-center py-5">
-                            <i class="fas fa-tint fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Bạn chưa có lịch sử hiến máu nào</h5>
-                            <p class="text-muted">Hãy tham gia các sự kiện hiến máu để lưu lại dấu ấn của bạn!</p>
-                            <a href="@Url.Action("Index", "Events")" class="btn btn-info">
-                                <i class="fas fa-plus me-1"></i>Đăng ký hiến máu
+                        <div class="empty-state fade-in">
+                            <i class="fas fa-tint empty-state-icon blood-drop-effect"></i>
+                            <h5 class="empty-state-title">Bạn chưa có lịch sử hiến máu nào</h5>
+                            <p class="empty-state-text">Hãy tham gia các sự kiện hiến máu để lưu lại dấu ấn của bạn!</p>
+                            <a href="@Url.Action("Index", "Events")" class="empty-state-btn heartbeat-effect">
+                                <i class="fas fa-heart me-1"></i>Đăng ký hiến máu
                             </a>
                         </div>
                     }
                     else
                     {
                         <div class="table-responsive">
-                            <table class="table table-bordered align-middle">
+                            <table class="history-table table table-bordered align-middle">
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
@@ -45,7 +48,7 @@
                                 <tbody>
                                     @foreach (var (item, idx) in Model.Select((x, i) => (x, i + 1)))
                                     {
-                                        <tr>
+                                        <tr class="slide-in">
                                             <td>@idx</td>
                                             <td>@item.EventName</td>
                                             <td>@item.DonationDate.ToString("dd/MM/yyyy")</td>
@@ -53,20 +56,20 @@
                                             <td>@item.BloodTypeName</td>
                                             <td>@item.Volume</td>
                                             <td>
-                                                <span class="badge @GetStatusBadgeClass(item.Status)">@GetStatusText(item.Status)</span>
+                                                <span class="status-badge @GetStatusBadgeClass(item.Status)">@GetStatusText(item.Status)</span>
                                             </td>
                                             <td>
                                                 @if (item.CertificateIssued)
                                                 {
-                                                    <span class="badge bg-success">Đã cấp</span>
+                                                    <span class="certificate-badge bg-success">Đã cấp</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-secondary">Chưa cấp</span>
+                                                    <span class="certificate-badge bg-secondary">Chưa cấp</span>
                                                 }
                                             </td>
                                             <td>
-                                                <a href="@Url.Action("Details", "DonationHistory", new { id = item.DonationId })" class="btn btn-outline-info btn-sm">
+                                                <a href="@Url.Action("Details", "DonationHistory", new { id = item.DonationId })" class="btn-details">
                                                     <i class="fas fa-eye me-1"></i>Chi tiết
                                                 </a>
                                             </td>
@@ -76,6 +79,7 @@
                             </table>
                         </div>
                     }
+                    </div>
                 </div>
             </div>
         </div>
