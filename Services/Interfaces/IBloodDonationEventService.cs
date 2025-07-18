@@ -1,4 +1,3 @@
-using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 
 namespace Blood_Donation_Website.Services.Interfaces

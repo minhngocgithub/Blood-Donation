@@ -101,7 +101,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatorName = e.Creator?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 
                 return new List<BloodDonationEventDto>();

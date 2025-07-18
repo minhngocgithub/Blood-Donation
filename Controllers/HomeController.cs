@@ -2,12 +2,8 @@ using Blood_Donation_Website.Models;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Blood_Donation_Website.Services.Interfaces;
-using Blood_Donation_Website.Models.DTOs;
-using System.Threading.Tasks;
-using System.Linq;
 
-namespace Blood_Donation_Website.Controllers.Home
+namespace Blood_Donation_Website.Controllers
 {
     public class HomeController : Controller
     {

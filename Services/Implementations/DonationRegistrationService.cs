@@ -749,20 +749,6 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<int> GetRegistrationCountByUserAndStatusAsync(int userId, string status)
-        {
-            try
-            {
-                return await _context.DonationRegistrations
-                    .Where(r => r.UserId == userId && r.Status == status)
-                    .CountAsync();
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
-
         public async Task<int> GetRegistrationCountByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             try
@@ -1067,6 +1053,24 @@ namespace Blood_Donation_Website.Services.Implementations
             }
             catch
             {
+            }
+        }
+
+        public async Task<bool> CancelCheckinAsync(int registrationId)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return false;
+                if (registration.Status != "CheckedIn") return false;
+                registration.Status = "Registered";
+                registration.CheckInTime = null;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

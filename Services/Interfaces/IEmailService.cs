@@ -1,6 +1,4 @@
-﻿using Blood_Donation_Website.Services.Interfaces;
-
-namespace Blood_Donation_Website.Services.Interfaces
+﻿namespace Blood_Donation_Website.Services.Interfaces
 {
     public interface IEmailService
     {

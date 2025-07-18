@@ -19,7 +19,7 @@ namespace Blood_Donation_Website.Controllers
 
         // GET: /DonationRegistration/Checkin
         [HttpGet]
-        [Authorize(Roles = "Admin,Hospital,Staff")]
+        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
         public IActionResult Checkin()
         {
             // Trang check-in ban đầu, không có dữ liệu
@@ -28,7 +28,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Checkin
         [HttpPost]
-        [Authorize(Roles = "Admin,Hospital,Staff")]
+        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkin(string RegistrationCode)
         {
@@ -57,7 +57,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/ConfirmCheckin
         [HttpPost]
-        [Authorize(Roles = "Admin,Hospital,Staff")]
+        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmCheckin(int id)
         {
@@ -141,7 +141,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Cancel/{id}
         [HttpPost]
-        public async Task<IActionResult> Cancel(int id, string reason = null)
+        public async Task<IActionResult> Cancel(int id, string? reason = null)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction(nameof(Details), new { id });
                 }
 
-                var success = await _registrationService.CancelRegistrationAsync(id, reason);
+                var success = await _registrationService.CancelRegistrationAsync(id, reason ?? string.Empty);
                 if (success)
                 {
                     if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -221,6 +221,35 @@ namespace Blood_Donation_Website.Controllers
                 TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                 return RedirectToAction(nameof(MyRegistrations));
             }
+        }
+
+        // POST: /DonationRegistration/CancelCheckin
+        [HttpPost]
+        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelCheckin(int id)
+        {
+            var registration = await _registrationService.GetRegistrationByIdAsync(id);
+            if (registration == null)
+            {
+                TempData["Error"] = "Không tìm thấy đăng ký.";
+                return RedirectToAction("Checkin");
+            }
+            if (registration.Status != "CheckedIn")
+            {
+                TempData["Error"] = "Chỉ có thể hủy check-in cho đăng ký đã check-in.";
+                return RedirectToAction("Checkin");
+            }
+            var success = await _registrationService.CancelCheckinAsync(id);
+            if (success)
+            {
+                TempData["Success"] = "Đã hủy check-in thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi hủy check-in.";
+            }
+            return RedirectToAction("Checkin");
         }
 
         // GET: /DonationRegistration/Statistics

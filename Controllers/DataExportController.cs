@@ -267,7 +267,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var user = JsonSerializer.Deserialize<User>(record.GetRawText());
-                                var existingUser = await _context.Users.FindAsync(user.UserId);
+                                var existingUser = await _context.Users.FindAsync(user!.UserId);
                                 
                                 if (existingUser == null)
                                 {
@@ -286,7 +286,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var role = JsonSerializer.Deserialize<Role>(record.GetRawText());
-                                var existingRole = await _context.Roles.FindAsync(role.RoleId);
+                                var existingRole = await _context.Roles.FindAsync(role!.RoleId);
                                 
                                 if (existingRole == null)
                                 {
@@ -305,7 +305,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var bloodType = JsonSerializer.Deserialize<BloodType>(record.GetRawText());
-                                var existingBloodType = await _context.BloodTypes.FindAsync(bloodType.BloodTypeId);
+                                var existingBloodType = await _context.BloodTypes.FindAsync(bloodType!.BloodTypeId);
                                 
                                 if (existingBloodType == null)
                                 {
@@ -324,7 +324,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var location = JsonSerializer.Deserialize<Location>(record.GetRawText());
-                                var existingLocation = await _context.Locations.FindAsync(location.LocationId);
+                                var existingLocation = await _context.Locations.FindAsync(location!.LocationId);
                                 
                                 if (existingLocation == null)
                                 {
@@ -343,7 +343,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var event_ = JsonSerializer.Deserialize<BloodDonationEvent>(record.GetRawText());
-                                var existingEvent = await _context.BloodDonationEvents.FindAsync(event_.EventId);
+                                var existingEvent = await _context.BloodDonationEvents.FindAsync(event_!.EventId);
                                 
                                 if (existingEvent == null)
                                 {
@@ -362,7 +362,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var registration = JsonSerializer.Deserialize<DonationRegistration>(record.GetRawText());
-                                var existingRegistration = await _context.DonationRegistrations.FindAsync(registration.RegistrationId);
+                                var existingRegistration = await _context.DonationRegistrations.FindAsync(registration!.RegistrationId);
                                 
                                 if (existingRegistration == null)
                                 {
@@ -381,7 +381,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var history = JsonSerializer.Deserialize<DonationHistory>(record.GetRawText());
-                                var existingHistory = await _context.DonationHistories.FindAsync(history.DonationId);
+                                var existingHistory = await _context.DonationHistories.FindAsync(history!.DonationId);
                                 
                                 if (existingHistory == null)
                                 {
@@ -400,7 +400,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var screening = JsonSerializer.Deserialize<HealthScreening>(record.GetRawText());
-                                var existingScreening = await _context.HealthScreenings.FindAsync(screening.ScreeningId);
+                                var existingScreening = await _context.HealthScreenings.FindAsync(screening!.ScreeningId);
                                 
                                 if (existingScreening == null)
                                 {
@@ -419,7 +419,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var news = JsonSerializer.Deserialize<News>(record.GetRawText());
-                                var existingNews = await _context.News.FindAsync(news.NewsId);
+                                var existingNews = await _context.News.FindAsync(news!.NewsId);
                                 
                                 if (existingNews == null)
                                 {
@@ -438,7 +438,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var message = JsonSerializer.Deserialize<ContactMessage>(record.GetRawText());
-                                var existingMessage = await _context.ContactMessages.FindAsync(message.MessageId);
+                                var existingMessage = await _context.ContactMessages.FindAsync(message!.MessageId);
                                 
                                 if (existingMessage == null)
                                 {
@@ -457,7 +457,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var category = JsonSerializer.Deserialize<NewsCategory>(record.GetRawText());
-                                var existingCategory = await _context.NewsCategories.FindAsync(category.CategoryId);
+                                var existingCategory = await _context.NewsCategories.FindAsync(category!.CategoryId);
                                 
                                 if (existingCategory == null)
                                 {
@@ -476,7 +476,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var notification = JsonSerializer.Deserialize<Notification>(record.GetRawText());
-                                var existingNotification = await _context.Notifications.FindAsync(notification.NotificationId);
+                                var existingNotification = await _context.Notifications.FindAsync(notification!.NotificationId);
                                 
                                 if (existingNotification == null)
                                 {
@@ -495,7 +495,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var setting = JsonSerializer.Deserialize<Setting>(record.GetRawText());
-                                var existingSetting = await _context.Settings.FindAsync(setting.SettingId);
+                                var existingSetting = await _context.Settings.FindAsync(setting!.SettingId);
                                 
                                 if (existingSetting == null)
                                 {
@@ -514,7 +514,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             foreach (var record in records)
                             {
                                 var compatibility = JsonSerializer.Deserialize<BloodCompatibility>(record.GetRawText());
-                                var existingCompatibility = await _context.BloodCompatibilities.FindAsync(compatibility.Id);
+                                var existingCompatibility = await _context.BloodCompatibilities.FindAsync(compatibility!.Id);
                                 
                                 if (existingCompatibility == null)
                                 {

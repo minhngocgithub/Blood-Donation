@@ -1,6 +1,5 @@
 ﻿using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Services.Utilities;
-using System.Text;
 
 namespace Blood_Donation_Website.Data.Seeders
 {

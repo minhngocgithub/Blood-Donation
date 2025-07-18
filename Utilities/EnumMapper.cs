@@ -209,10 +209,14 @@ namespace Blood_Donation_Website.Utilities
                 var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
                 if (displayAttribute?.Name == displayName)
                 {
-                    return (T)field.GetValue(null);
+                    var valueObj = field.GetValue(null);
+                    if (valueObj != null)
+                    {
+                        return (T)valueObj;
+                    }
                 }
             }
-            return default(T);
+            return default!;
         }
 
         /// <summary>
@@ -229,10 +233,14 @@ namespace Blood_Donation_Website.Utilities
             {
                 if (field.FieldType == enumType)
                 {
-                    var enumValue = (T)field.GetValue(null);
-                    var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
-                    var displayName = displayAttribute?.Name ?? field.Name;
-                    result[enumValue] = displayName;
+                    var valueObj = field.GetValue(null);
+                    if (valueObj != null)
+                    {
+                        var enumValue = (T)valueObj;
+                        var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
+                        var displayName = displayAttribute?.Name ?? field.Name;
+                        result[enumValue] = displayName;
+                    }
                 }
             }
             
