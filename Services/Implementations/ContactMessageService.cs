@@ -41,7 +41,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ResolvedByUserName = message.ResolvedByUser?.FullName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -71,7 +71,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ResolvedByUserName = c.ResolvedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<ContactMessageDto>();
             }
@@ -97,7 +97,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetMessageByIdAsync(message.MessageId) ?? messageDto;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -117,7 +117,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -134,7 +134,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -158,7 +158,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -181,7 +181,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -202,7 +202,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -234,7 +234,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ResolvedByUserName = c.ResolvedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<ContactMessageDto>();
             }
@@ -265,22 +265,22 @@ namespace Blood_Donation_Website.Services.Implementations
                     ResolvedByUserName = c.ResolvedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<ContactMessageDto>();
             }
         }
 
         // Since ContactMessage doesn't have Category property, we'll return empty list
-        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByCategoryAsync(string category)
+        public Task<IEnumerable<ContactMessageDto>> GetMessagesByCategoryAsync(string category)
         {
-            return new List<ContactMessageDto>();
+            return Task.FromResult<IEnumerable<ContactMessageDto>>(new List<ContactMessageDto>());
         }
 
         // Since ContactMessage doesn't have Priority property, we'll return empty list
-        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByPriorityAsync(string priority)
+        public Task<IEnumerable<ContactMessageDto>> GetMessagesByPriorityAsync(string priority)
         {
-            return new List<ContactMessageDto>();
+            return Task.FromResult<IEnumerable<ContactMessageDto>>(new List<ContactMessageDto>());
         }
 
         // Reply functionality - Since ContactMessage doesn't have Response property,
@@ -298,7 +298,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -329,7 +329,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     StatusStats = statusStats
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new
                 {
@@ -372,7 +372,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ResolvedByUserName = c.ResolvedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<ContactMessageDto>();
             }

@@ -48,7 +48,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreenedByUserName = screening.ScreenedByUser?.FullName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -85,7 +85,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreenedByUserName = h.ScreenedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<HealthScreeningDto>();
             }
@@ -115,7 +115,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetScreeningByIdAsync(screening.ScreeningId) ?? screeningDto;
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -140,7 +140,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -157,7 +157,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -178,7 +178,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -199,7 +199,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -240,7 +240,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreenedByUserName = h.ScreenedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<HealthScreeningDto>();
             }
@@ -278,7 +278,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreenedByUserName = h.ScreenedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<HealthScreeningDto>();
             }
@@ -316,7 +316,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     ScreenedByUserName = h.ScreenedByUser?.FullName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<HealthScreeningDto>();
             }
@@ -338,7 +338,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Ineligible = ineligibleScreenings,
                     EligibilityRate = totalScreenings > 0 ? (double)eligibleScreenings / totalScreenings * 100 :0               };
             }
-            catch (Exception ex)
+            catch
             {
                 return new
                 {
@@ -368,7 +368,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return isEligible;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

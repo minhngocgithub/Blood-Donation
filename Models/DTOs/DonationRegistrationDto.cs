@@ -12,13 +12,18 @@ namespace Blood_Donation_Website.Models.DTOs
         public DateTime? CheckInTime { get; set; }
         public DateTime? CompletionTime { get; set; }
         public string? CancellationReason { get; set; }
-        
+
         // Navigation properties
         public string? UserName { get; set; }
         public string? UserEmail { get; set; }
         public string? EventName { get; set; }
         public DateTime? EventDate { get; set; }
         public string? LocationName { get; set; }
+
+        // Thêm property cho check-in
+        public string? RegistrationCode { get; set; }
+        public string? FullName { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 
     public class DonationRegistrationCreateDto

@@ -3,6 +3,11 @@
     ViewData["Title"] = "Chi tiết đăng ký";
 }
 
+@{
+    // Thêm anti-forgery token cho JavaScript
+    var token = Html.AntiForgeryToken();
+}
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -167,7 +172,7 @@
                                     @if (Model.Status == "Registered" || Model.Status == "Approved")
                                     {
                                         <button type="button" class="btn btn-danger w-100 mb-2" 
-                                                onclick="showCancelModal(@Model.RegistrationId, '@Model.EventName')">
+                                                onclick="showCancelConfirmation(@Model.RegistrationId, '@Html.Raw(Model.EventName.Replace("'", "\\'"))')">
                                             <i class="fas fa-times me-1"></i>Hủy đăng ký
                                         </button>
                                     }
@@ -197,42 +202,98 @@
     </div>
 </div>
 
-<!-- Cancel Registration Modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Hủy đăng ký</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="cancelForm" method="post">
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn hủy đăng ký cho sự kiện <strong id="eventName"></strong>?</p>
-                    <div class="mb-3">
-                        <label for="cancelReason" class="form-label">Lý do hủy (tùy chọn)</label>
-                        <textarea class="form-control" id="cancelReason" name="reason" rows="3" 
-                                  placeholder="Nhập lý do hủy đăng ký..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-times me-1"></i>Hủy đăng ký
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
-        function showCancelModal(registrationId, eventName) {
-            document.getElementById('eventName').textContent = eventName;
-            document.getElementById('cancelForm').action = '@Url.Action("Cancel", "DonationRegistration")/' + registrationId;
-            new bootstrap.Modal(document.getElementById('cancelModal')).show();
+        function showCancelConfirmation(registrationId, eventName) {
+            Swal.fire({
+                title: 'Xác nhận hủy đăng ký',
+                html: `
+                    <p>Bạn có chắc chắn muốn hủy đăng ký cho sự kiện <strong>${eventName}</strong>?</p>
+                    <div class="form-group">
+                        <label for="cancelReason" class="form-label">Lý do hủy (tùy chọn)</label>
+                        <textarea id="cancelReason" class="form-control" rows="3" 
+                                  placeholder="Nhập lý do hủy đăng ký..."></textarea>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '<i class="fas fa-times me-1"></i>Hủy đăng ký',
+                cancelButtonText: 'Đóng',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const reason = document.getElementById('cancelReason').value;
+                    return { reason: reason };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cancelRegistration(registrationId, result.value.reason);
+                }
+            });
+        }
+
+        function cancelRegistration(registrationId, reason) {
+            // Hiển thị loading
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Gửi request hủy đăng ký
+            const formData = new FormData();
+            formData.append('reason', reason);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+            
+            fetch(`@Url.Action("Cancel", "DonationRegistration")/${registrationId}`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: 'Đã hủy đăng ký thành công',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Redirect về trang danh sách đăng ký
+                        window.location.href = '@Url.Action("MyRegistrations", "DonationRegistration")';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: data.message || 'Có lỗi xảy ra khi hủy đăng ký'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi hủy đăng ký. Vui lòng thử lại.'
+                });
+            });
         }
     </script>
+    <script src="~/js/registration.js" asp-append-version="true"></script>
 }
 
 @functions {

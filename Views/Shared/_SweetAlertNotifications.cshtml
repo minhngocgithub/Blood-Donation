@@ -1,38 +1,62 @@
 @using System.Text.Json
 
 
-@if (TempData["SuccessMessage"] != null)
+@if (TempData["Success"] != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            showSuccess('Thành công', '');
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '@Html.Raw(TempData["Success"])',
+                timer: 3000,
+                showConfirmButton: false
+            });
         });
     </script>
 }
 
-@if (TempData["ErrorMessage"] != null)
+@if (TempData["Error"] != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            showError('Thất bại', '');
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: '@Html.Raw(TempData["Error"])',
+                timer: 4000,
+                showConfirmButton: true
+            });
         });
     </script>
 }
 
-@if (TempData["WarningMessage"] != null)
+@if (TempData["Warning"] != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            showWarning('Cảnh báo', '');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cảnh báo!',
+                text: '@Html.Raw(TempData["Warning"])',
+                timer: 3000,
+                showConfirmButton: false
+            });
         });
     </script>
 }
 
-@if (TempData["InfoMessage"] != null)
+@if (TempData["Info"] != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            showInfo('Thông tin', '');
+            Swal.fire({
+                icon: 'info',
+                title: 'Thông tin!',
+                text: '@Html.Raw(TempData["Info"])',
+                timer: 3000,
+                showConfirmButton: false
+            });
         });
     </script>
 }

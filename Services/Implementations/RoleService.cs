@@ -31,7 +31,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = role.CreatedDate
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -54,7 +54,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = role.CreatedDate
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -76,7 +76,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = r.CreatedDate
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<RoleDto>();
             }
@@ -109,7 +109,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = role.CreatedDate
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -128,7 +128,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -154,7 +154,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -176,7 +176,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -195,7 +195,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -208,7 +208,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 return await _context.Users
                     .AnyAsync(u => u.UserId == userId && u.RoleId == roleId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -224,7 +224,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return user?.Role?.RoleName == roleName;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -263,7 +263,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     RoleDescription = u.Role?.Description
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<UserDto>();
             }
@@ -302,7 +302,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     RoleDescription = u.Role?.Description
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<UserDto>();
             }
@@ -315,7 +315,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.Roles.AnyAsync(r => r.RoleId == roleId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -327,7 +327,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.Roles.AnyAsync(r => r.RoleName == roleName);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -352,7 +352,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = r.CreatedDate
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<RoleDto>();
             }
@@ -367,7 +367,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(u => u.RoleId == roleId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -382,7 +382,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(u => u.Role.RoleName == roleName)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }

@@ -49,7 +49,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = donation.BloodType?.BloodTypeName
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -87,7 +87,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -209,7 +209,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     HasNextPage = pageNumber < totalPages
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new PagedResponseDto<DonationHistoryDto>
                 {
@@ -250,7 +250,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetDonationByIdAsync(donation.DonationId) ?? new DonationHistoryDto();
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
@@ -271,7 +271,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -288,7 +288,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -307,7 +307,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -325,7 +325,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -342,7 +342,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -355,7 +355,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donation = await _context.DonationHistories.FindAsync(donationId);
                 return donation?.Status ?? "Unknown";
             }
-            catch (Exception ex)
+            catch
             {
                 return "Unknown";
             }
@@ -395,7 +395,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -434,7 +434,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -473,7 +473,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -512,7 +512,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -551,7 +551,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -590,7 +590,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -603,7 +603,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.DonationHistories.CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -617,7 +617,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.UserId == userId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -631,7 +631,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.EventId == eventId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -645,7 +645,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.BloodTypeId == bloodTypeId)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -659,7 +659,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.Status == "Completed")
                     .SumAsync(d => d.Volume);
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -673,7 +673,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.UserId == userId && d.Status == "Completed")
                     .SumAsync(d => d.Volume);
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -687,7 +687,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.EventId == eventId && d.Status == "Completed")
                     .SumAsync(d => d.Volume);
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -701,7 +701,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.BloodTypeId == bloodTypeId && d.Status == "Completed")
                     .SumAsync(d => d.Volume);
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -719,7 +719,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return lastDonation?.NextEligibleDate;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -732,7 +732,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var nextEligibleDate = await GetUserNextEligibleDateAsync(userId);
                 return !nextEligibleDate.HasValue || nextEligibleDate.Value <= DateTime.Now;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -752,7 +752,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var daysSinceLastDonation = (donationDate - lastDonation.DonationDate).Days;
                 return daysSinceLastDonation >= 56;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -796,7 +796,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -835,7 +835,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -874,7 +874,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -913,7 +913,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -926,34 +926,27 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return await _context.DonationHistories.AnyAsync(d => d.DonationId == donationId);
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
         }
 
-        public async Task<bool> IsDonationDateValidAsync(DateTime donationDate)
+        public Task<bool> IsDonationDateValidAsync(DateTime donationDate)
         {
             try
             {
-                return donationDate <= DateTime.Now && donationDate >= DateTime.Now.AddYears(-10);
+                return Task.FromResult(donationDate <= DateTime.Now && donationDate >= DateTime.Now.AddYears(-10));
             }
-            catch (Exception ex)
+            catch
             {
-                return false;
+                return Task.FromResult(false);
             }
         }
 
-        public async Task<bool> IsDonationVolumeValidAsync(int volume)
+        public Task<bool> IsDonationVolumeValidAsync(int volume)
         {
-            try
-            {
-                return volume >= 200 && volume <= 500;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return Task.FromResult(volume >= 200 && volume <= 500);
         }
 
         // Donation reporting
@@ -966,7 +959,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetDonationsByDateRangeAsync(startDate, endDate);
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -981,7 +974,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return await GetDonationsByDateRangeAsync(startDate, endDate);
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<DonationHistoryDto>();
             }
@@ -1000,7 +993,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return result.ToDictionary(x => x.BloodType, x => x.Count);
             }
-            catch (Exception ex)
+            catch
             {
                 return new Dictionary<string, int>();
             }
@@ -1019,7 +1012,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var monthNames = new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
                 return result.ToDictionary(x => monthNames[x.Month - 1], x => x.Count);
             }
-            catch (Exception ex)
+            catch
             {
                 return new Dictionary<string, int>();
             }
@@ -1037,7 +1030,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -1057,7 +1050,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -1071,7 +1064,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Where(d => d.CertificateIssued)
                     .CountAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 return 0;
             }
@@ -1093,7 +1086,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -1110,7 +1103,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -1127,7 +1120,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 await Task.Delay(100);
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

@@ -115,6 +115,86 @@
                         </div>
                     </div>
 
+                    <!-- Import All Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-upload mr-2"></i>
+                                Import All Database Data
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Import all database tables from a ZIP file containing JSON data.</p>
+                            <form asp-action="ImportAll" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="importFile">Select ZIP file:</label>
+                                            <input type="file" name="file" id="importFile" class="form-control-file" accept=".zip" required />
+                                            <small class="form-text text-muted">Upload a ZIP file containing JSON export files.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            <i class="fas fa-upload mr-2"></i>
+                                            Import All Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Import Single Table Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-import mr-2"></i>
+                                Import Single Table
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Import data to a specific table from a JSON file.</p>
+                            <form asp-action="ImportTable" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="importTableName">Table Name:</label>
+                                            <select name="tableName" id="importTableName" class="form-control" required>
+                                                <option value="">Select a table...</option>
+                                                <option value="Users">Users</option>
+                                                <option value="Roles">Roles</option>
+                                                <option value="BloodTypes">Blood Types</option>
+                                                <option value="Locations">Locations</option>
+                                                <option value="BloodDonationEvents">Blood Donation Events</option>
+                                                <option value="DonationRegistrations">Donation Registrations</option>
+                                                <option value="DonationHistory">Donation History</option>
+                                                <option value="HealthScreenings">Health Screenings</option>
+                                                <option value="News">News</option>
+                                                <option value="ContactMessages">Contact Messages</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="importTableFile">Select JSON file:</label>
+                                            <input type="file" name="file" id="importTableFile" class="form-control-file" accept=".json" required />
+                                            <small class="form-text text-muted">Upload a JSON file exported from the same table.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-success btn-block">
+                                            <i class="fas fa-file-import mr-2"></i>
+                                            Import Table
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Testing Tools Section -->
                     <div class="card mb-4">
                         <div class="card-header">

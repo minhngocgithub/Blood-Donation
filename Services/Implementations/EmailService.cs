@@ -54,7 +54,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }

@@ -1,255 +1,242 @@
-﻿@model List<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+﻿@using System.Linq
+@using System.Collections.Generic
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
 @{
     ViewData["Title"] = "Trang chủ";
 }
 
 <div class="index-page">
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-background">
-        <div class="container">
-            <div class="row align-items-center min-vh-100">
-                <div class="col-lg-6">
-                    <div class="hero-content">
-                        <h1 class="hero-title">
-                            Hiến máu cứu người
-                            <span class="text-primary">Chia sẻ yêu thương</span>
-                        </h1>
-                        <p class="hero-description">
-                            Mỗi giọt máu bạn hiến tặng có thể cứu sống đến 3 người.
-                            Hãy cùng chúng tôi lan tỏa tình yêu thương và cứu sống những sinh mạng quý giá.
-                        </p>
-                        @* Hero Actions *@
-                        <div class="hero-actions">
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <a href="#events-section" class="btn btn-primary btn-lg me-3">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <div class="container">
+                <div class="row align-items-center min-vh-100">
+                    <div class="col-lg-6">
+                        <div class="hero-content">
+                            <h1 class="hero-title">
+                                Hiến máu cứu người
+                                <span class="text-primary">Chia sẻ yêu thương</span>
+                            </h1>
+                            <p class="hero-description">
+                                Mỗi giọt máu bạn hiến tặng có thể cứu sống đến 3 người.
+                                Hãy cùng chúng tôi lan tỏa tình yêu thương và cứu sống những sinh mạng quý giá.
+                            </p>
+                            @* Hero Actions *@
+                            <div class="hero-actions">                                
+                                <a class="btn btn-primary btn-lg me-3" id="btnScrollToTop">
                                     <i class="fas fa-calendar-plus me-2"></i>
                                     Đăng ký hiến máu
+                                </a>                                
+                                <a href="/Home/About" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Tìm hiểu thêm
                                 </a>
-                            }
-                            else
-                            {
-                                <button type="button" class="btn btn-primary btn-lg me-3" id="btnRegisterEvent">
-                                    <i class="fas fa-calendar-plus me-2"></i>
-                                    Đăng ký hiến máu
-                                </button>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        var btn = document.getElementById('btnRegisterEvent');
-                                        if (btn) {
-                                            btn.addEventListener('click', function () {
-                                                showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký hiến máu!');
-                                            });
-                                        }
-                                    });
-                                </script>
-                            }
-                            <a href="/Home/About" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Tìm hiểu thêm
-                            </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="hero-image">
+                            <img src="./image/Van-dong-hien-mau-tinh-nguyen.png" alt="Blood Donation"
+                                class="img-fluid rounded-3 shadow-lg">
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="hero-image">
-                        <img src="./image/Van-dong-hien-mau-tinh-nguyen.png" alt="Blood Donation"
-                            class="img-fluid rounded-3 shadow-lg">
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Stats Section -->
-<section class="stats-section py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="section-title">Tại sao nên hiến máu?</h2>
-                <p class="section-description">
-                    Hiến máu không chỉ giúp cứu sống người khác mà còn mang lại nhiều lợi ích cho chính bạn
-                </p>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="stat-card text-center">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="stat-number">15,000+</h3>
-                    <p class="stat-label">Người hiến máu</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="stat-card text-center">
-                    <div class="stat-icon">
-                        <i class="fas fa-tint"></i>
-                    </div>
-                    <h3 class="stat-number">45,000+</h3>
-                    <p class="stat-label">Đơn vị máu</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="stat-card text-center">
-                    <div class="stat-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3 class="stat-number">135,000+</h3>
-                    <p class="stat-label">Sinh mạng cứu sống</p>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="stat-card text-center">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <h3 class="stat-number">500+</h3>
-                    <p class="stat-label">Sự kiện tổ chức</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section class="features-section py-5 bg-light">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="section-title">Tại sao nên hiến máu?</h2>
-                <p class="section-description">
-                    Hiến máu không chỉ giúp cứu sống người khác mà còn mang lại nhiều lợi ích cho chính bạn
-                </p>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <h4 class="feature-title">Tốt cho sức khỏe</h4>
-                    <p class="feature-description">
-                        Hiến máu giúp kích thích sản xuất tế bào máu mới, giảm nguy cơ mắc bệnh tim mạch và ung thư.
+    <!-- Stats Section -->
+    <section class="stats-section py-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="section-title">Tại sao nên hiến máu?</h2>
+                    <p class="section-description">
+                        Hiến máu không chỉ giúp cứu sống người khác mà còn mang lại nhiều lợi ích cho chính bạn
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="stat-number">15,000+</h3>
+                        <p class="stat-label">Người hiến máu</p>
                     </div>
-                    <h4 class="feature-title">Kiểm tra sức khỏe miễn phí</h4>
-                    <p class="feature-description">
-                        Được kiểm tra sức khỏe tổng quát và xét nghiệm máu miễn phí trước khi hiến máu.
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <h3 class="stat-number">45,000+</h3>
+                        <p class="stat-label">Đơn vị máu</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="stat-number">135,000+</h3>
+                        <p class="stat-label">Sinh mạng cứu sống</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3 class="stat-number">500+</h3>
+                        <p class="stat-label">Sự kiện tổ chức</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="section-title">Tại sao nên hiến máu?</h2>
+                    <p class="section-description">
+                        Hiến máu không chỉ giúp cứu sống người khác mà còn mang lại nhiều lợi ích cho chính bạn
                     </p>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-hands-helping"></i>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h4 class="feature-title">Tốt cho sức khỏe</h4>
+                        <p class="feature-description">
+                            Hiến máu giúp kích thích sản xuất tế bào máu mới, giảm nguy cơ mắc bệnh tim mạch và ung thư.
+                        </p>
                     </div>
-                    <h4 class="feature-title">Cứu sống sinh mạng</h4>
-                    <p class="feature-description">
-                        Mỗi lần hiến máu có thể cứu sống đến 3 người, mang lại ý nghĩa to lớn cho cộng đồng.
-                    </p>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="feature-title">Kiểm tra sức khỏe miễn phí</h4>
+                        <p class="feature-description">
+                            Được kiểm tra sức khỏe tổng quát và xét nghiệm máu miễn phí trước khi hiến máu.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h4 class="feature-title">Cứu sống sinh mạng</h4>
+                        <p class="feature-description">
+                            Mỗi lần hiến máu có thể cứu sống đến 3 người, mang lại ý nghĩa to lớn cho cộng đồng.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Upcoming Events Section -->
-<section class="events-section py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="section-title">Sự kiện sắp tới</h2>
-                <p class="section-description">
-                    Tham gia các sự kiện hiến máu gần bạn nhất
-                </p>
+    <!-- Upcoming Events Section -->
+    <section class="events-section py-5" id="events-section">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="section-title">Sự kiện sắp tới</h2>
+                    <p class="section-description">
+                        Tham gia các sự kiện hiến máu gần bạn nhất
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div class="row" id="events-section">
-            @if (Model != null && Model.Any())
-            {
-                foreach (var eventItem in Model)
+            <div class="row">
+                <div class="col-12 text-center text-muted mb-2">
+                </div>
+                @if (Model.Any())
                 {
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="event-card">
-                            <div class="event-image">
-                                <img src="@(string.IsNullOrEmpty(eventItem.ImageUrl) ? "/placeholder.svg?height=200&width=350" : eventItem.ImageUrl)" alt="@eventItem.EventName" class="img-fluid">
-                                <div class="event-date">
-                                        <span>@eventItem.EventDate.ToString("dd/MM/yyyy")</span>
+                    foreach (var ev in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="event-card">
+                                <div class="event-image">
+                                    <img src="@(string.IsNullOrEmpty(ev.ImageUrl) ? "/placeholder.svg?height=200&width=350" : ev.ImageUrl)"
+                                        alt="Event" class="img-fluid">
+                                    <div class="event-date">
+                                        <span class="day">@ev.EventDate.Day</span>
+                                        <span class="month">Th@ev.EventDate.Month</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="event-content">
-                                <h5 class="event-title">@eventItem.EventName</h5>
-                                <div class="event-meta">
-                                    <span class="event-location">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        @(string.IsNullOrEmpty(eventItem.LocationName) ? "Chưa xác định" : eventItem.LocationName)
-                                    </span>
-                                    <span class="event-time">
-                                        <i class="fas fa-clock me-1"></i>
-                                        @eventItem.StartTime.ToString("hh\\:mm") - @eventItem.EndTime.ToString("hh\\:mm")
-                                    </span>
+                                <div class="event-content">
+                                    <h5 class="event-title">@ev.EventName</h5>
+                                    <div class="event-meta">
+                                        <span class="event-location">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            @ev.LocationName
+                                        </span>
+                                        <span class="event-time">
+                                            <i class="fas fa-clock me-1"></i>
+                                            @ev.StartTime.ToString(@"hh\:mm") - @ev.EndTime.ToString(@"hh\:mm")
+                                        </span>
+                                    </div>
+                                    <p class="event-description">
+                                        @ev.EventDescription
+                                    </p>
+                                    <a href="/events/details/@ev.EventId" class="btn btn-primary">Đăng ký ngay</a>
                                 </div>
-                                <p class="event-description">
-                                    @eventItem.EventDescription
-                                </p>
-                                <a href="/events/details/@eventItem.EventId" class="btn btn-primary">Đăng ký ngay</a>
                             </div>
                         </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center">
+                        <p>Hiện chưa có sự kiện sắp tới.</p>
                     </div>
                 }
-            }
-            else
-            {
-                <div class="col-12 text-center">
-                    <p class="text-muted">Không có sự kiện sắp tới.</p>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/events" class="btn btn-outline-primary btn-lg">
+                    Xem tất cả sự kiện
+                    <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3 class="cta-title mb-3">Sẵn sàng trở thành người hùng?</h3>
+                    <p class="cta-description mb-0">
+                        Đăng ký ngay hôm nay để tham gia vào cộng đồng những người hiến máu tình nguyện và cứu sống
+                        những sinh mạng quý giá.
+                    </p>
                 </div>
-            }
-
-        <div class="text-center mt-4">
-            <a href="/events" class="btn btn-outline-primary btn-lg">
-                Xem tất cả sự kiện
-                <i class="fas fa-arrow-right ms-2"></i>
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="cta-section py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h3 class="cta-title mb-3">Sẵn sàng trở thành người hùng?</h3>
-                <p class="cta-description mb-0">
-                    Đăng ký ngay hôm nay để tham gia vào cộng đồng những người hiến máu tình nguyện và cứu sống những
-                    sinh mạng quý giá.
-                </p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <button type="button" class="btn btn-light btn-lg" id="btnScrollToTop">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Đăng ký ngay
-                </button>
+                <div class="col-lg-4 text-lg-end">
+                    <button type="button" class="btn btn-light btn-lg" id="btnScrollToTop2">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Đăng ký ngay
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 @section Scripts {
     <script src="~/js/sweetalert-helper.js"></script>
@@ -268,16 +255,38 @@
             });
         });
         @if (TempData["SuccessMessage"] != null)
-        {
-            <text>
-                showSuccess("Thành công", "@TempData["SuccessMessage"]");
-            </text>
+            {
+                <text>
+                    showSuccess("Thành công");
+                </text>
         }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <text>
-                showError("Lỗi", "@TempData["ErrorMessage"]");
-            </text>
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                    showError("Lỗi");
+                </text>
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var btn1 = document.getElementById('btnScrollToTop');
+            if (btn1) {
+                btn1.addEventListener('click', function () {
+                    var section = document.getElementById('events-section');
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+            var btn2 = document.getElementById('btnScrollToTop2');
+            if (btn2) {
+                btn2.addEventListener('click', function () {
+                    var section = document.getElementById('events-section');
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+        });
     </script>
 }

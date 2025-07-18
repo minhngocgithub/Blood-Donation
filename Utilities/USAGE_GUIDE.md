@@ -23,7 +23,7 @@ public class AdminController : Controller
             TempData["SuccessMessage"] = "Export completed successfully!";
             return RedirectToAction("Index");
         }
-        catch (Exception ex)
+        catch
         {
             TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
             return RedirectToAction("Index");

@@ -3,6 +3,8 @@
     ViewData["Title"] = Model.EventName;
 }
 
+<link rel="stylesheet" href="~/css/event-page.css" />
+
 <div class="event-details-page">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="bg-light py-3">
@@ -90,7 +92,7 @@
                                     }
                                     @foreach (var bloodType in bloodTypes)
                                     {
-                                        <span class="badge bg-danger me-2 mb-2 px-3 py-2">@bloodType.Trim()</span>
+                                        <span class="badge bg-danger me-2 mb-2 px-3 py-2">@GetBloodTypeVi(bloodType.Trim())</span>
                                     }
                                 </div>
                             </div>
@@ -129,17 +131,29 @@
                                 
                                 @if (Model.Status.ToLower() == "active")
                                 {
-                                    @if (User.Identity?.IsAuthenticated == true)
+                                    if (User.Identity?.IsAuthenticated == true)
                                     {
-                                        <button type="button" class="btn btn-primary btn-lg w-100 mb-3" id="registerBtn">
-                                            <i class="fas fa-calendar-plus me-2"></i>
-                                            Đăng ký tham gia
-                                        </button>
+                                        if (ViewBag.UserHasRegistered == true)
+                                        {
+                                            <button class="btn btn-success btn-lg w-100 mb-3" disabled>
+                                                <i class="fas fa-check me-2"></i>Đã đăng ký
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Register" asp-controller="Events" method="post">
+                                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                                    <i class="fas fa-calendar-plus me-2"></i>
+                                                    Đăng ký tham gia
+                                                </button>
+                                            </form>
+                                        }
                                     }
                                     else
                                     {
-                                        <button type="button" class="btn btn-primary btn-lg w-100 mb-3" 
-                                                onclick="showWarning('Bạn cần đăng nhập', 'Vui lòng đăng nhập để đăng ký sự kiện!')">
+                                        <button type="button" class="btn btn-primary btn-lg w-100 mb-3" onclick="showLoginRequired()">
                                             <i class="fas fa-calendar-plus me-2"></i>
                                             Đăng ký tham gia
                                         </button>
@@ -273,46 +287,85 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const registerBtn = document.getElementById('registerBtn');
-    
-    if (registerBtn) {
-        registerBtn.addEventListener('click', function() {
-            const eventId = @Model.EventId;
-            registerForEvent(eventId);
-        });
-    }
-    
-    function registerForEvent(eventId) {
-        registerBtn.disabled = true;
-        registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang đăng ký...';
-        
-        fetch('/Events/Register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-            },
-            body: JSON.stringify({ eventId: eventId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccess(data.message);
-                registerBtn.innerHTML = '<i class="fas fa-check me-2"></i>Đã đăng ký';
-                registerBtn.classList.remove('btn-primary');
-                registerBtn.classList.add('btn-success');
-            } else {
-                showWarning('Thông báo', data.message);
-                registerBtn.disabled = false;
-                registerBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Đăng ký tham gia';
-            }
-        })
-        .catch(error => {
-            console.error('Error registering for event:', error);
-            showError('Có lỗi xảy ra khi đăng ký sự kiện');
-            registerBtn.disabled = false;
-            registerBtn.innerHTML = '<i class="fas fa-calendar-plus me-2"></i>Đăng ký tham gia';
-        });
-    }
+    // The registerForEvent function and its associated script block are removed
+    // as the registration logic is now handled by the Razor form.
 });
 </script>
+
+
+@{
+    string GetBloodTypeVi(string bloodType)
+    {
+        return bloodType switch
+        {
+            "A+" => "A+",
+            "A-" => "A-",
+            "B+" => "B+",
+            "B-" => "B-",
+            "O+" => "O+",
+            "O-" => "O-",
+            "AB+" => "AB+",
+            "AB-" => "AB-",
+            "All" => "Mọi nhóm máu",
+            _ => bloodType
+        };
+    }
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        $(function () {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+            if (successMsg) {
+                showSuccess('Thành công');
+            }
+            if (errorMsg) {
+                showError('Lỗi');
+            }
+        });
+        
+        // Function to show login required SweetAlert
+        function showLoginRequired() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Yêu cầu đăng nhập',
+                html: `
+                    <div class="text-center">
+                        <i class="fas fa-user-lock fa-3x text-warning mb-3"></i>
+                        <p class="mb-3">Bạn cần đăng nhập để đăng ký tham gia sự kiện này.</p>
+                        <div class="d-grid gap-2">
+                            <a href="/account/login?returnUrl=@Url.Action("Details", "Events", new { id = Model.EventId })" 
+                               class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập ngay
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary" onclick="Swal.close()">
+                                <i class="fas fa-times me-2"></i>Để sau
+                            </button>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: true,
+                allowEscapeKey: true,
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    'html-container': 'swal2-html-container'
+                },
+                buttonsStyling: false
+            });
+        }
+    </script>
+}
