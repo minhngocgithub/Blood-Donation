@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="~/css/guide-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/privacy-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/terms-page.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-demo-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
@@ -108,15 +109,14 @@
                                 <button class="btn btn-outline-danger dropdown-toggle d-flex align-items-center user-dropdown-btn"
                                         type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-circle me-2"></i>
-                                    <span class="user-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)</span>
+                                    <span class="user-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
+                                            <br />
+                                            <small class="text-muted">
+                                                @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))
+                                            </small>
+                                    </span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                                    <li>
-                                        <h6 class="dropdown-header">
-                                            <i class="fas fa-user me-2"></i>@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
-                                        </h6>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
                                             <i class="fas fa-user me-2 text-primary"></i>Thông tin cá nhân
@@ -137,7 +137,15 @@
                                             <i class="fas fa-history me-2 text-info"></i>Lịch sử hiến máu
                                         </a>
                                     </li>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital"))
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
+                                                <i class="fas fa-user-check me-2 text-info"></i>Check-in người hiến máu
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (User.IsInRole("Admin"))
                                     {
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
@@ -164,12 +172,30 @@
                                             </a>
                                         </li>
                                     }
-                                    @if (User.IsInRole("Doctor"))
+                                    @if (User.IsInRole("Doctor") || User.IsInRole("Hospital"))
                                     {
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Index">
                                                 <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="HealthScreening" asp-action="UpdateBloodTypeForm" asp-route-userId="0">
+                                                <i class="fas fa-tint me-2 text-info"></i>Cập nhật nhóm máu
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (User.IsInRole("Hospital"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
+                                                <i class="fas fa-calendar-alt me-2 text-danger"></i>Quản lý sự kiện
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
+                                                <i class="fas fa-map-marker-alt me-2 text-success"></i>Quản lý địa điểm
                                             </a>
                                         </li>
                                     }
@@ -238,7 +264,7 @@
                 <!-- Brand Column -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <div class="footer-brand mb-3">
-                        <img src="./image/Logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
+                        <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
                         <h5 class="text-white fw-bold">BloodLife</h5>
                     </div>
                     <p class="text-muted mb-3">

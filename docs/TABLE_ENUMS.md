@@ -12,17 +12,6 @@ public enum Gender
 }
 ```
 
-### 1.2. UserStatus (Trạng thái người dùng)
-```csharp
-public enum UserStatus
-{
-    Active = "Hoạt động",
-    Inactive = "Không hoạt động",
-    Suspended = "Tạm khóa",
-    Banned = "Bị cấm"
-}
-```
-
 ## 2. DonationRegistration Table Enums
 
 ### 2.1. RegistrationStatus (Trạng thái đăng ký)
@@ -62,20 +51,7 @@ public enum EventStatus
 
 ## 4. HealthScreening Table Enums
 
-### 4.1. ScreeningStatus (Trạng thái sàng lọc)
-```csharp
-public enum ScreeningStatus
-{
-    Pending = "Chờ khám",                // Chờ bác sĩ khám
-    InProgress = "Đang khám",            // Đang thực hiện khám
-    WaitingResults = "Chờ kết quả",      // Chờ kết quả xét nghiệm
-    Eligible = "Đủ điều kiện",           // Đạt tiêu chuẩn hiến máu
-    Ineligible = "Không đủ điều kiện",   // Không đạt tiêu chuẩn
-    Deferred = "Hoãn hiến"               // Hoãn hiến (tạm thời không đủ điều kiện)
-}
-```
-
-### 4.2. DisqualificationReason (Lý do loại)
+### 4.1. DisqualificationReason (Lý do loại)
 ```csharp
 public enum DisqualificationReason
 {
@@ -110,35 +86,9 @@ public enum DonationStatus
 }
 ```
 
-### 5.2. DonationType (Loại hiến máu)
-```csharp
-public enum DonationType
-{
-    WholeBlood = "Máu toàn phần",
-    Plasma = "Huyết tương",
-    Platelets = "Tiểu cầu",
-    RedBloodCells = "Hồng cầu",
-    DoubleRedCells = "Hồng cầu đôi"
-}
-```
+## 6. Notification Table Enums
 
-## 6. News Table Enums
-
-### 6.1. NewsStatus (Trạng thái tin tức)
-```csharp
-public enum NewsStatus
-{
-    Draft = "Bản nháp",                  // Đang soạn thảo
-    Pending = "Chờ duyệt",               // Chờ kiểm duyệt
-    Published = "Đã xuất bản",           // Đã xuất bản
-    Archived = "Lưu trữ",                // Đã lưu trữ
-    Rejected = "Bị từ chối"              // Không được duyệt
-}
-```
-
-## 7. Notification Table Enums
-
-### 7.1. NotificationType (Loại thông báo)
+### 6.1. NotificationType (Loại thông báo)
 ```csharp
 public enum NotificationType
 {
@@ -156,20 +106,9 @@ public enum NotificationType
 }
 ```
 
-### 7.2. NotificationPriority (Độ ưu tiên)
-```csharp
-public enum NotificationPriority
-{
-    Low = "Thấp",
-    Normal = "Bình thường", 
-    High = "Cao",
-    Urgent = "Khẩn cấp"
-}
-```
+## 7. ContactMessage Table Enums
 
-## 8. ContactMessage Table Enums
-
-### 8.1. MessageStatus (Trạng thái tin nhắn)
+### 7.1. MessageStatus (Trạng thái tin nhắn)
 ```csharp
 public enum MessageStatus
 {
@@ -181,67 +120,17 @@ public enum MessageStatus
 }
 ```
 
-### 8.2. MessageType (Loại tin nhắn)
-```csharp
-public enum MessageType
-{
-    General = "Chung",                   // Hỏi đáp chung
-    Technical = "Kỹ thuật",              // Vấn đề kỹ thuật
-    Medical = "Y tế",                    // Câu hỏi y tế
-    Event = "Sự kiện",                   // Về sự kiện hiến máu
-    Account = "Tài khoản",               // Vấn đề tài khoản
-    Complaint = "Khiếu nại",             // Khiếu nại
-    Suggestion = "Góp ý"                 // Góp ý cải thiện
-}
-```
+## 8. Role Table Enums
 
-## 9. Role Table Enums
-
-### 9.1. RoleType (Loại vai trò)
+### 8.1. RoleType (Loại vai trò)
 ```csharp
 public enum RoleType
 {
     Admin = "Quản trị viên",             // Quản trị toàn hệ thống
     Doctor = "Bác sĩ",                   // Bác sĩ sàng lọc
-    Nurse = "Y tá",                      // Y tá thực hiện hiến máu
     Staff = "Nhân viên",                 // Nhân viên tổ chức
     Hospital = "Bệnh viện",              // Đại diện bệnh viện
     User = "Người dùng",                 // Người hiến máu
-    Volunteer = "Tình nguyện viên"       // Tình nguyện viên hỗ trợ
-}
-```
-
-## 10. Setting Table Enums
-
-### 10.1. SettingType (Loại cài đặt)
-```csharp
-public enum SettingType
-{
-    System = "Hệ thống",                 // Cài đặt hệ thống
-    Email = "Email",                     // Cài đặt email
-    SMS = "SMS",                         // Cài đặt SMS
-    Notification = "Thông báo",          // Cài đặt thông báo
-    Medical = "Y tế",                    // Cài đặt y tế (khoảng cách hiến máu, etc.)
-    Security = "Bảo mật",                // Cài đặt bảo mật
-    Display = "Hiển thị"                 // Cài đặt hiển thị
-}
-```
-
-## 11. Location Table Enums
-
-### 11.1. LocationType (Loại địa điểm)
-```csharp
-public enum LocationType
-{
-    Hospital = "Bệnh viện",              // Bệnh viện
-    HealthCenter = "Trạm y tế",          // Trạm y tế
-    BloodBank = "Ngân hàng máu",         // Ngân hàng máu
-    School = "Trường học",               // Trường học
-    University = "Đại học",              // Đại học
-    Company = "Công ty",                 // Công ty
-    Community = "Cộng đồng",             // Trung tâm cộng đồng
-    Mobile = "Lưu động",                 // Xe hiến máu lưu động
-    Other = "Khác"                       // Địa điểm khác
 }
 ```
 

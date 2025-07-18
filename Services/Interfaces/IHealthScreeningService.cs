@@ -10,7 +10,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<HealthScreeningDto> CreateScreeningAsync(HealthScreeningDto screeningDto);
         Task<bool> UpdateScreeningAsync(int screeningId, HealthScreeningDto screeningDto);
         Task<bool> DeleteScreeningAsync(int screeningId);
-
+        
         // Status management
         Task<bool> UpdateScreeningStatusAsync(int screeningId, string status);
 

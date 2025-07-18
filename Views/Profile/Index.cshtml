@@ -73,12 +73,27 @@
 
                         <div class="form-group">
                             <label asp-for="Gender" class="form-label">Giới Tính</label>
-                            <select asp-for="Gender" class="form-control">
-                                <option value="">Chọn giới tính</option>
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                                <option value="Khác">Khác</option>
-                            </select>
+                            @if (ViewBag.IsReadOnlyGender == true)
+                            {
+                                var genderVi = Model.Gender switch
+                                {
+                                    "Male" => "Nam",
+                                    "Female" => "Nữ",
+                                    "Other" => "Khác",
+                                    _ => ""
+                                };
+                                <input type="text" class="form-control" value="@genderVi" readonly />
+                                <input type="hidden" asp-for="Gender" />
+                            }
+                            else
+                            {
+                                <select asp-for="Gender" class="form-control">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Male">Nam</option>
+                                    <option value="Female">Nữ</option>
+                                    <option value="Other">Khác</option>
+                                </select>
+                            }
                             <span asp-validation-for="Gender" class="text-danger"></span>
                         </div>
                     </div>
@@ -107,16 +122,22 @@
                             <label asp-for="BloodType" class="form-label">Nhóm Máu</label>
                             <div class="input-with-icon">
                                 <i class="fas fa-tint input-icon blood-icon"></i>
-                                <select asp-for="BloodType" class="form-control with-icon">
-                                    <option value="">Chọn nhóm máu</option>
-                                    @if (ViewBag.BloodTypes != null)
+                                @{
+                                    string bloodTypeName = Model.BloodType ?? "";
+                                    if (ViewBag.BloodTypes != null)
                                     {
-                                        foreach (var bloodType in ViewBag.BloodTypes)
+                                        foreach (var bt in ViewBag.BloodTypes)
                                         {
-                                            <option value="@bloodType.BloodTypeId">@bloodType.BloodTypeName</option>
+                                            if (bt.BloodTypeId.ToString() == Model.BloodType)
+                                            {
+                                                bloodTypeName = bt.BloodTypeName;
+                                                break;
+                                            }
                                         }
                                     }
-                                </select>
+                                }
+                                <input type="text" class="form-control with-icon" value="@bloodTypeName" readonly />
+                                <input type="hidden" asp-for="BloodType" />
                             </div>
                             <span asp-validation-for="BloodType" class="text-danger"></span>
                         </div>

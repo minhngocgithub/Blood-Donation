@@ -1,0 +1,47 @@
+.events-page {
+    padding-top: 70px;
+}
+
+.event-details-page {
+    padding-top: 70px;
+}
+
+.event-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px;
+    transition: box-shadow 0.2s;
+}
+.event-card:hover {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.16);
+}
+.event-image img {
+    border-radius: 8px;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.event-date {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #e53935;
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-weight: bold;
+}
+.event-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 12px;
+}
+.event-meta {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+.event-description {
+    margin-bottom: 16px;
+}

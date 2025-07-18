@@ -26,8 +26,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
 builder.Services.AddScoped<IBloodDonationEventService, BloodDonationEventService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
+
+builder.Services.AddScoped<Blood_Donation_Website.Utilities.DataExporter>();
+
 builder.Services.AddScoped<IDonationRegistrationService, DonationRegistrationService>();
 builder.Services.AddScoped<IBloodTypeService, BloodTypeService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
@@ -68,14 +71,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+// using (var scope = app.Services.CreateScope())
+// {
+//     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     
-    context.Database.EnsureCreated();
+//     context.Database.EnsureCreated();
     
-    context.SeedData();
-}
+//     context.SeedData();
+// }
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

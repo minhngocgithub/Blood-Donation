@@ -91,7 +91,9 @@
                                             </td>
                                             <td>
                                                 <small class="text-muted">
-                                                    @eventItem.StartTime.ToString("HH:mm") - @eventItem.EndTime.ToString("HH:mm")
+                                                    @(eventItem.StartTime is TimeSpan st ? st.ToString(@"hh\:mm") : "--")
+                                                    -
+                                                    @(eventItem.EndTime is TimeSpan et ? et.ToString(@"hh\:mm") : "--")
                                                 </small>
                                             </td>
                                             <td>

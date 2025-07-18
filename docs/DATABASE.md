@@ -1,6 +1,6 @@
 Table Roles {
   RoleId int [pk, increment]
-  RoleName nvarchar(50) [not null, unique]
+  RoleName nvarchar(50) [not null, unique] // Enum: Admin, User, Hospital, Doctor, Staff
   Description nvarchar(200)
   CreatedDate datetime [default: `getdate()`]
 }

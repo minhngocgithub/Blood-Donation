@@ -80,7 +80,7 @@ namespace Blood_Donation_Website.Controllers
 
                 return RedirectToAction("Index", "Home");
             }
-            catch (Exception ex)
+            catch
             {
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.");
                 return View(model);
@@ -130,7 +130,7 @@ namespace Blood_Donation_Website.Controllers
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
                 return RedirectToAction(nameof(Login));
             }
-            catch (Exception ex)
+            catch
             {
                 ModelState.AddModelError(string.Empty, "Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.");
                 return View(model);
@@ -189,7 +189,7 @@ namespace Blood_Donation_Website.Controllers
                 
                 return RedirectToAction("Index", "Home");
             }
-            catch (Exception ex)
+            catch
             {
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.";
                 return RedirectToAction("Index", "Home");
@@ -242,7 +242,7 @@ namespace Blood_Donation_Website.Controllers
                 TempData["SuccessMessage"] = "Bạn đã đăng xuất thành công!";
                 return RedirectToAction("Index", "Home");
             }
-            catch (Exception ex)
+            catch
             {                
                 if (Request.Headers.XRequestedWith == "XMLHttpRequest")
                 {
@@ -277,7 +277,7 @@ namespace Blood_Donation_Website.Controllers
                 var exists = await _accountService.IsEmailExistsAsync(email);
                 return Json(new { exists = exists });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { exists = false });
             }
@@ -298,6 +298,11 @@ namespace Blood_Donation_Website.Controllers
 
             // Lấy userId đúng từ Claims
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                TempData["ErrorMessage"] = "Có lỗi xác thực người dùng. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login", "Account");
+            }
             var result = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
 
             if (result)

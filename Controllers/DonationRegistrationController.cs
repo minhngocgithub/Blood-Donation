@@ -17,6 +17,73 @@ namespace Blood_Donation_Website.Controllers
             _registrationService = registrationService;
         }
 
+        // GET: /DonationRegistration/Checkin
+        [HttpGet]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
+        public IActionResult Checkin()
+        {
+            // Trang check-in ban đầu, không có dữ liệu
+            return View(new List<DonationRegistrationDto>());
+        }
+
+        // POST: /DonationRegistration/Checkin
+        [HttpPost]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Checkin(string RegistrationCode)
+        {
+            var showAll = Request.Form["showAll"].ToString();
+            IEnumerable<DonationRegistrationDto> results;
+            if (!string.IsNullOrEmpty(showAll) && showAll == "true")
+            {
+                // Hiển thị tất cả đăng ký chưa check-in
+                results = await _registrationService.GetRegistrationsByStatusAsync("Registered");
+            }
+            else if (!string.IsNullOrWhiteSpace(RegistrationCode))
+            {
+                results = await _registrationService.SearchRegistrationsForCheckinAsync(RegistrationCode);
+                if (results == null || !results.Any())
+                {
+                    TempData["Error"] = "Không tìm thấy đăng ký phù hợp.";
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Vui lòng nhập mã đăng ký hoặc số điện thoại hoặc chọn 'Hiển thị tất cả'.";
+                results = new List<DonationRegistrationDto>();
+            }
+            return View(results);
+        }
+
+        // POST: /DonationRegistration/ConfirmCheckin
+        [HttpPost]
+        [Authorize(Roles = "Admin,Hospital,Staff")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmCheckin(int id)
+        {
+            var registration = await _registrationService.GetRegistrationByIdAsync(id);
+            if (registration == null)
+            {
+                TempData["Error"] = "Không tìm thấy đăng ký.";
+                return RedirectToAction("Checkin");
+            }
+            if (registration.Status == "CheckedIn")
+            {
+                TempData["Error"] = "Người này đã được check-in.";
+                return RedirectToAction("Checkin");
+            }
+            var success = await _registrationService.CheckinRegistrationAsync(id);
+            if (success)
+            {
+                TempData["Success"] = "Check-in thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi check-in.";
+            }
+            return RedirectToAction("Checkin");
+        }
+
         // GET: /DonationRegistration/MyRegistrations
         public async Task<IActionResult> MyRegistrations()
         {
@@ -31,7 +98,7 @@ namespace Blood_Donation_Website.Controllers
                 var registrations = await _registrationService.GetRegistrationsByUserAsync(userId);
                 return View(registrations);
             }
-            catch (Exception ex)
+            catch
             {
                 TempData["Error"] = "Có lỗi xảy ra khi tải danh sách đăng ký.";
                 return View(new List<DonationRegistrationDto>());
@@ -65,7 +132,7 @@ namespace Blood_Donation_Website.Controllers
 
                 return View(registration);
             }
-            catch (Exception ex)
+            catch
             {
                 TempData["Error"] = "Có lỗi xảy ra khi tải chi tiết đăng ký.";
                 return RedirectToAction(nameof(MyRegistrations));
@@ -74,19 +141,27 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Cancel/{id}
         [HttpPost]
-        public async Task<IActionResult> Cancel(int id, string reason)
+        public async Task<IActionResult> Cancel(int id, string reason = null)
         {
             try
             {
                 var userId = GetCurrentUserId();
                 if (userId == 0)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Bạn cần đăng nhập để thực hiện thao tác này." });
+                    }
                     return RedirectToAction("Login", "Account");
                 }
 
                 var registration = await _registrationService.GetRegistrationByIdAsync(id);
                 if (registration == null)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Không tìm thấy đăng ký." });
+                    }
                     TempData["Error"] = "Không tìm thấy đăng ký.";
                     return RedirectToAction(nameof(MyRegistrations));
                 }
@@ -94,6 +169,10 @@ namespace Blood_Donation_Website.Controllers
                 // Kiểm tra xem đăng ký có thuộc về user hiện tại không
                 if (registration.UserId != userId)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Bạn không có quyền hủy đăng ký này." });
+                    }
                     TempData["Error"] = "Bạn không có quyền hủy đăng ký này.";
                     return RedirectToAction(nameof(MyRegistrations));
                 }
@@ -101,6 +180,10 @@ namespace Blood_Donation_Website.Controllers
                 // Kiểm tra xem đăng ký có thể hủy không
                 if (registration.Status != "Registered" && registration.Status != "Approved")
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Đăng ký này không thể hủy." });
+                    }
                     TempData["Error"] = "Đăng ký này không thể hủy.";
                     return RedirectToAction(nameof(Details), new { id });
                 }
@@ -108,17 +191,33 @@ namespace Blood_Donation_Website.Controllers
                 var success = await _registrationService.CancelRegistrationAsync(id, reason);
                 if (success)
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                    }
                     TempData["Success"] = "Đã hủy đăng ký thành công.";
                 }
                 else
                 {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                    }
                     TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                 }
 
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                }
                 return RedirectToAction(nameof(MyRegistrations));
             }
-            catch (Exception ex)
+            catch
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                }
                 TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                 return RedirectToAction(nameof(MyRegistrations));
             }
@@ -148,7 +247,7 @@ namespace Blood_Donation_Website.Controllers
 
                 return View(statistics);
             }
-            catch (Exception ex)
+            catch
             {
                 TempData["Error"] = "Có lỗi xảy ra khi tải thống kê.";
                 return RedirectToAction(nameof(MyRegistrations));
