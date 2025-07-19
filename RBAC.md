@@ -1,4 +1,4 @@
-Bảng phân quyền
+##Bảng phân quyền##
 Dựa trên cơ sở dữ liệu và quy trình hiến máu, bảng phân quyền dưới đây phân định quyền truy cập và thao tác cho các vai trò (Roles: Admin, User, Hospital, Doctor, Staff).
 
 | Chức năng / Trang | Admin | User | Hospital | Doctor | Staff |
@@ -39,7 +39,7 @@ Dựa trên cơ sở dữ liệu và quy trình hiến máu, bảng phân quyề
 | **Quản lý cài đặt hệ thống** ||||||
 | Cập nhật cài đặt (Settings)            | ✓ |   |   |   |   |
 
-Ghi chú:
+##Ghi chú:##
 
 Admin: Quyền toàn diện, quản lý toàn bộ hệ thống.
 User: Người dùng thông thường, chỉ thao tác trên dữ liệu cá nhân (đăng ký, xem lịch sử, hồ sơ).
