@@ -1,5 +1,5 @@
-## Bảng phân quyền
-# Dựa trên cơ sở dữ liệu và quy trình hiến máu, bảng phân quyền dưới đây phân định quyền truy cập và thao tác cho các vai trò (Roles: Admin, User, Hospital, Doctor, Staff).
+# Bảng phân quyền
+## Dựa trên cơ sở dữ liệu và quy trình hiến máu, bảng phân quyền dưới đây phân định quyền truy cập và thao tác cho các vai trò (Roles: Admin, User, Hospital, Doctor, Staff).
 
 | Chức năng / Trang | Admin | User | Hospital | Doctor | Staff |
 |-------------------|:-----:|:----:|:--------:|:------:|:-----:|
