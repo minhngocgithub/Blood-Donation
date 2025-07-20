@@ -6,15 +6,7 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            if (!context.DonationHistories.Any())
-            {
-                var histories = new List<DonationHistory>
-                {
-                    new DonationHistory { UserId = 1, DonationDate = DateTime.Now.AddMonths(-1), Volume = 450, BloodTypeId = 1, EventId = 1 },
-                };
-                context.DonationHistories.AddRange(histories);
-                context.SaveChanges();
-            }
+            
         }
     }
 } 

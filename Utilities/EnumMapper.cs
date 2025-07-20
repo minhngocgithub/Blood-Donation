@@ -45,7 +45,9 @@ namespace Blood_Donation_Website.Utilities
             [Display(Name = "Không đến")]
             NoShow,
             [Display(Name = "Thất bại")]
-            Failed
+            Failed,
+            [Display(Name = "Tạm hoãn")]
+            Deferred
         }
         #endregion
 
@@ -74,17 +76,27 @@ namespace Blood_Donation_Website.Utilities
         #region DisqualificationReason Enum
         public enum DisqualificationReason
         {
-            [Display(Name = "Hb thấp")]
-            LowHemoglobin,
+            [Display(Name = "Thiếu cân (BMI < 18.5)")]
+            Underweight,
+            [Display(Name = "Thừa cân (BMI > 30)")]
+            Overweight,
             [Display(Name = "Huyết áp cao")]
             HighBloodPressure,
             [Display(Name = "Huyết áp thấp")]
             LowBloodPressure,
+            [Display(Name = "Nhịp tim cao")]
+            HighHeartRate,
+            [Display(Name = "Nhịp tim thấp")]
+            LowHeartRate,
             [Display(Name = "Sốt")]
-            Fever,
-            [Display(Name = "Cân nặng không đủ")]
+            HighTemperature,
+            [Display(Name = "Thiếu máu (Hb thấp)")]
+            LowHemoglobin,
+            [Display(Name = "Cân nặng không đủ (< 45kg)")]
             LowWeight,
-            [Display(Name = "Mới hiến gần đây")]
+            [Display(Name = "Chiều cao không đủ (< 150cm)")]
+            LowHeight,
+            [Display(Name = "Mới hiến máu gần đây")]
             RecentDonation,
             [Display(Name = "Tiền sử bệnh lý")]
             MedicalHistory,
@@ -117,7 +129,9 @@ namespace Blood_Donation_Website.Utilities
             [Display(Name = "Dừng giữa chừng")]
             Stopped,
             [Display(Name = "Thất bại")]
-            Failed
+            Failed,
+            [Display(Name = "Đã hủy")]
+            Cancelled
         }
         #endregion
 
@@ -176,7 +190,7 @@ namespace Blood_Donation_Website.Utilities
             Hospital,
             [Display(Name = "Bác sĩ")]
             Doctor,
-            [Display(Name = "Nhân viên y tế")]
+            [Display(Name = "Nhân viên")]
             Staff
         }
         #endregion
@@ -353,6 +367,90 @@ namespace Blood_Donation_Website.Utilities
         public static List<SelectListItem> GetRoleTypeOptions()
         {
             return GetSelectList<RoleType>();
+        }
+        #endregion
+
+        #region Utility Methods
+        /// <summary>
+        /// Kiểm tra xem trạng thái đăng ký có thể check-in không
+        /// </summary>
+        /// <param name="status">Trạng thái đăng ký</param>
+        /// <returns>True nếu có thể check-in</returns>
+        public static bool CanCheckIn(RegistrationStatus status)
+        {
+            return status == RegistrationStatus.Registered || status == RegistrationStatus.Confirmed;
+        }
+
+        /// <summary>
+        /// Kiểm tra xem trạng thái đăng ký có thể sàng lọc không
+        /// </summary>
+        /// <param name="status">Trạng thái đăng ký</param>
+        /// <returns>True nếu có thể sàng lọc</returns>
+        public static bool CanScreen(RegistrationStatus status)
+        {
+            return status == RegistrationStatus.CheckedIn;
+        }
+
+        /// <summary>
+        /// Kiểm tra xem trạng thái đăng ký có thể hiến máu không
+        /// </summary>
+        /// <param name="status">Trạng thái đăng ký</param>
+        /// <param name="isEligible">Có đủ điều kiện sức khỏe không</param>
+        /// <returns>True nếu có thể hiến máu</returns>
+        public static bool CanDonate(RegistrationStatus status, bool isEligible)
+        {
+            return status == RegistrationStatus.Eligible && isEligible;
+        }
+
+        /// <summary>
+        /// Lấy trạng thái tiếp theo sau khi sàng lọc
+        /// </summary>
+        /// <param name="isEligible">Có đủ điều kiện sức khỏe không</param>
+        /// <returns>Trạng thái tiếp theo</returns>
+        public static RegistrationStatus GetNextStatusAfterScreening(bool isEligible)
+        {
+            return isEligible ? RegistrationStatus.Eligible : RegistrationStatus.Ineligible;
+        }
+
+        /// <summary>
+        /// Lấy màu badge cho trạng thái đăng ký
+        /// </summary>
+        /// <param name="status">Trạng thái đăng ký</param>
+        /// <returns>CSS class cho màu badge</returns>
+        public static string GetRegistrationStatusBadgeClass(RegistrationStatus status)
+        {
+            return status switch
+            {
+                RegistrationStatus.Registered => "bg-primary",
+                RegistrationStatus.Confirmed => "bg-info",
+                RegistrationStatus.CheckedIn => "bg-warning",
+                RegistrationStatus.Screening => "bg-warning",
+                RegistrationStatus.Eligible => "bg-success",
+                RegistrationStatus.Ineligible => "bg-danger",
+                RegistrationStatus.Donating => "bg-info",
+                RegistrationStatus.Completed => "bg-success",
+                RegistrationStatus.Cancelled => "bg-danger",
+                RegistrationStatus.NoShow => "bg-secondary",
+                RegistrationStatus.Failed => "bg-danger",
+                RegistrationStatus.Deferred => "bg-warning",
+                _ => "bg-secondary"
+            };
+        }
+
+        public static string GetEventStatusBadgeClass(EventStatus status)
+        {
+            return status switch
+            {
+                EventStatus.Active => "text-success",
+                EventStatus.Full => "text-warning",
+                EventStatus.Completed => "text-danger",
+                EventStatus.Cancelled => "text-danger",
+                EventStatus.Closed => "text-danger",
+                EventStatus.Draft => "text-secondary",
+                EventStatus.Published => "text-primary",
+                EventStatus.Postponed => "text-warning",
+                _ => "text-secondary"
+            };
         }
         #endregion
     }

@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class ContactMessageDto
@@ -8,7 +10,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public string? Phone { get; set; }
         public string Subject { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
+        public MessageStatus Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? ResolvedDate { get; set; }
         public int? ResolvedBy { get; set; }
@@ -28,7 +30,7 @@ namespace Blood_Donation_Website.Models.DTOs
 
     public class ContactMessageUpdateDto
     {
-        public string Status { get; set; } = string.Empty;
+        public MessageStatus Status { get; set; }
         public DateTime? ResolvedDate { get; set; }
         public int? ResolvedBy { get; set; }
     }

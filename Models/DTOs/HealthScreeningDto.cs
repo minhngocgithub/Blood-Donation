@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class HealthScreeningDto
@@ -11,7 +13,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public decimal? Temperature { get; set; }
         public decimal? Hemoglobin { get; set; }
         public bool IsEligible { get; set; }
-        public string? DisqualifyReason { get; set; }
+        public DisqualificationReason? DisqualifyReason { get; set; }
         public int? ScreenedBy { get; set; }
         public DateTime ScreeningDate { get; set; }
         public string? RegistrationStatus { get; set; }
@@ -33,7 +35,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public decimal? Temperature { get; set; }
         public decimal? Hemoglobin { get; set; }
         public bool IsEligible { get; set; } = true;
-        public string? DisqualifyReason { get; set; }
+        public DisqualificationReason? DisqualifyReason { get; set; }
         public int? ScreenedBy { get; set; }
     }
 
@@ -46,6 +48,6 @@ namespace Blood_Donation_Website.Models.DTOs
         public decimal? Temperature { get; set; }
         public decimal? Hemoglobin { get; set; }
         public bool IsEligible { get; set; }
-        public string? DisqualifyReason { get; set; }
+        public DisqualificationReason? DisqualifyReason { get; set; }
     }
 } 

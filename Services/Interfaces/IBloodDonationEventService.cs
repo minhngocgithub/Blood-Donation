@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Interfaces
 {
@@ -102,7 +103,7 @@ namespace Blood_Donation_Website.Services.Interfaces
 
         Task<IEnumerable<BloodDonationEventDto>> SearchEventsByNameDescLocationAsync(string searchTerm, string location);
 
-        Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(string status);
+        Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(EventStatus status);
         /// <summary>
         /// Lấy danh sách sự kiện hiến máu theo nhóm máu cần thiết.
         /// </summary>
@@ -147,5 +148,13 @@ namespace Blood_Donation_Website.Services.Interfaces
         /// Gửi thông báo cập nhật cho sự kiện hiến máu.
         /// </summary>
         Task<bool> SendEventUpdatesAsync(int eventId, string updateMessage);
+        /// <summary>
+        /// Tự động cập nhật trạng thái tất cả sự kiện đã qua từ Active thành Completed.
+        /// </summary>
+        Task<int> UpdateAllPastEventsStatusAsync();
+        /// <summary>
+        /// Lấy danh sách sự kiện cần cập nhật trạng thái (đã qua ngày nhưng vẫn Active).
+        /// </summary>
+        Task<IEnumerable<BloodDonationEventDto>> GetEventsNeedingStatusUpdateAsync();
     }
 } 

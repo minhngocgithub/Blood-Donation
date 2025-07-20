@@ -1,15 +1,15 @@
 using Blood_Donation_Website.Data;
 using Blood_Donation_Website.Utilities;
-using Microsoft.AspNetCore.Authorization;
+using Blood_Donation_Website.Utilities.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IO.Compression;
 using System.Text.Json;
 using Blood_Donation_Website.Models.Entities;
 
-namespace Blood_Donation_Website.Controllers.Admin
+namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [AdminOnly]
     [Route("admin/data-export")]
     public class DataExportController : Controller
     {
@@ -33,14 +33,12 @@ namespace Blood_Donation_Website.Controllers.Admin
         {
             try
             {                
-                // Ensure DatabaseExport directory exists
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
                 {
                     Directory.CreateDirectory(dataExportPath);
                 }
 
-                // Perform export
                 if (format.ToLower() == "csv")
                 {
                     await _dataExporter.ExportAllDataToCsvAsync();
@@ -50,7 +48,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     await _dataExporter.ExportAllDataAsync();
                 }
 
-                // Find the latest export folder
                 var directories = Directory.GetDirectories(dataExportPath);
                 
                 var latestFolder = directories
@@ -65,14 +62,12 @@ namespace Blood_Donation_Website.Controllers.Admin
 
                 var files = Directory.GetFiles(latestFolder);
 
-                // Create ZIP file
                 var tempPath = Path.GetTempPath();
                 var zipPath = Path.Combine(tempPath, $"DatabaseExport_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
                 ZipFile.CreateFromDirectory(latestFolder, zipPath);
 
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(zipPath);
                 
-                // Cleanup
                 System.IO.File.Delete(zipPath);
                 
                 return File(fileBytes, "application/zip", $"DatabaseExport_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
@@ -95,7 +90,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Ensure DatabaseExport directory exists
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
                 {
@@ -104,7 +98,6 @@ namespace Blood_Donation_Website.Controllers.Admin
 
                 await _dataExporter.ExportTableAsync(tableName);
 
-                // Find the latest export folder
                 var latestFolder = Directory.GetDirectories(dataExportPath)
                     .OrderByDescending(d => Directory.GetCreationTime(d))
                     .FirstOrDefault();
@@ -132,6 +125,254 @@ namespace Blood_Donation_Website.Controllers.Admin
             }
         }
 
+        [HttpPost("export-event")]
+        public async Task<IActionResult> ExportEventData(int eventId, string format = "json")
+        {
+            try
+            {
+                // Kiểm tra sự kiện có tồn tại không
+                var eventEntity = await _context.BloodDonationEvents
+                    .Include(e => e.Location)
+                    .FirstOrDefaultAsync(e => e.EventId == eventId);
+
+                if (eventEntity == null)
+                {
+                    TempData["ErrorMessage"] = "Sự kiện không tồn tại.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
+                if (!Directory.Exists(dataExportPath))
+                {
+                    Directory.CreateDirectory(dataExportPath);
+                }
+
+                // Tạo thư mục cho sự kiện cụ thể
+                var eventExportPath = Path.Combine(dataExportPath, $"Event_{eventId}_{DateTime.Now:yyyyMMdd_HHmmss}");
+                Directory.CreateDirectory(eventExportPath);
+
+                if (format.ToLower() == "csv")
+                {
+                    await ExportEventToCsvAsync(eventEntity, eventExportPath);
+                }
+                else
+                {
+                    await ExportEventToJsonAsync(eventEntity, eventExportPath);
+                }
+
+                // Tạo file ZIP
+                var tempPath = Path.GetTempPath();
+                var zipPath = Path.Combine(tempPath, $"Event_{eventId}_Export_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
+                ZipFile.CreateFromDirectory(eventExportPath, zipPath);
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(zipPath);
+                
+                // Dọn dẹp
+                System.IO.File.Delete(zipPath);
+                Directory.Delete(eventExportPath, true);
+                
+                return File(fileBytes, "application/zip", $"Event_{eventId}_Export_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        private async Task ExportEventToJsonAsync(BloodDonationEvent eventEntity, string exportPath)
+        {
+            // Lấy dữ liệu đăng ký
+            var registrations = await _context.DonationRegistrations
+                .Include(r => r.User)
+                .Where(r => r.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            // Lấy dữ liệu lịch sử hiến máu
+            var donationHistories = await _context.DonationHistories
+                .Include(d => d.User)
+                .Include(d => d.Registration)
+                .Where(d => d.Registration!.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            // Lấy dữ liệu sàng lọc sức khỏe
+            var healthScreenings = await _context.HealthScreenings
+                .Include(h => h.Registration)
+                .Include(h => h.Registration.User)
+                .Where(h => h.Registration.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            var eventData = new
+            {
+                exportInfo = new
+                {
+                    exportDate = DateTime.Now,
+                    eventId = eventEntity.EventId,
+                    eventName = eventEntity.EventName,
+                    format = "json"
+                },
+                eventDetails = new
+                {
+                    eventId = eventEntity.EventId,
+                    eventName = eventEntity.EventName,
+                    eventDescription = eventEntity.EventDescription,
+                    eventDate = eventEntity.EventDate,
+                    startTime = eventEntity.StartTime,
+                    endTime = eventEntity.EndTime,
+                    locationName = eventEntity.Location?.LocationName,
+                    locationAddress = eventEntity.Location?.Address,
+                    maxDonors = eventEntity.MaxDonors,
+                    currentDonors = eventEntity.CurrentDonors,
+                    status = eventEntity.Status,
+                    requiredBloodTypes = eventEntity.RequiredBloodTypes,
+                    imageUrl = eventEntity.ImageUrl,
+                    createdDate = eventEntity.CreatedDate,
+                    updatedDate = eventEntity.UpdatedDate
+                },
+                registrations = registrations.Select(r => new
+                {
+                    registrationId = r.RegistrationId,
+                    userId = r.UserId,
+                    userName = r.User?.FullName,
+                    userEmail = r.User?.Email,
+                    userPhone = r.User?.Phone,
+                    registrationDate = r.RegistrationDate,
+                    status = r.Status,
+                    notes = r.Notes,
+                    isEligible = r.IsEligible,
+                    checkInTime = r.CheckInTime,
+                    completionTime = r.CompletionTime,
+                    cancellationReason = r.CancellationReason
+                }),
+                donationHistories = donationHistories.Select(d => new
+                {
+                    donationId = d.DonationId,
+                    userId = d.UserId,
+                    userName = d.User?.FullName,
+                    donationDate = d.DonationDate,
+                    bloodVolume = d.Volume,
+                    bloodType = d.User?.BloodType?.BloodTypeName,
+                    notes = d.Notes
+                }),
+                healthScreenings = healthScreenings.Select(h => new
+                {
+                    screeningId = h.ScreeningId,
+                    userId = h.Registration.UserId,
+                    userName = h.Registration.User?.FullName,
+                    screeningDate = h.ScreeningDate,
+                    isEligible = h.IsEligible,
+                    bloodPressure = h.BloodPressure,
+                    heartRate = h.HeartRate,
+                    temperature = h.Temperature,
+                    hemoglobin = h.Hemoglobin,
+                    weight = h.Weight,
+                    disqualifyReason = h.DisqualifyReason,
+                    screenedBy = h.ScreenedByUser?.FullName
+                }),
+                statistics = new
+                {
+                    totalRegistrations = registrations.Count,
+                    completedDonations = donationHistories.Count,
+                    eligibleScreenings = healthScreenings.Count(h => h.IsEligible),
+                    ineligibleScreenings = healthScreenings.Count(h => !h.IsEligible),
+                    completionRate = eventEntity.MaxDonors > 0 ? (double)donationHistories.Count / eventEntity.MaxDonors * 100 : 0
+                }
+            };
+
+            var fileName = $"Event_{eventEntity.EventId}_Data_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            var filePath = Path.Combine(exportPath, fileName);
+
+            var jsonContent = System.Text.Json.JsonSerializer.Serialize(eventData, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            await System.IO.File.WriteAllTextAsync(filePath, jsonContent);
+        }
+
+        private async Task ExportEventToCsvAsync(BloodDonationEvent eventEntity, string exportPath)
+        {
+            // Lấy dữ liệu đăng ký
+            var registrations = await _context.DonationRegistrations
+                .Include(r => r.User)
+                .Where(r => r.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            // Lấy dữ liệu lịch sử hiến máu
+            var donationHistories = await _context.DonationHistories
+                .Include(d => d.User)
+                .Include(d => d.Registration)
+                .Where(d => d.Registration!.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            // Lấy dữ liệu sàng lọc sức khỏe
+            var healthScreenings = await _context.HealthScreenings
+                .Include(h => h.Registration)
+                .Include(h => h.Registration.User)
+                .Where(h => h.Registration.EventId == eventEntity.EventId)
+                .ToListAsync();
+
+            var csvContent = new System.Text.StringBuilder();
+
+            // Thông tin sự kiện
+            csvContent.AppendLine("=== EVENT INFORMATION ===");
+            csvContent.AppendLine($"Event ID,{eventEntity.EventId}");
+            csvContent.AppendLine($"Event Name,{eventEntity.EventName}");
+            csvContent.AppendLine($"Event Date,{eventEntity.EventDate:yyyy-MM-dd}");
+            csvContent.AppendLine($"Start Time,{eventEntity.StartTime}");
+            csvContent.AppendLine($"End Time,{eventEntity.EndTime}");
+            csvContent.AppendLine($"Location,{eventEntity.Location?.LocationName}");
+            csvContent.AppendLine($"Address,{eventEntity.Location?.Address}");
+            csvContent.AppendLine($"Max Donors,{eventEntity.MaxDonors}");
+            csvContent.AppendLine($"Current Donors,{eventEntity.CurrentDonors}");
+            csvContent.AppendLine($"Status,{eventEntity.Status}");
+            csvContent.AppendLine($"Required Blood Types,{eventEntity.RequiredBloodTypes}");
+            csvContent.AppendLine($"Created Date,{eventEntity.CreatedDate:yyyy-MM-dd HH:mm}");
+            csvContent.AppendLine($"Updated Date,{eventEntity.UpdatedDate:yyyy-MM-dd HH:mm}");
+            csvContent.AppendLine();
+
+            // Thống kê
+            csvContent.AppendLine("=== STATISTICS ===");
+            csvContent.AppendLine($"Total Registrations,{registrations.Count}");
+            csvContent.AppendLine($"Completed Donations,{donationHistories.Count}");
+            csvContent.AppendLine($"Eligible Screenings,{healthScreenings.Count(h => h.IsEligible)}");
+            csvContent.AppendLine($"Ineligible Screenings,{healthScreenings.Count(h => !h.IsEligible)}");
+            csvContent.AppendLine($"Completion Rate,{(eventEntity.MaxDonors > 0 ? (double)donationHistories.Count / eventEntity.MaxDonors * 100 : 0):F1}%");
+            csvContent.AppendLine();
+
+            // Danh sách đăng ký
+            csvContent.AppendLine("=== REGISTRATIONS ===");
+            csvContent.AppendLine("Registration ID,User ID,User Name,User Email,User Phone,Registration Date,Status,Is Eligible,Check-in Time,Completion Time,Cancellation Reason,Notes");
+            
+            foreach (var reg in registrations)
+            {
+                csvContent.AppendLine($"{reg.RegistrationId},{reg.UserId},{reg.User?.FullName},{reg.User?.Email},{reg.User?.Phone},{reg.RegistrationDate:yyyy-MM-dd HH:mm},{reg.Status},{reg.IsEligible},{reg.CheckInTime?.ToString("yyyy-MM-dd HH:mm") ?? ""},{reg.CompletionTime?.ToString("yyyy-MM-dd HH:mm") ?? ""},{reg.CancellationReason ?? ""},{reg.Notes ?? ""}");
+            }
+            csvContent.AppendLine();
+
+            // Lịch sử hiến máu
+            csvContent.AppendLine("=== DONATION HISTORIES ===");
+            csvContent.AppendLine("Donation ID,User ID,User Name,Blood Type,Donation Date,Blood Volume,Notes");
+            
+            foreach (var donation in donationHistories)
+            {
+                csvContent.AppendLine($"{donation.DonationId},{donation.UserId},{donation.User?.FullName},{donation.User?.BloodType?.BloodTypeName},{donation.DonationDate:yyyy-MM-dd HH:mm},{donation.Volume},{donation.Notes ?? ""}");
+            }
+            csvContent.AppendLine();
+
+            // Sàng lọc sức khỏe
+            csvContent.AppendLine("=== HEALTH SCREENINGS ===");
+            csvContent.AppendLine("Screening ID,User ID,User Name,Screening Date,Is Eligible,Blood Pressure,Heart Rate,Temperature,Hemoglobin,Weight,Notes,Screened By");
+            
+            foreach (var screening in healthScreenings)
+            {
+                csvContent.AppendLine($"{screening.ScreeningId},{screening.Registration.UserId},{screening.Registration.User?.FullName},{screening.ScreeningDate:yyyy-MM-dd HH:mm},{screening.IsEligible},{screening.BloodPressure},{screening.HeartRate},{screening.Temperature},{screening.Hemoglobin},{screening.Weight},{screening.DisqualifyReason?.ToString() ?? ""},{screening.ScreenedByUser?.FullName ?? ""}");
+            }
+
+            var fileName = $"Event_{eventEntity.EventId}_Data_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            var filePath = Path.Combine(exportPath, fileName);
+            await System.IO.File.WriteAllTextAsync(filePath, csvContent.ToString());
+        }
+
         [HttpPost("import-all")]
         public async Task<IActionResult> ImportAll(IFormFile file)
         {
@@ -149,7 +390,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Extract ZIP file
                 var tempPath = Path.GetTempPath();
                 var extractPath = Path.Combine(tempPath, $"Import_{DateTime.Now:yyyyMMdd_HHmmss}");
                 Directory.CreateDirectory(extractPath);
@@ -166,7 +406,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     System.IO.File.Delete(tempZipPath);
                 }
 
-                // Import all JSON files
                 var jsonFiles = Directory.GetFiles(extractPath, "*.json", SearchOption.AllDirectories);
                 var importResults = new List<string>();
 
@@ -177,7 +416,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     importResults.Add($"{tableName}: {result}");
                 }
 
-                // Cleanup
                 Directory.Delete(extractPath, true);
 
                 TempData["SuccessMessage"] = $"Import completed! Results: {string.Join(", ", importResults)}";
@@ -213,7 +451,6 @@ namespace Blood_Donation_Website.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Save uploaded file temporarily
                 var tempPath = Path.GetTempPath();
                 var tempFile = Path.Combine(tempPath, $"{tableName}_{DateTime.Now:yyyyMMdd_HHmmss}.json");
                 
@@ -224,7 +461,6 @@ namespace Blood_Donation_Website.Controllers.Admin
 
                 var result = await ImportTableFromFile(tempFile, tableName);
 
-                // Cleanup
                 if (System.IO.File.Exists(tempFile))
                 {
                     System.IO.File.Delete(tempFile);
@@ -510,7 +746,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                             }
                             break;
 
-                        case "bloodcompatibilities":
+                        case "bloodcompatibility":
                             foreach (var record in records)
                             {
                                 var compatibility = JsonSerializer.Deserialize<BloodCompatibility>(record.GetRawText());
@@ -610,7 +846,6 @@ namespace Blood_Donation_Website.Controllers.Admin
         {
             try
             {                
-                // Chạy các test methods
                 await Blood_Donation_Website.Tests.DataExporterTest.TestDataExportAsync(_context);
                 await Blood_Donation_Website.Tests.DataExporterTest.TestExtensionMethodsAsync(_context);
                 await Blood_Donation_Website.Tests.DataExporterTest.TestTablesWithDataAsync(_context);
@@ -662,24 +897,20 @@ namespace Blood_Donation_Website.Controllers.Admin
         public async Task<IActionResult> TestSimple()
         {
             try
-            {                
-                // Test database connection
+            {
                 var userCount = await _context.Users.CountAsync();
                 var roleCount = await _context.Roles.CountAsync();
-                                
-                // Test directory creation
+ 
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
                 {
                     Directory.CreateDirectory(dataExportPath);
                 }
                 
-                // Simple test - try to export roles table
                 if (roleCount > 0)
                 {
                     await _dataExporter.ExportTableAsync("Roles");
                     
-                    // Check if file was created
                     var directories = Directory.GetDirectories(dataExportPath);
                     var latestFolder = directories.OrderByDescending(d => Directory.GetCreationTime(d)).FirstOrDefault();
                     

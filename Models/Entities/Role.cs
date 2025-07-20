@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Models.Entities
 {
@@ -12,8 +13,7 @@ namespace Blood_Donation_Website.Models.Entities
         public int RoleId { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string RoleName { get; set; } = string.Empty;
+        public RoleType RoleName { get; set; }
 
         [StringLength(200)]
         public string? Description { get; set; }

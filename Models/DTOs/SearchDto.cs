@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class SearchParametersDto
@@ -14,7 +16,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public int? LocationId { get; set; }
-        public string? Status { get; set; }
+        public EventStatus? Status { get; set; }
         public string? RequiredBloodTypes { get; set; }
     }
 
@@ -24,7 +26,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int? RoleId { get; set; }
         public bool? IsActive { get; set; }
         public bool? EmailVerified { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
     }
 
     public class DonationSearchDto : SearchParametersDto
@@ -32,7 +34,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int? UserId { get; set; }
         public int? EventId { get; set; }
         public int? BloodTypeId { get; set; }
-        public string? Status { get; set; }
+        public DonationStatus? Status { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public bool? CertificateIssued { get; set; }

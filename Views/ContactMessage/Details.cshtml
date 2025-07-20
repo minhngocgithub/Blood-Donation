@@ -1,0 +1,411 @@
+@model Blood_Donation_Website.Models.DTOs.ContactMessageDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chi tiết tin nhắn";
+    
+    string GetStatusDisplayName(EnumMapper.MessageStatus status)
+    {
+        return EnumMapper.GetDisplayName<EnumMapper.MessageStatus>(status);
+    }
+    
+    string GetStatusClass(EnumMapper.MessageStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.MessageStatus.New => "bg-primary",
+            EnumMapper.MessageStatus.Read => "bg-info",
+            EnumMapper.MessageStatus.InProgress => "bg-warning",
+            EnumMapper.MessageStatus.Resolved => "bg-success",
+            EnumMapper.MessageStatus.Closed => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary fw-bold">
+                    <i class="fas fa-envelope me-2"></i>Chi tiết tin nhắn
+                </h2>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a asp-action="Reply" asp-route-id="@Model.MessageId" class="btn btn-primary me-2">
+                        <i class="fas fa-reply me-2"></i>Trả lời
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete(@Model.MessageId, '@Model.Subject')">
+                        <i class="fas fa-trash me-2"></i>Xóa
+                    </button>
+                </div>
+            </div>
+
+            <!-- SweetAlert notifications will be handled by _SweetAlertNotifications partial -->
+
+            <div class="row">
+                <!-- Message Details -->
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-envelope me-2"></i>Nội dung tin nhắn
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h4 class="text-primary mb-3">@Model.Subject</h4>
+                                <div class="message-content p-3 bg-light rounded">
+                                    @Html.Raw(Model.Message?.Replace("\n", "<br>"))
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message Info -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin tin nhắn
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Trạng thái:</label>
+                                <div>
+                                    <span class="badge @GetStatusClass(Model.Status) fs-6">@GetStatusDisplayName(Model.Status)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Ngày gửi:</label>
+                                <div class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                            
+                            @if (Model.ResolvedDate.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Ngày giải quyết:</label>
+                                    <div class="text-muted">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        @Model.ResolvedDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.ResolvedByUserName))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Giải quyết bởi:</label>
+                                    <div class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        @Model.ResolvedByUserName
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Thời gian:</label>
+                                <div class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @{
+                                        var timeAgo = DateTime.Now - Model.CreatedDate;
+                                        if (timeAgo.TotalDays >= 1)
+                                        {
+                                            <span>@((int)timeAgo.TotalDays) ngày trước</span>
+                                        }
+                                        else if (timeAgo.TotalHours >= 1)
+                                        {
+                                            <span>@((int)timeAgo.TotalHours) giờ trước</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@((int)timeAgo.TotalMinutes) phút trước</span>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sender Info -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user me-2"></i>Thông tin người gửi
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-success rounded me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">@Model.FullName</h6>
+                                    <small class="text-muted">Người gửi</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Email:</label>
+                                <div>
+                                    <a href="mailto:@Model.Email" class="text-decoration-none">
+                                        <i class="fas fa-envelope me-1"></i>@Model.Email
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.Phone))
+                            {
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Số điện thoại:</label>
+                                    <div>
+                                        <a href="tel:@Model.Phone" class="text-decoration-none">
+                                            <i class="fas fa-phone me-1"></i>@Model.Phone
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>Thao tác nhanh
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                @if (Model.Status == EnumMapper.MessageStatus.New)
+                                {
+                                    <form action="/admin/contact-messages/mark-read/@Model.MessageId" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-outline-success">
+                                            <i class="fas fa-check me-2"></i>Đánh dấu đã đọc
+                                        </button>
+                                    </form>
+                                }
+                                else if (Model.Status == EnumMapper.MessageStatus.Read)
+                                {
+                                    <form action="/admin/contact-messages/mark-unread/@Model.MessageId" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-outline-warning">
+                                            <i class="fas fa-envelope me-2"></i>Đánh dấu chưa đọc
+                                        </button>
+                                    </form>
+                                }
+                                
+                                <a asp-action="Reply" asp-route-id="@Model.MessageId" class="btn btn-outline-primary">
+                                    <i class="fas fa-reply me-2"></i>Trả lời tin nhắn
+                                </a>
+                                
+                                <button type="button" class="btn btn-outline-secondary" onclick="showStatusUpdateOptions()">
+                                    <i class="fas fa-edit me-2"></i>Cập nhật trạng thái
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status options will be handled by SweetAlert -->
+
+<!-- SweetAlert will handle all confirmations -->
+
+<style>
+    .message-content {
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+    
+    .dropdown-item {
+        cursor: pointer;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    /* Fix dropdown z-index issue */
+    .dropdown-menu {
+        z-index: 9999 !important;
+        position: fixed !important;
+    }
+    
+    /* Ensure dropdown is above cards */
+    .card {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Make sure dropdown container has proper positioning */
+    .dropdown {
+        position: relative;
+    }
+    
+    /* Ensure dropdown menu appears above other elements */
+    .dropdown-menu.show {
+        z-index: 9999 !important;
+        position: fixed !important;
+    }
+    
+    /* Override any container overflow issues */
+    .container, .row, .col-md-4, .col-md-8 {
+        overflow: visible !important;
+    }
+    
+    /* Ensure proper stacking context */
+    .card-body {
+        overflow: visible !important;
+    }
+</style>
+
+@section Scripts {
+    <!-- SweetAlert Helper -->
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    
+    <script>
+        function confirmDelete(messageId, messageSubject) {
+            showDeleteConfirm(`tin nhắn "${messageSubject}"`, 'Hành động này không thể hoàn tác.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/contact-messages/delete/${messageId}`;
+                        
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+        }
+
+        // Add loading indicators for form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                        submitBtn.disabled = true;
+                        
+                        // Re-enable after a delay (in case of validation errors)
+                        setTimeout(() => {
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.disabled = false;
+                        }, 3000);
+                    }
+                });
+            });
+        });
+
+        // Show message info when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageStatus = '@Model.Status';
+            const messageSubject = '@Model.Subject';
+            
+            if (messageStatus === 'New') {
+                showToast('warning', `Tin nhắn "${messageSubject}" chưa được đọc`, 3000);
+            }
+            
+                    // Show status update options with SweetAlert
+        window.showStatusUpdateOptions = function() {
+            const statusOptions = @Html.Raw(Json.Serialize(EnumMapper.GetMessageStatusOptions()));
+            const currentStatus = '@Model.Status';
+            const messageId = @Model.MessageId;
+            const messageSubject = '@Model.Subject';
+            
+            // Filter out current status
+            const availableOptions = statusOptions.filter(option => option.value !== currentStatus);
+            
+            if (availableOptions.length === 0) {
+                showInfo('Không có tùy chọn', 'Tin nhắn đã ở trạng thái cuối cùng.');
+                return;
+            }
+            
+            // Create buttons for SweetAlert
+            const buttons = {};
+            availableOptions.forEach(option => {
+                buttons[option.value] = {
+                    text: option.text,
+                    value: option.value,
+                    className: 'btn btn-outline-primary me-2 mb-2'
+                };
+            });
+            
+            // Show SweetAlert with custom buttons
+            Swal.fire({
+                title: '<i class="fas fa-edit me-2"></i>Cập nhật trạng thái tin nhắn',
+                text: `Chọn trạng thái mới cho tin nhắn "${messageSubject}":`,
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: 'Hủy bỏ',
+                cancelButtonColor: '#6c757d',
+                width: '500px',
+                html: `
+                    <div class="text-start mb-3">
+                        <p>Chọn trạng thái mới cho tin nhắn "<strong>${messageSubject}</strong>":</p>
+                    </div>
+                    <div class="d-grid gap-2">
+                        ${availableOptions.map(option => `
+                            <button type="button" class="btn btn-outline-primary text-start status-option-btn" 
+                                    onclick="updateMessageStatus('${option.value}', ${messageId})">
+                                <i class="fas fa-arrow-right me-2"></i>${option.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                `,
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    'html-container': 'swal2-html-container'
+                }
+            });
+        };
+        
+        // Function to update message status
+        window.updateMessageStatus = function(status, messageId) {
+            // Show loading
+            showLoading('Đang cập nhật...', 'Cập nhật trạng thái tin nhắn');
+            
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/contact-messages/status/${messageId}`;
+            
+            const statusInput = document.createElement('input');
+            statusInput.type = 'hidden';
+            statusInput.name = 'status';
+            statusInput.value = status;
+            
+            const token = document.createElement('input');
+            token.type = 'hidden';
+            token.name = '__RequestVerificationToken';
+            token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            form.appendChild(statusInput);
+            form.appendChild(token);
+            document.body.appendChild(form);
+            form.submit();
+        };
+        });
+    </script>
+} 

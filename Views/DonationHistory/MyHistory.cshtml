@@ -1,4 +1,5 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationHistoryDto>
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Lịch sử hiến máu của tôi";
 }
@@ -14,6 +15,12 @@
                             <h4 class="mb-0">
                                 <i class="fas fa-history me-2"></i>Lịch sử hiến máu của tôi
                             </h4>
+                            @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                            {
+                                <a href="@Url.Action("Statistics", "DonationHistory")" class="btn btn-info btn-sm">
+                                    <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                </a>
+                            }
                         </div>
                     </div>
                     <div class="card-body">
@@ -56,7 +63,10 @@
                                             <td>@item.BloodTypeName</td>
                                             <td>@item.Volume</td>
                                             <td>
-                                                <span class="status-badge @GetStatusBadgeClass(item.Status)">@GetStatusText(item.Status)</span>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(item.Status);
+                                                }
+                                                <span class="status-badge @GetStatusBadgeClass(item.Status)">@statusDisplayName</span>
                                             </td>
                                             <td>
                                                 @if (item.CertificateIssued)
@@ -87,22 +97,17 @@
 </div>
 
 @functions {
-    private string GetStatusBadgeClass(string status)
+    private string GetStatusBadgeClass(EnumMapper.DonationStatus status)
     {
         return status switch
         {
-            "Completed" => "bg-success text-white",
-            "Cancelled" => "bg-danger text-white",
+            EnumMapper.DonationStatus.Completed => "bg-success text-white",
+            EnumMapper.DonationStatus.InProgress => "bg-primary text-white",
+            EnumMapper.DonationStatus.Started => "bg-info text-white",
+            EnumMapper.DonationStatus.Stopped => "bg-warning text-white",
+            EnumMapper.DonationStatus.Failed => "bg-danger text-white",
+            EnumMapper.DonationStatus.Cancelled => "bg-secondary text-white",
             _ => "bg-secondary text-white"
-        };
-    }
-    private string GetStatusText(string status)
-    {
-        return status switch
-        {
-            "Completed" => "Hoàn thành",
-            "Cancelled" => "Đã hủy",
-            _ => status
         };
     }
 } 

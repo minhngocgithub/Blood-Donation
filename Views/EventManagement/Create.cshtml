@@ -1,6 +1,21 @@
-@model Blood_Donation_Website.Models.DTOs.BloodDonationEventDto
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventCreateDto
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div>@error.ErrorMessage</div>
+        }
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@using Blood_Donation_Website.Utilities
 @{
-    ViewData["Title"] = "Tạo sự kiện mới";}
+    ViewData["Title"] = "Tạo sự kiện mới";
+}
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="~/css/event-create-page.css" asp-append-version="true" />
@@ -72,7 +87,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="RequiredBloodTypes" class="form-label">Nhóm máu cần thiết</label>
-                                <select id="RequiredBloodTypesSelect" class="form-select" multiple size="4" style="width:100%">
+                                <select id="RequiredBloodTypesSelect" class="form-select" multiple style="width:100%">
                                     @if (ViewBag.BloodTypes != null)
                                     {
                                         foreach (var bloodType in ViewBag.BloodTypes)
@@ -83,14 +98,15 @@
                                 </select>
                                 <input type="hidden" asp-for="RequiredBloodTypes" id="RequiredBloodTypes" />
                                 <span asp-validation-for="RequiredBloodTypes" class="text-danger"></span>
-                                <small class="text-muted">Chọn nhiều nhóm máu nếu cần (giữ Ctrl hoặc Cmd)</small>
+                                <small class="text-muted">Chọn nhiều nhóm máu nếu cần</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Status" class="form-label">Trạng thái</label>
                                 <select asp-for="Status" class="form-select">
-                                    <option value="Draft">Nháp</option>
-                                    <option value="Published">Đã xuất bản</option>
-                                    <option value="Active">Đang hoạt động</option>
+                                    @foreach (var status in EnumMapper.GetSelectList<EnumMapper.EventStatus>())
+                                    {
+                                        <option value="@status.Value">@status.Text</option>
+                                    }
                                 </select>
                                 <span asp-validation-for="Status" class="text-danger"></span>
                             </div>
@@ -133,12 +149,25 @@
                     }
                 }
             });
+
+            // Set initial value for hidden input
+            updateRequiredBloodTypes();
         });
-        // Khi submit form, lấy các giá trị đã chọn và gán vào input ẩn
-        document.querySelector('form').addEventListener('submit', function(e) {
+
+        // Update hidden input when selection changes
+        $('#RequiredBloodTypesSelect').on('change', function() {
+            updateRequiredBloodTypes();
+        });
+
+        function updateRequiredBloodTypes() {
             var select = document.getElementById('RequiredBloodTypesSelect');
             var selected = Array.from(select.selectedOptions).map(opt => opt.value);
             document.getElementById('RequiredBloodTypes').value = selected.join(',');
+        }
+
+        // When submit form, ensure the hidden input is updated
+        document.querySelector('form').addEventListener('submit', function(e) {
+            updateRequiredBloodTypes();
         });
     </script>
 } 

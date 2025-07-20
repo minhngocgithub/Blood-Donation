@@ -3,16 +3,20 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
     public class DonationHistoryService : IDonationHistoryService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDonationRegistrationService _registrationService;
 
-        public DonationHistoryService(ApplicationDbContext context)
+        public DonationHistoryService(ApplicationDbContext context, IDonationRegistrationService registrationService)
         {
             _context = context;
+            _registrationService = registrationService;
         }
 
         // Basic CRUD operations
@@ -38,7 +42,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = donation.DonationDate,
                     BloodTypeId = donation.BloodTypeId,
                     Volume = donation.Volume,
-                    Status = donation.Status,
+                    Status = donation.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = donation.Notes,
                     NextEligibleDate = donation.NextEligibleDate,
                     CertificateIssued = donation.CertificateIssued,
@@ -76,7 +80,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -120,9 +124,9 @@ namespace Blood_Donation_Website.Services.Implementations
                     query = query.Where(d => d.BloodTypeId == searchDto.BloodTypeId.Value);
                 }
 
-                if (!string.IsNullOrEmpty(searchDto.Status))
+                if (searchDto.Status.HasValue)
                 {
-                    query = query.Where(d => d.Status == searchDto.Status);
+                    query = query.Where(d => d.Status == searchDto.Status.Value);
                 }
 
                 if (searchDto.StartDate.HasValue)
@@ -187,7 +191,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -239,7 +243,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = createDto.DonationDate,
                     BloodTypeId = createDto.BloodTypeId,
                     Volume = createDto.Volume,
-                    Status = "Completed",
+                    Status = DonationStatus.Completed,
                     Notes = createDto.Notes,
                     NextEligibleDate = nextEligibleDate,
                     CertificateIssued = false
@@ -247,6 +251,13 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 _context.DonationHistories.Add(donation);
                 await _context.SaveChangesAsync();
+
+                // Huỷ tất cả đăng ký còn lại của user (trừ đăng ký vừa hoàn thành)
+                await _registrationService.CancelAllActiveRegistrationsExceptAsync(
+                    createDto.UserId,
+                    createDto.RegistrationId ?? 0,
+                    DisqualificationReason.RecentDonation // hoặc tạo thêm lý do mới nếu muốn
+                );
 
                 return await GetDonationByIdAsync(donation.DonationId) ?? new DonationHistoryDto();
             }
@@ -302,7 +313,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donation = await _context.DonationHistories.FindAsync(donationId);
                 if (donation == null) return false;
 
-                donation.Status = "Completed";
+                donation.Status = DonationStatus.Completed;
                 donation.NextEligibleDate = donation.DonationDate.AddDays(56);
                 await _context.SaveChangesAsync();
                 return true;
@@ -313,15 +324,15 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> CancelDonationAsync(int donationId, string reason)
+        public async Task<bool> CancelDonationAsync(int donationId, DisqualificationReason reason)
         {
             try
             {
                 var donation = await _context.DonationHistories.FindAsync(donationId);
                 if (donation == null) return false;
 
-                donation.Status = "Cancelled";
-                donation.Notes = reason;
+                // Không gán status, chỉ lưu lý do huỷ vào Notes
+                donation.Notes = reason.ToString();
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -353,7 +364,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var donation = await _context.DonationHistories.FindAsync(donationId);
-                return donation?.Status ?? "Unknown";
+                return donation?.Status.ToString() ?? "Unknown";
             }
             catch
             {
@@ -384,7 +395,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -423,7 +434,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -462,7 +473,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -479,7 +490,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<DonationHistoryDto>> GetDonationsByStatusAsync(string status)
+        public async Task<IEnumerable<DonationHistoryDto>> GetDonationsByStatusAsync(DonationStatus status)
         {
             try
             {
@@ -501,7 +512,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -540,7 +551,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -579,7 +590,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -595,6 +606,46 @@ namespace Blood_Donation_Website.Services.Implementations
                 return new List<DonationHistoryDto>();
             }
         }
+
+        public async Task<IEnumerable<DonationHistoryDto>> GetDonationsByDisqualificationReasonAsync(DisqualificationReason reason)
+        {
+            try
+            {
+                var donations = await _context.DonationHistories
+                    .Include(d => d.User)
+                    .Include(d => d.Event)
+                    .Include(d => d.BloodType)
+                    .Include(d => d.Registration)
+                    .Where(d => d.Notes == reason.ToString())
+                    .OrderByDescending(d => d.DonationDate)
+                    .ToListAsync();
+
+                return donations.Select(d => new DonationHistoryDto
+                {
+                    DonationId = d.DonationId,
+                    UserId = d.UserId,
+                    EventId = d.EventId,
+                    RegistrationId = d.RegistrationId,
+                    DonationDate = d.DonationDate,
+                    BloodTypeId = d.BloodTypeId,
+                    Volume = d.Volume,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
+                    Notes = d.Notes,
+                    NextEligibleDate = d.NextEligibleDate,
+                    CertificateIssued = d.CertificateIssued,
+                    UserName = d.User?.FullName,
+                    UserEmail = d.User?.Email,
+                    EventName = d.Event?.EventName,
+                    EventDate = d.Event?.EventDate,
+                    BloodTypeName = d.BloodType?.BloodTypeName
+                });
+            }
+            catch
+            {
+                return new List<DonationHistoryDto>();
+            }
+        }
+
 
         // Donation statistics
         public async Task<int> GetTotalDonationsAsync()
@@ -656,7 +707,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 return await _context.DonationHistories
-                    .Where(d => d.Status == "Completed")
+                    .Where(d => d.Status == DonationStatus.Completed)
                     .SumAsync(d => d.Volume);
             }
             catch
@@ -670,7 +721,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 return await _context.DonationHistories
-                    .Where(d => d.UserId == userId && d.Status == "Completed")
+                    .Where(d => d.UserId == userId && d.Status == DonationStatus.Completed)
                     .SumAsync(d => d.Volume);
             }
             catch
@@ -684,7 +735,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 return await _context.DonationHistories
-                    .Where(d => d.EventId == eventId && d.Status == "Completed")
+                    .Where(d => d.EventId == eventId && d.Status == DonationStatus.Completed)
                     .SumAsync(d => d.Volume);
             }
             catch
@@ -698,7 +749,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 return await _context.DonationHistories
-                    .Where(d => d.BloodTypeId == bloodTypeId && d.Status == "Completed")
+                    .Where(d => d.BloodTypeId == bloodTypeId && d.Status == DonationStatus.Completed)
                     .SumAsync(d => d.Volume);
             }
             catch
@@ -713,7 +764,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var lastDonation = await _context.DonationHistories
-                    .Where(d => d.UserId == userId && d.Status == "Completed")
+                    .Where(d => d.UserId == userId && d.Status == DonationStatus.Completed)
                     .OrderByDescending(d => d.DonationDate)
                     .FirstOrDefaultAsync();
 
@@ -743,7 +794,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var lastDonation = await _context.DonationHistories
-                    .Where(d => d.UserId == userId && d.Status == "Completed")
+                    .Where(d => d.UserId == userId && d.Status == DonationStatus.Completed)
                     .OrderByDescending(d => d.DonationDate)
                     .FirstOrDefaultAsync();
 
@@ -785,7 +836,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -811,7 +862,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Include(d => d.Event)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
-                    .Where(d => d.Status == "Completed")
+                    .Where(d => d.Status == DonationStatus.Completed)
                     .OrderByDescending(d => d.DonationDate)
                     .ToListAsync();
 
@@ -824,7 +875,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -850,7 +901,8 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Include(d => d.Event)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
-                    .Where(d => d.Status == "Cancelled")
+                    // Không có DonationStatus.Cancelled trong enum, loại bỏ truy vấn này
+                    // .Where(d => d.Status == DonationStatus.Cancelled)
                     .OrderByDescending(d => d.DonationDate)
                     .ToListAsync();
 
@@ -863,7 +915,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -902,7 +954,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     DonationDate = d.DonationDate,
                     BloodTypeId = d.BloodTypeId,
                     Volume = d.Volume,
-                    Status = d.Status,
+                    Status = d.Status ?? EnumMapper.DonationStatus.Completed,
                     Notes = d.Notes,
                     NextEligibleDate = d.NextEligibleDate,
                     CertificateIssued = d.CertificateIssued,
@@ -986,7 +1038,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 var result = await _context.DonationHistories
                     .Include(d => d.BloodType)
-                    .Where(d => d.Status == "Completed")
+                    .Where(d => d.Status == DonationStatus.Completed)
                     .GroupBy(d => d.BloodType.BloodTypeName)
                     .Select(g => new { BloodType = g.Key, Count = g.Count() })
                     .ToListAsync();
@@ -1004,7 +1056,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var result = await _context.DonationHistories
-                    .Where(d => d.DonationDate.Year == year && d.Status == "Completed")
+                    .Where(d => d.DonationDate.Year == year && d.Status == DonationStatus.Completed)
                     .GroupBy(d => d.DonationDate.Month)
                     .Select(g => new { Month = g.Key, Count = g.Count() })
                     .ToListAsync();

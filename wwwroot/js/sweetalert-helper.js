@@ -249,30 +249,67 @@ function showCustomHTML(title, html, icon = null) {
 /**
  * Hiển thị progress bar
  * @param {string} title - Tiêu đề
+ * @param {string} text - Text mô tả (tùy chọn)
  */
-function showProgress(title) {
+function showProgress(title, text = '') {
     Swal.fire({
         title: title,
+        text: text,
         html: `
-            <div class="progress mb-3">
-                <div class="progress-bar bg-primary" id="progress-bar"
-                     role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100">
-                    0%
+            <div class="progress mb-3" style="height: 25px;">
+                <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
+                     id="progress-bar"
+                     role="progressbar" style="width: 0%" 
+                     aria-valuemin="0" aria-valuemax="100">
+                    <span id="progress-text">0%</span>
                 </div>
             </div>
+            <div class="text-muted small" id="progress-status">Đang khởi tạo...</div>
         `,
         showConfirmButton: false,
         allowOutsideClick: false,
-        allowEscapeKey: false
+        allowEscapeKey: false,
+        customClass: {
+            popup: 'swal2-popup',
+            title: 'swal2-title',
+            'html-container': 'swal2-html-container'
+        },
+        buttonsStyling: false
     });
 }
 
-function updateProgress(value) {
+/**
+ * Cập nhật progress bar
+ * @param {number} value - Giá trị phần trăm (0-100)
+ * @param {string} status - Text trạng thái (tùy chọn)
+ */
+function updateProgress(value, status = '') {
     const bar = document.getElementById('progress-bar');
-    if (bar) {
+    const text = document.getElementById('progress-text');
+    const statusEl = document.getElementById('progress-status');
+    
+    if (bar && text) {
+        // Đảm bảo value trong khoảng 0-100
+        value = Math.max(0, Math.min(100, value));
+        
         bar.style.width = `${value}%`;
         bar.setAttribute('aria-valuenow', value);
-        bar.innerText = `${value}%`;
+        text.innerText = `${value}%`;
+        
+        // Thay đổi màu sắc dựa trên progress
+        if (value < 30) {
+            bar.className = 'progress-bar bg-primary progress-bar-striped progress-bar-animated';
+        } else if (value < 70) {
+            bar.className = 'progress-bar bg-info progress-bar-striped progress-bar-animated';
+        } else if (value < 100) {
+            bar.className = 'progress-bar bg-warning progress-bar-striped progress-bar-animated';
+        } else {
+            bar.className = 'progress-bar bg-success progress-bar-striped progress-bar-animated';
+        }
+    }
+    
+    if (statusEl && status) {
+        statusEl.innerText = status;
     }
 }
 

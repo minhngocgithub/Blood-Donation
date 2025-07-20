@@ -6,15 +6,7 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            if (!context.Settings.Any())
-            {
-                var settings = new List<Setting>
-                {
-                    new Setting { SettingKey = "SiteName", SettingValue = "BloodLife" },
-                };
-                context.Settings.AddRange(settings);
-                context.SaveChanges();
-            }
+            
         }
     }
 } 

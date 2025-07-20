@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Blood_Donation_Website.Models.Entities;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
@@ -12,7 +13,7 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(r => r.UserId).IsRequired();
             builder.Property(r => r.EventId).IsRequired();
             builder.Property(r => r.RegistrationDate).HasDefaultValueSql("getdate()");
-            builder.Property(r => r.Status).HasMaxLength(20).HasDefaultValue("Registered");
+            builder.Property(r => r.Status).HasDefaultValue(EnumMapper.RegistrationStatus.Registered);
             builder.Property(r => r.Notes).HasMaxLength(500);
             builder.Property(r => r.IsEligible)
                 .HasDefaultValue(false);

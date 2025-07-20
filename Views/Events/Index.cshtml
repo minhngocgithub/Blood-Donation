@@ -1,4 +1,5 @@
-@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@model Blood_Donation_Website.Models.ViewModels.EventsViewModel
+@using Newtonsoft.Json
 @{
     ViewData["Title"] = "Sự kiện hiến máu";
 }
@@ -23,35 +24,139 @@
     <!-- Search and Filter Section -->
     <section class="search-filter-section py-4 bg-light">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="search-box">
-                        <div class="input-group">
-                            <input type="text" class="form-control form-control-lg" 
-                                   placeholder="Tìm kiếm sự kiện..." id="searchInput">
-                            <button class="btn btn-primary" type="button" id="searchBtn">
-                                <i class="fas fa-search"></i>
-                            </button>
+            <form method="get" action="@Url.Action("Index", "Events")" id="filterForm">
+                <div class="row g-3">
+                    <!-- Search Box -->
+                    <div class="col-lg-4">
+                        <div class="search-box">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="Tìm kiếm sự kiện..." 
+                                       name="searchTerm" 
+                                       value="@Model.SearchTerm">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="filter-options">
-                        <select class="form-select form-select-lg" id="locationFilter">
-                            <option value="">Tất cả địa điểm</option>
+
+                    <!-- Location Filter -->
+                    <div class="col-lg-2">
+                        <div class="filter-options">
+                            <select class="form-select form-select-lg" name="location" id="locationFilter">
+                                <option value="">Tất cả địa điểm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Date Range Filters -->
+                    <div class="col-lg-2">
+                        <input type="date" class="form-control form-control-lg" 
+                               name="fromDate" 
+                               value="@(Model.FromDate?.ToString("yyyy-MM-dd"))"
+                               placeholder="Từ ngày">
+                    </div>
+
+                    <div class="col-lg-2">
+                        <input type="date" class="form-control form-control-lg" 
+                               name="toDate" 
+                               value="@(Model.ToDate?.ToString("yyyy-MM-dd"))"
+                               placeholder="Đến ngày">
+                    </div>
+
+                    <!-- Blood Type Filter -->
+                    <div class="col-lg-2">
+                        <select class="form-select form-select-lg" name="bloodType" id="bloodTypeFilter">
+                            <option value="">Tất cả nhóm máu</option>
+                            @if (ViewBag.BloodTypes != null)
+                            {
+                                foreach (var bloodType in ViewBag.BloodTypes)
+                                {
+                                    var isSelected = Model.SelectedBloodType == bloodType.BloodTypeName;
+                                    <option value="@bloodType.BloodTypeName" selected="@isSelected">
+                                        @bloodType.BloodTypeName
+                                    </option>
+                                }
+                            }
                         </select>
                     </div>
                 </div>
-            </div>
+
+                <!-- Filter Actions -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="filter-stats">
+                                <span class="badge bg-success me-2">Đang diễn ra: @Model.TotalCurrentEvents</span>
+                                <span class="badge bg-secondary">Đã qua: @Model.TotalPastEvents</span>
+                            </div>
+                            <div class="filter-actions">
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i>Lọc
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </section>
 
     <!-- Events Section -->
     <section class="events-list-section py-5">
         <div class="container">
-            <div id="eventsContainer" class="row">
-                <partial name="_EventCards" model="Model" />
-            </div>
+            @if (!Model.HasAnyEvents)
+            {
+                <!-- No Events Found -->
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted">Không tìm thấy sự kiện nào</h4>
+                    <p class="text-muted">Không có sự kiện nào phù hợp với bộ lọc của bạn.</p>
+                    <a href="@Url.Action("Index", "Events")" class="btn btn-primary">
+                        <i class="fas fa-refresh me-1"></i>Xem tất cả sự kiện
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Current and Upcoming Events -->
+                @if (Model.HasCurrentEvents)
+                {
+                    <div class="events-section mb-5">
+                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-check text-success me-2"></i>
+                                Sự kiện đang và sắp diễn ra
+                                <span class="badge bg-success ms-2">@Model.TotalCurrentEvents</span>
+                            </h2>
+                        </div>
+                        <div class="row" id="currentEventsContainer">
+                            <partial name="_EventCards" model="Model.CurrentAndUpcomingEvents" />
+                        </div>
+                    </div>
+                }
+
+                <!-- Past Events -->
+                @if (Model.HasPastEvents)
+                {
+                    <div class="events-section">
+                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-times text-secondary me-2"></i>
+                                Sự kiện đã qua
+                                <span class="badge bg-secondary ms-2">@Model.TotalPastEvents</span>
+                            </h2>
+                        </div>
+                        <div class="row" id="pastEventsContainer">
+                            <partial name="_EventCards" model="Model.PastEvents" />
+                        </div>
+                    </div>
+                }
+            }
 
             <!-- Loading Indicator -->
             <div class="text-center mt-5" id="loadingIndicator" style="display: none;">
@@ -71,289 +176,26 @@
     </section>
 </div>
 
-<!-- Custom CSS -->
-<style>
-    .events-page {
-        min-height: 100vh;
-    }
 
-    .page-header {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    }
-
-    .search-box .form-control:focus {
-        border-color: #dc3545;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-    }
-
-    .event-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-
-    .event-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .event-image {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .event-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-
-    .event-card:hover .event-image img {
-        transform: scale(1.05);
-    }
-
-    .event-date {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: rgba(220, 53, 69, 0.9);
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-        text-align: center;
-        min-width: 60px;
-    }
-
-    .event-date .day {
-        display: block;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1;
-    }
-
-    .event-date .month {
-        display: block;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-    }
-
-    .event-content {
-        padding: 1.5rem;
-    }
-
-    .event-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #2c3e50;
-    }
-
-    .event-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .event-meta span {
-        display: flex;
-        align-items: center;
-    }
-
-    .event-description {
-        color: #6c757d;
-        margin-bottom: 1.5rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .event-actions {
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-    }
-
-    .btn-register {
-        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        border: none;
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 25px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-register:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
-        color: white;
-    }
-
-    .event-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        text-transform: uppercase;
-    }
-
-    .status-active {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-full {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .status-ended {
-        background-color: #e2e3e5;
-        color: #383d41;
-    }
-
-    /* Responsive styles */
-    media (max-width: 768px) {
-        .event-meta {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .event-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-    }
-</style>
-
-<!-- JavaScript for Infinite Scroll -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    let currentPage = 1;
-    let isLoading = false;
-    let hasMoreEvents = true;
-    
-    const eventsContainer = document.getElementById('eventsContainer');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const noMoreEvents = document.getElementById('noMoreEvents');
-    
-    // Infinite scroll functionality
-    function checkScroll() {
-        if (isLoading || !hasMoreEvents) return;
-        
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        // Load more when user is 200px from bottom
-        if (scrollTop + windowHeight >= documentHeight - 200) {
-            loadMoreEvents();
-        }
-    }
-    
-    function loadMoreEvents() {
-        if (isLoading || !hasMoreEvents) return;
-        
-        isLoading = true;
-        currentPage++;
-        loadingIndicator.style.display = 'block';
-        
-        fetch(`/Events/LoadMoreEvents?page=${currentPage}&pageSize=6`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            loadingIndicator.style.display = 'none';
-            
-            if (html.trim() === '' || html.includes('no-events')) {
-                hasMoreEvents = false;
-                noMoreEvents.style.display = 'block';
-            } else {
-                eventsContainer.insertAdjacentHTML('beforeend', html);
-            }
-        })
-        .catch(error => {
-            console.error('Error loading more events:', error);
-            showError('Có lỗi xảy ra khi tải thêm sự kiện');
-        })
-        .finally(() => {
-            isLoading = false;
-        });
-    }
-    
-    // Event listeners
-    window.addEventListener('scroll', checkScroll);
-    
-    // Đã chuyển sang submit form MVC, không dùng JS tìm kiếm nữa
-    
-    // Filter functionality
-    const locationFilter = document.getElementById('locationFilter');
-    locationFilter.addEventListener('change', function() {
-        const selectedLocation = this.value;
-        // TODO: Implement filter functionality
-        console.log('Filtering by location:', selectedLocation);
-    });
-    
-    // Event registration
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-register') || e.target.closest('.btn-register')) {
-            e.preventDefault();
-            const button = e.target.classList.contains('btn-register') ? e.target : e.target.closest('.btn-register');
-            const eventId = button.dataset.eventId;
-            registerForEvent(eventId);
-        }
-    });
-    
-    function registerForEvent(eventId) {
-        fetch('/Events/Register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-            },
-            body: JSON.stringify({ eventId: eventId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showSuccess(data.message);
-            } else {
-                showWarning('Thông báo', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error registering for event:', error);
-            showError('Có lỗi xảy ra khi đăng ký sự kiện');
-        });
-    }
-});
-</script>
 
 @section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
     <script>
+        $(function () {
+            var successMsg = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TempData["Success"]));
+            var errorMsg = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TempData["Error"]));
+            if (successMsg && successMsg.trim() !== '' && successMsg.toLowerCase() !== 'true' && successMsg.toLowerCase() !== 'false' && successMsg !== 'null') {
+                showSuccess('Thành công', successMsg);
+            }
+            if (errorMsg && errorMsg.trim() !== '' && errorMsg.toLowerCase() !== 'true' && errorMsg.toLowerCase() !== 'false' && errorMsg !== 'null') {
+                showError('Lỗi', errorMsg);
+            }
+        });
+        // Pass current location to JavaScript
         document.addEventListener('DOMContentLoaded', function() {
             const locationFilter = document.getElementById('locationFilter');
             if (locationFilter) {
-                fetch('https://provinces.open-api.vn/api/p/')
-                    .then(response => response.json())
-                    .then(provinces => {
-                        provinces.forEach(province => {
-                            const option = new Option(province.name, province.name);
-                            locationFilter.add(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading provinces:', error);
-                    });
+                locationFilter.dataset.currentLocation = '@Model.Location';
             }
         });
     </script>

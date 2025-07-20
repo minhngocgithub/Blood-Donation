@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Models.Entities
 {
@@ -33,8 +34,7 @@ namespace Blood_Donation_Website.Models.Entities
 
         public DateTime? DateOfBirth { get; set; }
 
-        [StringLength(10)]
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
 
         public int? BloodTypeId { get; set; }
 

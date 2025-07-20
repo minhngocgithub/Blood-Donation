@@ -5,6 +5,7 @@ using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Services.Utilities;
 using Blood_Donation_Website.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -61,10 +62,10 @@ namespace Blood_Donation_Website.Services.Implementations
                     Email = model.Email,
                     FullName = model.FullName,
                     Phone = model.Phone,
-                    Address = model.Address, // Can be null/empty
-                    DateOfBirth = model.DateOfBirth, // Can be null
-                    Gender = model.Gender, // Can be null/empty
-                    BloodTypeId = model.BloodTypeId, // Can be null
+                    Address = model.Address,
+                    DateOfBirth = model.DateOfBirth,
+                    Gender = null,
+                    BloodTypeId = model.BloodTypeId,
                     PasswordHash = await HashPasswordAsync(model.Password),
                     RoleId = 2,
                     IsActive = true,
@@ -72,6 +73,13 @@ namespace Blood_Donation_Website.Services.Implementations
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now
                 };
+                if (!string.IsNullOrEmpty(model.Gender))
+                {
+                    if (Enum.TryParse<Gender>(model.Gender, out var genderValue))
+                    {
+                        user.Gender = genderValue;
+                    }
+                }
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
@@ -117,9 +125,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null) return false;
 
-                // Generate reset token and send email
                 var token = Guid.NewGuid().ToString();
-                // Store token logic here
 
                 return true;
             }
@@ -210,7 +216,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> IsUserInRoleAsync(string userId, string role)
+        public async Task<bool> IsUserInRoleAsync(string userId, RoleType role)
         {
             var user = await GetUserByIdAsync(userId);
             return user?.Role?.RoleName == role;

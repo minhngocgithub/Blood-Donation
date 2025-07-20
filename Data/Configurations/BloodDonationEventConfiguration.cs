@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Blood_Donation_Website.Models.Entities;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
@@ -19,7 +20,8 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(e => e.LocationId);
             builder.Property(e => e.MaxDonors).HasDefaultValue(100);
             builder.Property(e => e.CurrentDonors).HasDefaultValue(0);
-            builder.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Active");
+            builder.Property(e => e.Status)
+                .HasDefaultValue(EnumMapper.EventStatus.Active);
             builder.Property(e => e.ImageUrl).HasMaxLength(255);
             builder.Property(e => e.RequiredBloodTypes).HasMaxLength(100);
             builder.Property(e => e.CreatedBy);

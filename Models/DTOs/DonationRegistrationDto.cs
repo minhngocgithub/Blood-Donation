@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class DonationRegistrationDto
@@ -6,7 +8,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int UserId { get; set; }
         public int EventId { get; set; }
         public DateTime RegistrationDate { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public RegistrationStatus Status { get; set; }
         public string? Notes { get; set; }
         public bool IsEligible { get; set; }
         public DateTime? CheckInTime { get; set; }
@@ -18,6 +20,8 @@ namespace Blood_Donation_Website.Models.DTOs
         public string? UserEmail { get; set; }
         public string? EventName { get; set; }
         public DateTime? EventDate { get; set; }
+        public TimeSpan? EventStartTime { get; set; }
+        public TimeSpan? EventEndTime { get; set; }
         public string? LocationName { get; set; }
 
         // Thêm property cho check-in
@@ -35,7 +39,7 @@ namespace Blood_Donation_Website.Models.DTOs
 
     public class DonationRegistrationUpdateDto
     {
-        public string Status { get; set; } = string.Empty;
+        public RegistrationStatus Status { get; set; }
         public string? Notes { get; set; }
         public bool IsEligible { get; set; }
         public DateTime? CheckInTime { get; set; }

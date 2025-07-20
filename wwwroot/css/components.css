@@ -688,29 +688,6 @@
     text-align: center;
 }
 
-.events-section .event-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.events-section .event-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: space-between;
-    padding: 1rem;
-}
-
-.events-section .event-content p.event-description {
-    flex-grow: 1;
-    margin-bottom: 1rem;
-}
-
-.events-section .event-content .btn {
-    margin-top: auto;
-}
-
 .cta-section .btn-light:hover {
     color:#dc3545
 }

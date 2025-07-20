@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/submenu.css" asp-append-version="true" />
 
     <!-- Page-specific Styles -->
     @await RenderSectionAsync("Styles", required: false)
@@ -106,7 +107,19 @@
                                     <span class="user-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
                                             <br />
                                             <small class="text-muted">
-                                                @string.Join(", ", User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value))
+                                                @{
+                                                    var roles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value);
+                                                    var roleDisplayNames = roles.Select(r => r switch
+                                                    {
+                                                        "Admin" => "Quản trị viên",
+                                                        "Hospital" => "Bệnh viện",
+                                                        "Doctor" => "Bác sĩ",
+                                                        "Staff" => "Nhân viên",
+                                                        "User" => "Người dùng",
+                                                        _ => r
+                                                    });
+                                                }
+                                                @string.Join(", ", roleDisplayNames)
                                             </small>
                                     </span>
                                 </button>
@@ -131,66 +144,164 @@
                                             <i class="fas fa-history me-2 text-info"></i>Lịch sử hiến máu
                                         </a>
                                     </li>
-                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
-                                                <i class="fas fa-user-check me-2 text-info"></i>Check-in người hiến máu
-                                            </a>
-                                        </li>
-                                    }
-                                    @if (User.IsInRole("Admin"))
+                                    <!-- Quản lý hiến máu (Hospital, Doctor, Staff) -->
+                                    @if (User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
                                     {
                                         <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
-                                                <i class="fas fa-calendar-plus me-2 text-primary"></i>Quản lý sự kiện
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-tint me-2 text-danger"></i>Quản lý hiến máu
                                             </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
-                                                <i class="fas fa-map-marker-alt me-2 text-info"></i>Quản lý địa điểm
-                                            </a>
-                                        </li>
-                                    }
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="ContactMessage" asp-action="Index">
-                                                <i class="fas fa-envelope me-2 text-warning"></i>Tin nhắn liên hệ
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
-                                                <i class="fas fa-cog me-2 text-warning"></i>Quản trị hệ thống
-                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationManagement" asp-action="Index">
+                                                        <i class="fas fa-list me-2 text-primary"></i>Danh sách hiến máu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
+                                                        <i class="fas fa-user-check me-2 text-info"></i>Check-in người hiến máu
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </li>
                                     }
-                                    @if (User.IsInRole("Doctor") || User.IsInRole("Hospital"))
+
+                                    <!-- Sàng lọc sức khỏe (Hospital, Doctor) -->
+                                    @if (User.IsInRole("Hospital") || User.IsInRole("Doctor"))
                                     {
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Index">
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
                                             </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="HealthScreening" asp-action="UpdateBloodTypeForm" asp-route-userId="0">
-                                                <i class="fas fa-tint me-2 text-info"></i>Cập nhật nhóm máu
-                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Index">
+                                                        <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="PendingScreenings">
+                                                        <i class="fas fa-clock me-2 text-warning"></i>Chờ sàng lọc
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="UpdateBloodTypeForm" asp-route-userId="0">
+                                                        <i class="fas fa-tint me-2 text-info"></i>Cập nhật nhóm máu
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </li>
                                     }
-                                    @if (User.IsInRole("Hospital"))
+
+                                    <!-- Quản lý hệ thống (Admin, Hospital) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital"))
                                     {
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
-                                                <i class="fas fa-calendar-alt me-2 text-danger"></i>Quản lý sự kiện
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-cogs me-2 text-primary"></i>Quản lý hệ thống
                                             </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
+                                                        <i class="fas fa-calendar-plus me-2 text-primary"></i>Quản lý sự kiện
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
+                                                        <i class="fas fa-map-marker-alt me-2 text-info"></i>Quản lý địa điểm
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="News" asp-action="Index">
+                                                        <i class="fas fa-newspaper me-2 text-success"></i>Quản lý tin tức
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="ContactMessage" asp-action="Index">
+                                                        <i class="fas fa-envelope me-2 text-warning"></i>Tin nhắn liên hệ
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
-                                                <i class="fas fa-map-marker-alt me-2 text-success"></i>Quản lý địa điểm
+                                    }
+
+                                    <!-- Báo cáo và thống kê (Admin, Hospital, Doctor) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-chart-bar me-2 text-primary"></i>Báo cáo & Thống kê
                                             </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Statistics">
+                                                        <i class="fas fa-chart-bar me-2 text-primary"></i>Thống kê đăng ký
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationHistory" asp-action="Report">
+                                                        <i class="fas fa-chart-line me-2 text-success"></i>Báo cáo hiến máu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Statistics">
+                                                        <i class="fas fa-heartbeat me-2 text-danger"></i>Thống kê sàng lọc
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Quản lý người dùng (Admin, Hospital, Doctor) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-users me-2 text-primary"></i>Quản lý người dùng
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="User" asp-action="Index">
+                                                        <i class="fas fa-users me-2 text-primary"></i>Quản lý người dùng
+                                                    </a>
+                                                </li>
+                                                @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                                {
+                                                    <li>
+                                                        <a class="dropdown-item" asp-controller="DonationHistory" asp-action="Statistics">
+                                                            <i class="fas fa-chart-bar me-2 text-info"></i>Thống kê hiến máu
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Quản trị hệ thống (Admin only) -->
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-cog me-2 text-warning"></i>Quản trị hệ thống
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="NewsCategory" asp-action="Index">
+                                                        <i class="fas fa-tags me-2 text-warning"></i>Danh mục tin tức
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DataExport" asp-action="Index">
+                                                        <i class="fas fa-download me-2 text-info"></i>Xuất dữ liệu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                                        <i class="fas fa-cog me-2 text-warning"></i>Quản trị hệ thống
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </li>
                                     }
                                     <li><hr class="dropdown-divider"></li>
@@ -418,3 +529,4 @@
     @await Html.PartialAsync("_SweetAlertNotifications")
 </body>
 </html>
+

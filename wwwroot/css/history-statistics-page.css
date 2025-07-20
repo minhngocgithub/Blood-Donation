@@ -1,0 +1,401 @@
+/* Statistics Page Styles */
+.donation-statistics-page {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.donation-statistics-page .container {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.statistics-header {
+    background: #dc3545;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.statistics-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.statistics-header .subtitle {
+    margin-top: 0.5rem;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.overview-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #dc3545;
+}
+
+.stat-card.primary {
+    border-color: #dc3545;
+    background: white;
+}
+
+.stat-card.success {
+    border-color: #28a745;
+    background: white;
+}
+
+.stat-card.warning {
+    border-color: #ffc107;
+    background: white;
+}
+
+.stat-card.info {
+    border-color: #17a2b8;
+    background: white;
+}
+
+.stat-card.danger {
+    border-color: #dc3545;
+    background: white;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #dc3545;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #dc3545;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.stat-unit {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-left: 0.25rem;
+}
+
+.chart-section {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.chart-header {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.blood-type-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.blood-type-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #dc3545;
+    transition: all 0.3s ease;
+}
+
+.blood-type-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blood-type-name {
+    font-weight: 700;
+    color: #dc3545;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.blood-type-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.monthly-chart {
+    margin-top: 1rem;
+}
+
+.monthly-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.month-label {
+    min-width: 80px;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.month-bar {
+    flex: 1;
+    height: 30px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin: 0 1rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+}
+
+.month-bar-fill {
+    height: 100%;
+    background: #dc3545;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.month-count {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.recent-donations {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ffc107;
+}
+
+.recent-donation-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    border: 1px solid #ffc107;
+    transition: all 0.3s ease;
+}
+
+.recent-donation-item:hover {
+    transform: translateX(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recent-donation-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.recent-donation-date {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.recent-donation-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.recent-donation-status.completed {
+    background: #28a745;
+    color: white;
+}
+
+.recent-donation-status.cancelled {
+    background: #dc3545;
+    color: white;
+}
+
+.recent-donation-details {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.eligibility-info {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #28a745;
+    text-align: center;
+}
+
+.eligibility-info h4 {
+    color: #155724;
+    margin-bottom: 1rem;
+}
+
+.eligibility-date {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #155724;
+    margin-bottom: 0.5rem;
+}
+
+.eligibility-message {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-statistics {
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-statistics:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .overview-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .blood-type-chart {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-statistics {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .monthly-bar {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .month-label {
+        min-width: auto;
+        margin-bottom: 0.5rem;
+    }
+    
+    .month-bar {
+        margin: 0.5rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .donation-statistics-page {
+        padding: 1rem 0;
+    }
+    
+    .donation-statistics-page .container {
+        padding: 1rem;
+    }
+    
+    .statistics-header {
+        padding: 1rem;
+    }
+    
+    .statistics-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .chart-section {
+        padding: 1rem;
+    }
+    
+    .blood-type-chart {
+        grid-template-columns: 1fr;
+    }
+} 

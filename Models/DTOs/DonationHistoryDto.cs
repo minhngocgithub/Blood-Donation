@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class DonationHistoryDto
@@ -9,7 +11,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public DateTime DonationDate { get; set; }
         public int BloodTypeId { get; set; }
         public int Volume { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public DonationStatus Status { get; set; }
         public string? Notes { get; set; }
         public DateTime? NextEligibleDate { get; set; }
         public bool CertificateIssued { get; set; }
@@ -36,7 +38,7 @@ namespace Blood_Donation_Website.Models.DTOs
 
     public class DonationHistoryUpdateDto
     {
-        public string Status { get; set; } = string.Empty;
+        public DonationStatus Status { get; set; }
         public string? Notes { get; set; }
         public DateTime? NextEligibleDate { get; set; }
         public bool CertificateIssued { get; set; }

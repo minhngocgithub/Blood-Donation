@@ -122,7 +122,7 @@ Table News {
   CategoryId int
   AuthorId int
   ViewCount int [default: 0]
-  IsPublished bit [default: 0] // Alternative: Status nvarchar(20) - Enum: "Draft", "Pending", "Published", "Archived", "Rejected"
+  IsPublished bit [default: 0]
   PublishedDate datetime
   CreatedDate datetime [default: `getdate()`]
   UpdatedDate datetime [default: `getdate()`]

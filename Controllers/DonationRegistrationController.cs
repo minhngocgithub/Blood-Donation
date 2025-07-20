@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Models.ViewModels;
+using Blood_Donation_Website.Utilities.Filters;
 using System.Security.Claims;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Controllers
 {
@@ -11,15 +13,17 @@ namespace Blood_Donation_Website.Controllers
     public class DonationRegistrationController : Controller
     {
         private readonly IDonationRegistrationService _registrationService;
+        private readonly IHealthScreeningService _healthScreeningService;
 
-        public DonationRegistrationController(IDonationRegistrationService registrationService)
+        public DonationRegistrationController(IDonationRegistrationService registrationService, IHealthScreeningService healthScreeningService)
         {
             _registrationService = registrationService;
+            _healthScreeningService = healthScreeningService;
         }
 
         // GET: /DonationRegistration/Checkin
         [HttpGet]
-        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
+        [DoctorOrStaff]
         public IActionResult Checkin()
         {
             // Trang check-in ban đầu, không có dữ liệu
@@ -28,16 +32,26 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Checkin
         [HttpPost]
-        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
+        [DoctorOrStaff]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkin(string RegistrationCode)
         {
             var showAll = Request.Form["showAll"].ToString();
             IEnumerable<DonationRegistrationDto> results;
+            
+            // Kiểm tra showAll trước
             if (!string.IsNullOrEmpty(showAll) && showAll == "true")
             {
-                // Hiển thị tất cả đăng ký chưa check-in
-                results = await _registrationService.GetRegistrationsByStatusAsync("Registered");
+                // Hiển thị tất cả đăng ký
+                results = await _registrationService.GetAllRegistrationsAsync();
+                if (results == null || !results.Any())
+                {
+                    TempData["Info"] = "Chưa có đăng ký nào trong hệ thống.";
+                }
+                else
+                {
+                    TempData["Success"] = $"Đã tải {results.Count()} đăng ký.";
+                }
             }
             else if (!string.IsNullOrWhiteSpace(RegistrationCode))
             {
@@ -57,7 +71,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/ConfirmCheckin
         [HttpPost]
-        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
+        [DoctorOrStaff]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmCheckin(int id)
         {
@@ -67,15 +81,59 @@ namespace Blood_Donation_Website.Controllers
                 TempData["Error"] = "Không tìm thấy đăng ký.";
                 return RedirectToAction("Checkin");
             }
-            if (registration.Status == "CheckedIn")
+            
+            // Kiểm tra trạng thái có thể check-in
+            var allowedStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed };
+            if (!allowedStatuses.Contains(registration.Status))
+            {
+                TempData["Error"] = $"Không thể check-in với trạng thái '{registration.Status}'.";
+                return RedirectToAction("Checkin");
+            }
+            
+            if (registration.Status == RegistrationStatus.CheckedIn)
             {
                 TempData["Error"] = "Người này đã được check-in.";
                 return RedirectToAction("Checkin");
             }
+            
+            // Kiểm tra thời gian check-in
+            var currentDateTime = DateTime.Now;
+            var eventDate = registration.EventDate?.Date ?? DateTime.MinValue;
+            var eventStartTime = registration.EventStartTime ?? TimeSpan.Zero;
+            var eventEndTime = registration.EventEndTime ?? TimeSpan.Zero;
+            
+            // Kiểm tra ngày
+            if (currentDateTime.Date != eventDate)
+            {
+                TempData["Error"] = $"Chỉ có thể check-in vào ngày {eventDate:dd/MM/yyyy}.";
+                return RedirectToAction("Checkin");
+            }
+            
+            // Kiểm tra giờ (cho phép check-in từ 30 phút trước giờ bắt đầu đến giờ kết thúc)
+            var eventStartDateTime = eventDate.Add(eventStartTime);
+            var checkinStartTime = eventStartDateTime.AddMinutes(-30); // Cho phép check-in sớm 30 phút
+            var eventEndDateTime = eventDate.Add(eventEndTime);
+            
+            if (currentDateTime < checkinStartTime)
+            {
+                var timeUntilStart = checkinStartTime - currentDateTime;
+                var hours = (int)timeUntilStart.TotalHours;
+                var minutes = timeUntilStart.Minutes;
+                var timeMessage = hours > 0 ? $"{hours} giờ {minutes} phút" : $"{minutes} phút";
+                TempData["Error"] = $"Chưa đến giờ check-in. Vui lòng quay lại sau {timeMessage} nữa.";
+                return RedirectToAction("Checkin");
+            }
+            
+            if (currentDateTime > eventEndDateTime)
+            {
+                TempData["Error"] = $"Đã quá giờ check-in. Sự kiện kết thúc lúc {eventEndTime:hh\\:mm}.";
+                return RedirectToAction("Checkin");
+            }
+            
             var success = await _registrationService.CheckinRegistrationAsync(id);
             if (success)
             {
-                TempData["Success"] = "Check-in thành công.";
+                TempData["Success"] = "Check-in thành công. Vui lòng đưa người hiến đến khu vực sàng lọc sức khỏe.";
             }
             else
             {
@@ -85,6 +143,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         // GET: /DonationRegistration/MyRegistrations
+        [AuthenticatedUser]
         public async Task<IActionResult> MyRegistrations(string status = "active")
         {
             try
@@ -100,17 +159,17 @@ namespace Blood_Donation_Website.Controllers
 
                 if (string.IsNullOrEmpty(status) || status == "active")
                 {
-                    var activeStatuses = new[] { "Registered", "Approved", "CheckedIn", "Screening", "Eligible", "Ineligible", "Donating" };
-                    filtered = allRegs.Where(r => activeStatuses.Contains(r.Status));
+                    var activeStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.CheckedIn, RegistrationStatus.Screening, RegistrationStatus.Eligible, RegistrationStatus.Ineligible, RegistrationStatus.Donating };
+                    filtered = allRegs.Where(r => activeStatuses.Contains(r.Status)).ToList();
                 }
                 else if (status == "completed")
                 {
-                    filtered = allRegs.Where(r => r.Status == "Completed");
+                    filtered = allRegs.Where(r => r.Status == RegistrationStatus.Completed).ToList();
                 }
                 else if (status == "cancelled")
                 {
-                    var cancelledStatuses = new[] { "Cancelled", "Rejected", "Failed", "NoShow" };
-                    filtered = allRegs.Where(r => cancelledStatuses.Contains(r.Status));
+                    var cancelledStatuses = new RegistrationStatus[] { RegistrationStatus.Cancelled, RegistrationStatus.Failed, RegistrationStatus.NoShow };
+                    filtered = allRegs.Where(r => cancelledStatuses.Contains(r.Status)).ToList();
                 }
                 // else: show all
 
@@ -124,6 +183,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         // GET: /DonationRegistration/Details/{id}
+        [AuthenticatedUser]
         public async Task<IActionResult> Details(int id)
         {
             try
@@ -148,6 +208,10 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction(nameof(MyRegistrations));
                 }
 
+                // Lấy screening mới nhất nếu có
+                var screening = await _healthScreeningService.GetLatestScreeningByRegistrationIdAsync(id);
+                ViewBag.HealthScreening = screening;
+
                 return View(registration);
             }
             catch
@@ -159,6 +223,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/Cancel/{id}
         [HttpPost]
+        [AuthenticatedUser]
         public async Task<IActionResult> Cancel(int id, string? reason = null)
         {
             try
@@ -196,7 +261,7 @@ namespace Blood_Donation_Website.Controllers
                 }
 
                 // Kiểm tra xem đăng ký có thể hủy không
-                if (registration.Status != "Registered" && registration.Status != "Approved")
+                if (registration.Status != RegistrationStatus.Registered)
                 {
                     if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                     {
@@ -206,22 +271,30 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction(nameof(Details), new { id });
                 }
 
-                var success = await _registrationService.CancelRegistrationAsync(id, reason ?? string.Empty);
-                if (success)
+                if (Enum.TryParse<DisqualificationReason>(reason, out var reasonEnum))
                 {
-                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    var success = await _registrationService.CancelRegistrationAsync(id, reasonEnum);
+                    if (success)
                     {
-                        return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        {
+                            return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                        }
+                        TempData["Success"] = "Đã hủy đăng ký thành công.";
                     }
-                    TempData["Success"] = "Đã hủy đăng ký thành công.";
+                    else
+                    {
+                        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        {
+                            return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                        }
+                        TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
+                    }
                 }
                 else
                 {
-                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                    {
-                        return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
-                    }
-                    TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
+                    TempData["Error"] = "Lý do hủy không hợp lệ.";
+                    return RedirectToAction(nameof(MyRegistrations));
                 }
 
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -243,7 +316,7 @@ namespace Blood_Donation_Website.Controllers
 
         // POST: /DonationRegistration/CancelCheckin
         [HttpPost]
-        [Authorize(Roles = "Admin,Hospital,Staff,Doctor")]
+        [DoctorOrStaff]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CancelCheckin(int id)
         {
@@ -253,7 +326,7 @@ namespace Blood_Donation_Website.Controllers
                 TempData["Error"] = "Không tìm thấy đăng ký.";
                 return RedirectToAction("Checkin");
             }
-            if (registration.Status != "CheckedIn")
+            if (registration.Status != RegistrationStatus.CheckedIn)
             {
                 TempData["Error"] = "Chỉ có thể hủy check-in cho đăng ký đã check-in.";
                 return RedirectToAction("Checkin");
@@ -270,8 +343,9 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction("Checkin");
         }
 
-        // GET: /DonationRegistration/Statistics
-        public async Task<IActionResult> Statistics()
+        // GET: /DonationRegistration/MyStatistics
+        [AuthenticatedUser]
+        public async Task<IActionResult> MyStatistics()
         {
             try
             {
@@ -284,15 +358,13 @@ namespace Blood_Donation_Website.Controllers
                 var statistics = new RegistrationStatisticsViewModel
                 {
                     TotalRegistrations = await _registrationService.GetRegistrationCountByUserAsync(userId),
-                    CompletedRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "Completed"),
-                    PendingRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "Registered"),
-                    ApprovedRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "Approved"),
-                    CancelledRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "Cancelled"),
-                    RejectedRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "Rejected"),
-                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, "CheckedIn")
+                    CompletedRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Completed),
+                    PendingRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Registered),
+                    CancelledRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Cancelled),
+                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.CheckedIn)
                 };
 
-                return View(statistics);
+                return View("MyStatistics", statistics);
             }
             catch
             {

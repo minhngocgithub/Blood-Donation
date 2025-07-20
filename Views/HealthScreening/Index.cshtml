@@ -1,8 +1,7 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.HealthScreeningDto>
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Sàng lọc sức khỏe";
-    ViewData["ShowBreadcrumb"] = true;
-    ViewData["BreadcrumbItems"] = "<li class='breadcrumb-item active'>Sàng lọc sức khỏe</li>";
 }
 
 <div class="container py-5">
@@ -10,13 +9,13 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="text-danger fw-bold">
-                    <i class="fas fa-stethoscope me-2"></i>Sàng lọc sức khỏe
+                    <i class="fas fa-stethoscope me-2"></i>Lịch sử sàng lọc 
                 </h2>
                 <div>
                     <a asp-action="PendingScreenings" class="btn btn-warning me-2">
                         <i class="fas fa-clock me-2"></i>Chờ sàng lọc
                     </a>
-                    <a href="/screening/update-blood-type" class="btn btn-info">
+                    <a href="/screening/update-blood-type" class="btn btn-primary">
                         <i class="fas fa-tint me-2"></i>Cập nhật nhóm máu
                     </a>
                 </div>
@@ -50,6 +49,45 @@
                     }
                     else
                     {
+                        <!-- Sorting Controls -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label class="form-label me-2 mb-0 fw-bold">
+                                        <i class="fas fa-sort me-1"></i>Sắp xếp theo:
+                                    </label>
+                                    <select id="sortBy" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="name-asc">Tên người hiến máu (A-Z)</option>
+                                        <option value="name-desc">Tên người hiến máu (Z-A)</option>
+                                        <option value="event-asc">Sự kiện (A-Z)</option>
+                                        <option value="event-desc">Sự kiện (Z-A)</option>
+                                        <option value="date-newest">Ngày sàng lọc (Mới nhất)</option>
+                                        <option value="date-oldest">Ngày sàng lọc (Cũ nhất)</option>
+                                        <option value="status-eligible">Trạng thái (Đạt)</option>
+                                        <option value="status-ineligible">Trạng thái (Không đạt)</option>
+                                        <option value="bp-high">Huyết áp (Cao nhất)</option>
+                                        <option value="bp-low">Huyết áp (Thấp nhất)</option>
+                                        <option value="hr-high">Nhịp tim (Cao nhất)</option>
+                                        <option value="hr-low">Nhịp tim (Thấp nhất)</option>
+                                        <option value="temp-high">Nhiệt độ (Cao nhất)</option>
+                                        <option value="temp-low">Nhiệt độ (Thấp nhất)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex align-items-center justify-content-end">
+                                    <label class="form-label me-2 mb-0 fw-bold">
+                                        <i class="fas fa-filter me-1"></i>Lọc trạng thái:
+                                    </label>
+                                    <select id="statusFilter" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="all">Tất cả</option>
+                                        <option value="eligible">Đạt</option>
+                                        <option value="ineligible">Không đạt</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead class="table-danger">
@@ -67,7 +105,14 @@
                                 <tbody>
                                     @foreach (var screening in Model)
                                     {
-                                        <tr>
+                                        <tr class="screening-row" 
+                                            data-name="@(screening.UserName?.ToLower() ?? "")"
+                                            data-event="@(screening.EventName?.ToLower() ?? "")"
+                                            data-date="@screening.ScreeningDate.ToString("yyyy-MM-dd")"
+                                            data-status="@(screening.IsEligible ? "eligible" : "ineligible")"
+                                            data-bp="@screening.BloodPressure"
+                                            data-hr="@screening.HeartRate"
+                                            data-temp="@screening.Temperature">
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="bg-success rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -98,8 +143,11 @@
                                                 @{
                                                     var statusClass = screening.IsEligible ? "bg-success" : "bg-danger";
                                                     var statusText = screening.IsEligible ? "Đạt" : "Không đạt";
+                                                    var statusIcon = screening.IsEligible ? "fas fa-check" : "fas fa-times";
                                                 }
-                                                <span class="badge @statusClass">@statusText</span>
+                                                <span class="badge @statusClass">
+                                                    <i class="@statusIcon me-1"></i>@statusText
+                                                </span>
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
@@ -109,19 +157,23 @@
                                                     <a asp-action="Edit" asp-route-id="@screening.ScreeningId" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    @if (screening.IsEligible 
-                                                        && screening.RegistrationStatus != "CheckedIn"
-                                                        && screening.RegistrationStatus != "Cancelled"
-                                                        && screening.RegistrationStatus != "Ineligible"
-                                                        && screening.RegistrationStatus != "Failed")
-                                                    {
-                                                        <button type="button" class="btn btn-sm btn-outline-success" title="Check-in" onclick="checkIn(@screening.ScreeningId)">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
+                                                    @{
+                                                        // Theo quy trình: Check-in được thực hiện TRƯỚC khi sàng lọc sức khỏe
+                                                        // Nên không thể check-in từ trang sàng lọc
+                                                        var isCheckedIn = screening.RegistrationStatus == EnumMapper.RegistrationStatus.CheckedIn.ToString();
                                                     }
-                                                    else if (screening.RegistrationStatus == "CheckedIn")
+                                                    
+                                                    @if (screening.IsEligible)
                                                     {
-                                                        <span class="text-success">Đã check-in</span>
+                                                        <span class="text-success">
+                                                            <i class="fas fa-check me-1"></i>Đủ điều kiện hiến máu
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-danger">
+                                                            <i class="fas fa-times me-1"></i>Không đủ điều kiện
+                                                        </span>
                                                     }
                                                 </div>
                                             </td>
@@ -139,30 +191,87 @@
 
 @section Scripts {
     <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
-    <script>
-        function checkIn(screeningId) {
-            showConfirm(
-                'Xác nhận check-in',
-                'Bạn có chắc chắn muốn check-in cho sàng lọc này?',
-                'Check-in',
-                'Hủy',
-                'question'
-            ).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/screening/checkin/${screeningId}`;
 
-                    const token = document.createElement('input');
-                    token.type = 'hidden';
-                    token.name = '__RequestVerificationToken';
-                    token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        // Sorting and Filtering functionality
+        $(document).ready(function () {
+            const sortBySelect = document.getElementById('sortBy');
+            const statusFilterSelect = document.getElementById('statusFilter');
+            const screeningRows = document.querySelectorAll('.screening-row');
+            const tbody = document.querySelector('tbody');
 
-                    form.appendChild(token);
-                    document.body.appendChild(form);
-                    form.submit();
+            function applySortAndFilter() {
+                const sortBy = sortBySelect.value;
+                const statusFilter = statusFilterSelect.value;
+                
+                // Convert NodeList to Array for sorting
+                let rows = Array.from(screeningRows);
+                
+                // Filter by status
+                if (statusFilter !== 'all') {
+                    rows = rows.filter(row => row.dataset.status === statusFilter);
                 }
-            });
-        }
+                
+                // Sort rows
+                rows.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name-asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case 'name-desc':
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        case 'event-asc':
+                            return (a.dataset.event || '').localeCompare(b.dataset.event || '');
+                        case 'event-desc':
+                            return (b.dataset.event || '').localeCompare(a.dataset.event || '');
+                        case 'date-newest':
+                            return new Date(b.dataset.date) - new Date(a.dataset.date);
+                        case 'date-oldest':
+                            return new Date(a.dataset.date) - new Date(b.dataset.date);
+                        case 'status-eligible':
+                            return (b.dataset.status === 'eligible') - (a.dataset.status === 'eligible');
+                        case 'status-ineligible':
+                            return (a.dataset.status === 'ineligible') - (b.dataset.status === 'ineligible');
+                        case 'bp-high':
+                            return parseFloat(b.dataset.bp) - parseFloat(a.dataset.bp);
+                        case 'bp-low':
+                            return parseFloat(a.dataset.bp) - parseFloat(b.dataset.bp);
+                        case 'hr-high':
+                            return parseFloat(b.dataset.hr) - parseFloat(a.dataset.hr);
+                        case 'hr-low':
+                            return parseFloat(a.dataset.hr) - parseFloat(b.dataset.hr);
+                        case 'temp-high':
+                            return parseFloat(b.dataset.temp) - parseFloat(a.dataset.temp);
+                        case 'temp-low':
+                            return parseFloat(a.dataset.temp) - parseFloat(b.dataset.temp);
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Reorder rows in DOM
+                rows.forEach(row => tbody.appendChild(row));
+                
+                // Show/hide rows based on filter
+                screeningRows.forEach(row => {
+                    if (statusFilter === 'all' || row.dataset.status === statusFilter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Update screening count display
+                const visibleCount = rows.filter(row => row.style.display !== 'none').length;
+                const totalCount = screeningRows.length;
+                if (visibleCount !== totalCount) {
+                    showToast('info', `Hiển thị ${visibleCount}/${totalCount} sàng lọc`, 2000);
+                }
+            }
+
+            // Event listeners
+            if (sortBySelect && statusFilterSelect) {
+                sortBySelect.addEventListener('change', applySortAndFilter);
+                statusFilterSelect.addEventListener('change', applySortAndFilter);
+            }
+        });
     </script>
 } 

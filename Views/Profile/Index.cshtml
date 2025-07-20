@@ -226,6 +226,9 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <!-- SweetAlert Helper -->
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -392,5 +395,10 @@
 
             loadProvinces();
         });
+        
+        // Test SweetAlert functions availability
+        if (typeof showSuccess === 'undefined') {
+            console.warn('SweetAlert helper functions not loaded');
+        }
     </script>
 }

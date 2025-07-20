@@ -1,13 +1,13 @@
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Models.ViewModels.Profile;
+using Blood_Donation_Website.Utilities.Filters;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Blood_Donation_Website.Controllers.Account
+namespace Blood_Donation_Website.Controllers
 {
-    [Authorize]
+    [AuthenticatedUser]
     [Route("profile")]
     public class ProfileController : Controller
     {

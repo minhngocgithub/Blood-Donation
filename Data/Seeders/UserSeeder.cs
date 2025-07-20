@@ -1,5 +1,6 @@
 using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Services.Utilities;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Data.Seeders
 {
@@ -14,82 +15,66 @@ namespace Blood_Donation_Website.Data.Seeders
                     new User 
                     { 
                         Username = "john_doe", 
-                        Email = "john.doe@example.com", 
-                        PasswordHash = PasswordHelper.HashPassword("Password123!"), 
+                        Email = "user@example.com", 
+                        PasswordHash = PasswordHelper.HashPassword("Admin@123"), 
                         FullName = "John Doe",
                         Phone = "555-0101",
                         Address = "123 Main St, City, State 12345",
                         DateOfBirth = new DateTime(1990, 5, 15),
-                        Gender = "Male",
-                        BloodTypeId = 1, // A+
-                        RoleId = 2, // Regular user
+                        Gender = Gender.Male,
+                        BloodTypeId = 1,
+                        RoleId = 2,
                         IsActive = true,
                         EmailVerified = true,
-                        LastDonationDate = DateTime.Now.AddDays(-90)
+                        LastDonationDate = null
                     },
                     new User 
                     { 
                         Username = "jane_smith", 
-                        Email = "jane.smith@example.com", 
-                        PasswordHash = PasswordHelper.HashPassword("Password123!"), 
+                        Email = "hospital@example.com", 
+                        PasswordHash = PasswordHelper.HashPassword("Admin@123"), 
                         FullName = "Jane Smith",
                         Phone = "555-0102",
                         Address = "456 Oak Ave, City, State 12346",
                         DateOfBirth = new DateTime(1985, 8, 22),
-                        Gender = "Female",
-                        BloodTypeId = 8, // O-
-                        RoleId = 2, // Regular user
+                        Gender = Gender.Female,
+                        BloodTypeId = 8,
+                        RoleId = 3,
                         IsActive = true,
                         EmailVerified = true,
-                        LastDonationDate = DateTime.Now.AddDays(-120)
+                        LastDonationDate = null
                     },
                     new User 
                     { 
                         Username = "mike_wilson", 
-                        Email = "mike.wilson@example.com", 
-                        PasswordHash = "AQAAAAEAACcQAAAAEHashed_Password_Here_789", 
+                        Email = "doctor@example.com", 
+                        PasswordHash = PasswordHelper.HashPassword("Admin@123"), 
                         FullName = "Michael Wilson",
                         Phone = "555-0103",
                         Address = "789 Pine Rd, City, State 12347",
                         DateOfBirth = new DateTime(1992, 12, 3),
-                        Gender = "Male",
-                        BloodTypeId = 3, // B+
-                        RoleId = 2, // Regular user
+                        Gender = Gender.Male,
+                        BloodTypeId = 3,
+                        RoleId = 4,
                         IsActive = true,
                         EmailVerified = true,
-                        LastDonationDate = null // First-time donor
+                        LastDonationDate = null
                     },
                     new User 
                     { 
                         Username = "sarah_johnson", 
-                        Email = "sarah.johnson@example.com", 
-                        PasswordHash = "AQAAAAEAACcQAAAAEHashed_Password_Here_101", 
+                        Email = "staff@example.com", 
+                        PasswordHash = PasswordHelper.HashPassword("Admin@123"), 
                         FullName = "Sarah Johnson",
                         Phone = "555-0104",
                         Address = "321 Elm St, City, State 12348",
                         DateOfBirth = new DateTime(1988, 3, 17),
-                        Gender = "Female",
-                        BloodTypeId = 5, // AB+
-                        RoleId = 2, // Regular user
+                        Gender = Gender.Female,
+                        BloodTypeId = 5,
+                        RoleId = 5,
                         IsActive = true,
-                        EmailVerified = false, // Email not verified yet
-                        LastDonationDate = DateTime.Now.AddDays(-45)
-                    },
-                    new User 
-                    { 
-                        Username = "david_brown", 
-                        Email = "david.brown@example.com", 
-                        PasswordHash = "AQAAAAEAACcQAAAAEHashed_Password_Here_202", 
-                        FullName = "David Brown",
-                        Phone = "555-0105",
-                        Address = "654 Maple Dr, City, State 12349",
-                        DateOfBirth = new DateTime(1995, 11, 28),
-                        Gender = "Male",
-                        BloodTypeId = 7, // O+
-                        RoleId = 2, // Regular user
-                        IsActive = false, // Temporarily inactive
                         EmailVerified = true,
-                        LastDonationDate = DateTime.Now.AddDays(-200)
+                        LastDonationDate = null
                     }
                 };
                 context.Users.AddRange(users);

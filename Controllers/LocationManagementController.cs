@@ -1,12 +1,10 @@
-using Blood_Donation_Website.Filters;
+using Blood_Donation_Website.Utilities.Filters;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Hospital,Admin")]
     [HospitalAdminOnly]
     [Route("admin/locations")]
     public class LocationManagementController : Controller
@@ -66,13 +64,22 @@ namespace Blood_Donation_Website.Controllers
 
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LocationUpdateDto locationDto)
+        public async Task<IActionResult> Edit(int id, LocationDto locationDto)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var success = await _locationService.UpdateLocationAsync(id, locationDto);
+                    var updateDto = new LocationUpdateDto
+                    {
+                        LocationName = locationDto.LocationName,
+                        Address = locationDto.Address,
+                        ContactPhone = locationDto.ContactPhone,
+                        Capacity = locationDto.Capacity,
+                        IsActive = locationDto.IsActive
+                    };
+
+                    var success = await _locationService.UpdateLocationAsync(id, updateDto);
                     if (success)
                     {
                         TempData["SuccessMessage"] = "Địa điểm đã được cập nhật thành công!";
@@ -116,28 +123,44 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // [HttpPost("toggle-status/{id}")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> ToggleStatus(int id)
-        // {
-        //     try
-        //     {
-        //         var success = await _locationService.ToggleLocationStatusAsync(id);
-        //         if (success)
-        //         {
-        //             TempData["SuccessMessage"] = "Trạng thái địa điểm đã được cập nhật!";
-        //         }
-        //         else
-        //         {
-        //             TempData["ErrorMessage"] = "Không thể cập nhật trạng thái địa điểm.";
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         TempData["ErrorMessage"] = ex.Message;
-        //     }
-        //
-        //     return RedirectToAction(nameof(Index));
-        // }
+        [HttpPost("toggle-status/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            try
+            {
+                var location = await _locationService.GetLocationByIdAsync(id);
+                if (location == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy địa điểm.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                bool success;
+                if (location.IsActive)
+                {
+                    success = await _locationService.DeactivateLocationAsync(id);
+                }
+                else
+                {
+                    success = await _locationService.ActivateLocationAsync(id);
+                }
+
+                if (success)
+                {
+                    TempData["SuccessMessage"] = "Trạng thái địa điểm đã được cập nhật!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể cập nhật trạng thái địa điểm.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 } 

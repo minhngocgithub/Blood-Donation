@@ -1,0 +1,275 @@
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventUpdateDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chỉnh sửa sự kiện";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/event-create-page.css" asp-append-version="true" />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="event-create-card">
+                <div class="event-create-header">
+                    <i class="fas fa-edit"></i>
+                    <h4 class="mb-0">Chỉnh sửa sự kiện hiến máu</h4>
+                </div>
+                <div class="event-create-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" name="EventId" value="@ViewBag.EventId" />
+                        <input type="hidden" name="CreatedBy" value="@ViewBag.CreatedBy" />
+                        <input type="hidden" name="CreatedDate" value="@ViewBag.CreatedDate" />
+                        <input type="hidden" name="CurrentDonors" value="@ViewBag.CurrentDonors" />
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventName" class="form-label">Tên sự kiện <span class="text-danger">*</span></label>
+                                <input asp-for="EventName" class="form-control" placeholder="Nhập tên sự kiện">
+                                <span asp-validation-for="EventName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventDate" class="form-label">Ngày diễn ra <span class="text-danger">*</span></label>
+                                <input asp-for="EventDate" type="date" class="form-control">
+                                <span asp-validation-for="EventDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartTime" class="form-label">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                <input asp-for="StartTime" type="time" class="form-control">
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndTime" class="form-label">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                <input asp-for="EndTime" type="time" class="form-control">
+                                <span asp-validation-for="EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationId" class="form-label">Địa điểm <span class="text-danger">*</span></label>
+                                <select asp-for="LocationId" class="form-select">
+                                    <option value="">Chọn địa điểm</option>
+                                    @if (ViewBag.Locations != null)
+                                    {
+                                        @foreach (var location in ViewBag.Locations)
+                                        {
+                                            if (Model.LocationId == location.LocationId)
+                                            {
+                                                <option value="@location.LocationId" selected>@location.LocationName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@location.LocationId">@location.LocationName</option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="LocationId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaxDonors" class="form-label">Số lượng tối đa <span class="text-danger">*</span></label>
+                                <input asp-for="MaxDonors" type="number" class="form-control" placeholder="100" min="@ViewBag.CurrentDonors">
+                                <span asp-validation-for="MaxDonors" class="text-danger"></span>
+                                <small class="text-muted">Tối thiểu: @ViewBag.CurrentDonors (số người đã đăng ký)</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EventDescription" class="form-label">Mô tả sự kiện</label>
+                            <textarea asp-for="EventDescription" class="form-control" rows="4" placeholder="Mô tả chi tiết về sự kiện hiến máu">@Model.EventDescription</textarea>
+                            <span asp-validation-for="EventDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RequiredBloodTypes" class="form-label">Nhóm máu cần thiết</label>
+                                <select id="RequiredBloodTypesSelect" class="form-select" multiple style="width:100%">
+                                    @if (ViewBag.BloodTypes != null)
+                                    {
+                                        foreach (var bloodType in ViewBag.BloodTypes)
+                                        {
+                                            <option value="@bloodType.BloodTypeName">@bloodType.BloodTypeName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="hidden" asp-for="RequiredBloodTypes" id="RequiredBloodTypes" />
+                                <span asp-validation-for="RequiredBloodTypes" class="text-danger"></span>
+                                <small class="text-muted">Chọn nhiều nhóm máu nếu cần</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label">Trạng thái</label>
+                                <select asp-for="Status" class="form-select">
+                                    @foreach (var status in EnumMapper.GetSelectList<EnumMapper.EventStatus>())
+                                    {
+                                        @if (Model.Status.ToString() == status.Value)
+                                        {
+                                            <option value="@status.Value" selected>@status.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@status.Value">@status.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <!-- Current Event Info -->
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin hiện tại
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Số người đã đăng ký: <strong>@ViewBag.CurrentDonors</strong></small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Ngày tạo: <strong>@ViewBag.CreatedDate.ToString("dd/MM/yyyy HH:mm")</strong></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-outline-danger me-2" onclick="confirmDelete()">
+                                    <i class="fas fa-trash me-2"></i>Xóa sự kiện
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Cập nhật sự kiện
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert will handle all confirmations -->
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Set initial values for edit mode before initializing Select2
+            var initialBloodTypes = '@Html.Raw(Model.RequiredBloodTypes)';
+            if (initialBloodTypes && initialBloodTypes.trim() !== '') {
+                var bloodTypes = initialBloodTypes.split(',').map(function(item) {
+                    return item.trim();
+                });
+                $('#RequiredBloodTypesSelect').val(bloodTypes).trigger('change');
+                console.log("BloodTypes:", bloodTypes);
+                console.log("All option values:", $('#RequiredBloodTypesSelect option').map((_, o) => o.value).get());
+            }
+
+            $('#RequiredBloodTypesSelect').select2({
+                placeholder: 'Chọn nhóm máu cần thiết',
+                width: '100%',
+                allowClear: true,
+                closeOnSelect: false,
+                language: {
+                    noResults: function() {
+                        return "Không tìm thấy nhóm máu phù hợp";
+                    }
+                }
+            });
+
+            // Set initial value for hidden input
+            updateRequiredBloodTypes();
+        });
+
+        // Update hidden input when selection changes
+        $('#RequiredBloodTypesSelect').on('change', function() {
+            updateRequiredBloodTypes();
+        });
+
+        function updateRequiredBloodTypes() {
+            var select = document.getElementById('RequiredBloodTypesSelect');
+            var selected = Array.from(select.selectedOptions).map(opt => opt.value);
+            document.getElementById('RequiredBloodTypes').value = selected.join(',');
+        }
+
+        // When submit form, ensure the hidden input is updated
+        document.querySelector('form').addEventListener('submit', function(e) {
+            updateRequiredBloodTypes();
+        });
+
+        function confirmDelete() {
+            var eventName = '@Html.Raw(Model.EventName.Replace("\"", "\\\""))';
+            showDeleteConfirm('sự kiện "' + eventName + '"', 'Hành động này không thể hoàn tác.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/admin/events/delete/@ViewBag.EventId';
+                        
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+        }
+
+        // Show toast notification when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            var eventName = '@Model.EventName';
+            showToast('info', 'Chỉnh sửa sự kiện: "' + eventName + '"', 3000);
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const maxDonors = parseInt(document.getElementById('MaxDonors').value);
+            const currentDonors = @ViewBag.CurrentDonors;
+            
+            if (maxDonors < currentDonors) {
+                e.preventDefault();
+                showError('Lỗi!', 'Số lượng tối đa không thể nhỏ hơn số người đã đăng ký (' + currentDonors + ')');
+                return false;
+            }
+
+            const startTime = document.getElementById('StartTime').value;
+            const endTime = document.getElementById('EndTime').value;
+            
+            if (startTime && endTime && startTime >= endTime) {
+                e.preventDefault();
+                showError('Lỗi!', 'Thời gian kết thúc phải sau thời gian bắt đầu');
+                return false;
+            }
+
+            const eventDate = new Date(document.getElementById('EventDate').value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (eventDate < today) {
+                e.preventDefault();
+                showError('Lỗi!', 'Ngày diễn ra không thể trong quá khứ');
+                return false;
+            }
+
+            showLoading('Đang cập nhật...', 'Cập nhật thông tin sự kiện');
+        });
+    </script>
+} 

@@ -1,11 +1,11 @@
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Blood_Donation_Website.Utilities.Filters;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Blood_Donation_Website.Controllers.Doctor
+namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Doctor,Hospital")]
+    [HospitalOrDoctor]
     [Route("screening")]
     public class HealthScreeningController : Controller
     {
@@ -36,8 +36,8 @@ namespace Blood_Donation_Website.Controllers.Doctor
         [HttpGet("pending")]
         public async Task<IActionResult> PendingScreenings()
         {
-            var pendingScreenings = await _screeningService.GetScreeningsByStatusAsync("Pending");
-            return View(pendingScreenings);
+            var pendingRegistrations = await _screeningService.GetPendingScreeningsAsync();
+            return View(pendingRegistrations);
         }
 
         [HttpGet("create/{registrationId}")]
@@ -198,11 +198,11 @@ namespace Blood_Donation_Website.Controllers.Doctor
 
         [HttpPost("status/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
+        public async Task<IActionResult> UpdateStatus(int id, bool isEligible)
         {
             try
             {
-                var success = await _screeningService.UpdateScreeningStatusAsync(id, status);
+                var success = await _screeningService.UpdateScreeningStatusAsync(id, isEligible);
                 if (success)
                 {
                     TempData["SuccessMessage"] = "Trạng thái sàng lọc đã được cập nhật!";
@@ -249,7 +249,6 @@ namespace Blood_Donation_Website.Controllers.Doctor
         {
             if (userId == 0)
             {
-                // Hiển thị form tìm kiếm user
                 return View("SelectUser");
             }
 
@@ -297,7 +296,6 @@ namespace Blood_Donation_Website.Controllers.Doctor
                 }
                 else if (!string.IsNullOrEmpty(phone))
                 {
-                    // Tìm theo phone - cần implement trong UserService
                     var allUsers = await _userService.GetAllUsersAsync();
                     users = allUsers.Where(u => u.Phone == phone).ToList();
                 }

@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -37,7 +38,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<RoleDto?> GetRoleByNameAsync(string roleName)
+        public async Task<RoleDto?> GetRoleByNameAsync(RoleType roleName)
         {
             try
             {
@@ -214,7 +215,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> IsUserInRoleByNameAsync(int userId, string roleName)
+        public async Task<bool> IsUserInRoleByNameAsync(int userId, RoleType roleName)
         {
             try
             {
@@ -269,7 +270,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<UserDto>> GetUsersByRoleNameAsync(string roleName)
+        public async Task<IEnumerable<UserDto>> GetUsersByRoleNameAsync(RoleType roleName)
         {
             try
             {
@@ -321,7 +322,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> IsRoleNameExistsAsync(string roleName)
+        public async Task<bool> IsRoleNameExistsAsync(RoleType roleName)
         {
             try
             {
@@ -339,7 +340,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var roles = await _context.Roles
-                    .Where(r => r.RoleName.Contains(searchTerm) || 
+                    .Where(r => r.RoleName.ToString().Contains(searchTerm) || 
                                (r.Description != null && r.Description.Contains(searchTerm)))
                     .OrderBy(r => r.RoleName)
                     .ToListAsync();
@@ -373,7 +374,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<int> GetUserCountByRoleNameAsync(string roleName)
+        public async Task<int> GetUserCountByRoleNameAsync(RoleType roleName)
         {
             try
             {

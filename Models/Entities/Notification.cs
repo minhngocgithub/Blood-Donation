@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Models.Entities
 {
@@ -19,8 +20,7 @@ namespace Blood_Donation_Website.Models.Entities
         [StringLength(500)]
         public string Message { get; set; } = string.Empty;
 
-        [StringLength(50)]
-        public string? Type { get; set; }
+        public NotificationType? Type { get; set; }
 
         public bool IsRead { get; set; } = false;
         public DateTime CreatedDate { get; set; } = DateTime.Now;

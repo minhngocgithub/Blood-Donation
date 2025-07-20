@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class NotificationDto
@@ -6,7 +8,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int? UserId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string? Type { get; set; }
+        public NotificationType? Type { get; set; }
         public bool IsRead { get; set; }
         public DateTime CreatedDate { get; set; }
         
@@ -20,14 +22,14 @@ namespace Blood_Donation_Website.Models.DTOs
         public int? UserId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string? Type { get; set; }
+        public NotificationType? Type { get; set; }
     }
 
     public class NotificationUpdateDto
     {
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string? Type { get; set; }
+        public NotificationType? Type { get; set; }
         public bool IsRead { get; set; }
     }
 } 
