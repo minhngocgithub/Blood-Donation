@@ -1,22 +1,24 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class RoleDto
     {
         public int RoleId { get; set; }
-        public string RoleName { get; set; } = string.Empty;
+        public RoleType RoleName { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 
     public class RoleCreateDto
     {
-        public string RoleName { get; set; } = string.Empty;
+        public RoleType RoleName { get; set; }
         public string? Description { get; set; }
     }
 
     public class RoleUpdateDto
     {
-        public string RoleName { get; set; } = string.Empty;
+        public RoleType RoleName { get; set; }
         public string? Description { get; set; }
     }
 } 

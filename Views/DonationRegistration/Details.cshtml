@@ -1,4 +1,5 @@
 @model Blood_Donation_Website.Models.DTOs.DonationRegistrationDto
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Chi tiết đăng ký";
 }
@@ -63,8 +64,11 @@
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Trạng thái</label>
                                             <div>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(Model.Status);
+                                                }
                                                 <span class="badge status-badge @GetStatusBadgeClass(Model.Status)">
-                                                    @GetStatusText(Model.Status)
+                                                    @statusDisplayName
                                                 </span>
                                             </div>
                                         </div>
@@ -89,20 +93,31 @@
                                             </p>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Tình trạng đủ điều kiện</label>
+                                            <label class="form-label">Tình trạng sức khỏe</label>
                                             <div>
-                                                @if (Model.IsEligible)
+                                                @{
+                                                    var screening = ViewBag.HealthScreening as Blood_Donation_Website.Models.DTOs.HealthScreeningDto;
+                                                    bool? healthEligible = screening?.IsEligible;
+                                                }
+                                                @if (healthEligible == true)
                                                 {
                                                     <span class="badge status-badge bg-success">
                                                         <i class="fas fa-check"></i>
                                                         <span>Đủ điều kiện</span>
                                                     </span>
                                                 }
-                                                else if (Model.Status == "Screening")
+                                                else if (healthEligible == false)
                                                 {
-                                                    <span class="badge status-badge bg-warning text-dark">
-                                                        <i class="fas fa-stethoscope"></i>
-                                                        <span>Chờ khám sức khỏe</span>
+                                                    <span class="badge status-badge bg-danger">
+                                                        <i class="fas fa-times"></i>
+                                                        <span>Không đủ điều kiện</span>
+                                                    </span>
+                                                }
+                                                else if (Model.IsEligible)
+                                                {
+                                                    <span class="badge status-badge bg-success">
+                                                        <i class="fas fa-check"></i>
+                                                        <span>Đủ điều kiện</span>
                                                     </span>
                                                 }
                                                 else
@@ -188,7 +203,7 @@
                                     </h6>
                                 </div>
                                 <div class="card-body content-card-body">
-                                    @if (Model.Status == "Registered" || Model.Status == "Approved")
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Registered)
                                     {
                                         <button type="button" class="action-button btn-cancel-registration" 
                                                 onclick="showCancelConfirmation(@Model.RegistrationId, '@Html.Raw(Model.EventName!.Replace("'", "\\'"))')">
@@ -197,7 +212,7 @@
                                         </button>
                                     }
                                     
-                                    @if (Model.Status == "Completed")
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Completed)
                                     {
                                         <div class="success-alert">
                                             <i class="fas fa-trophy"></i>
@@ -205,11 +220,11 @@
                                         </div>
                                     }
                                     
-                                    @if (Model.Status == "Cancelled" || Model.Status == "Rejected")
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Cancelled)
                                     {
                                         <div class="warning-alert">
                                             <i class="fas fa-info-circle"></i>
-                                            <span>Đăng ký này đã bị @(Model.Status == "Cancelled" ? "hủy" : "từ chối").</span>
+                                            <span>Đăng ký này đã bị @(Model.Status == EnumMapper.RegistrationStatus.Cancelled ? "hủy" : "từ chối").</span>
                                         </div>
                                     }
                                 </div>
@@ -317,31 +332,23 @@
 }
 
 @functions {
-    private string GetStatusBadgeClass(string status)
+    private string GetStatusBadgeClass(EnumMapper.RegistrationStatus status)
     {
         return status switch
         {
-            "Registered" => "bg-warning text-dark",
-            "Approved" => "bg-info text-white",
-            "CheckedIn" => "bg-primary text-white",
-            "Completed" => "bg-success text-white",
-            "Cancelled" => "bg-danger text-white",
-            "Rejected" => "bg-secondary text-white",
+            EnumMapper.RegistrationStatus.Registered => "bg-warning text-dark",
+            EnumMapper.RegistrationStatus.Confirmed => "bg-info text-white",
+            EnumMapper.RegistrationStatus.CheckedIn => "bg-primary text-white",
+            EnumMapper.RegistrationStatus.Screening => "bg-warning text-dark",
+            EnumMapper.RegistrationStatus.Eligible => "bg-success text-white",
+            EnumMapper.RegistrationStatus.Ineligible => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.Donating => "bg-info text-white",
+            EnumMapper.RegistrationStatus.Completed => "bg-success text-white",
+            EnumMapper.RegistrationStatus.Cancelled => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.NoShow => "bg-secondary text-white",
+            EnumMapper.RegistrationStatus.Failed => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.Deferred => "bg-warning text-dark",
             _ => "bg-light text-dark"
-        };
-    }
-
-    private string GetStatusText(string status)
-    {
-        return status switch
-        {
-            "Registered" => "Đã đăng ký",
-            "Approved" => "Đã duyệt",
-            "CheckedIn" => "Đã check-in",
-            "Completed" => "Hoàn thành",
-            "Cancelled" => "Đã hủy",
-            "Rejected" => "Từ chối",
-            _ => status
         };
     }
 } 

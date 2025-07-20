@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -88,7 +89,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Phone = messageDto.Phone,
                     Subject = messageDto.Subject,
                     Message = messageDto.Message,
-                    Status = messageDto.Status ?? "New",
+                    Status = messageDto.Status,
                     CreatedDate = DateTime.Now
                 };
 
@@ -141,7 +142,7 @@ namespace Blood_Donation_Website.Services.Implementations
         }
 
         // Status management
-        public async Task<bool> UpdateMessageStatusAsync(int messageId, string status)
+        public async Task<bool> UpdateMessageStatusAsync(int messageId, MessageStatus status)
         {
             try
             {
@@ -150,7 +151,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 message.Status = status;
 
-                if (status == "Resolved")
+                if (status == MessageStatus.Resolved)
                 {
                     message.ResolvedDate = DateTime.Now;
                 }
@@ -173,9 +174,9 @@ namespace Blood_Donation_Website.Services.Implementations
                 var message = await _context.ContactMessages.FindAsync(messageId);
                 if (message == null) return false;
 
-                if (message.Status == "New")
+                if (message.Status == MessageStatus.New)
                 {
-                    message.Status = "Read";
+                    message.Status = MessageStatus.Read;
                 }
 
                 await _context.SaveChangesAsync();
@@ -194,9 +195,9 @@ namespace Blood_Donation_Website.Services.Implementations
                 var message = await _context.ContactMessages.FindAsync(messageId);
                 if (message == null) return false;
 
-                if (message.Status == "Read")
+                if (message.Status == MessageStatus.Read)
                 {
-                    message.Status = "New";
+                    message.Status = MessageStatus.New;
                 }
 
                 await _context.SaveChangesAsync();
@@ -215,7 +216,7 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 var messages = await _context.ContactMessages
                     .Include(c => c.ResolvedByUser)
-                    .Where(c => c.Status == "New")
+                    .Where(c => c.Status == MessageStatus.New)
                     .OrderByDescending(c => c.CreatedDate)
                     .ToListAsync();
 
@@ -240,7 +241,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByStatusAsync(string status)
+        public async Task<IEnumerable<ContactMessageDto>> GetMessagesByStatusAsync(MessageStatus status)
         {
             try
             {
@@ -292,10 +293,19 @@ namespace Blood_Donation_Website.Services.Implementations
                 var message = await _context.ContactMessages.FindAsync(messageId);
                 if (message == null) return false;
 
-                message.Status = "Resolved";
+                // Update message status to Resolved
+                message.Status = MessageStatus.Resolved;
                 message.ResolvedDate = DateTime.Now;
 
                 await _context.SaveChangesAsync();
+                
+                // TODO: Implement email sending functionality
+                // For now, we'll just log the reply
+                // In a real application, you would:
+                // 1. Send email to the original sender
+                // 2. Store the reply in a separate table
+                // 3. Log the communication
+                
                 return true;
             }
             catch
@@ -305,40 +315,51 @@ namespace Blood_Donation_Website.Services.Implementations
         }
 
         // Statistics
-        public async Task<object> GetMessageStatisticsAsync()
+        public async Task<ContactMessageStatisticsDto> GetMessageStatisticsAsync()
         {
             try
             {
                 var totalMessages = await _context.ContactMessages.CountAsync();
-                var unreadMessages = await _context.ContactMessages.CountAsync(c => c.Status == "New");
-                var resolvedMessages = await _context.ContactMessages.CountAsync(c => c.Status == "Resolved");
-                var readMessages = await _context.ContactMessages.CountAsync(c => c.Status == "Read");
+                var unreadMessages = await _context.ContactMessages.CountAsync(c => c.Status == MessageStatus.New);
+                var resolvedMessages = await _context.ContactMessages.CountAsync(c => c.Status == MessageStatus.Resolved);
+                var readMessages = await _context.ContactMessages.CountAsync(c => c.Status == MessageStatus.Read);
+                var inProgressMessages = await _context.ContactMessages.CountAsync(c => c.Status == MessageStatus.InProgress);
+                var closedMessages = await _context.ContactMessages.CountAsync(c => c.Status == MessageStatus.Closed);
 
                 var statusStats = await _context.ContactMessages
                     .GroupBy(c => c.Status)
-                    .Select(g => new { Status = g.Key, Count = g.Count() })
+                    .Select(g => new StatusStatDto 
+                    { 
+                        Status = g.Key, 
+                        Count = g.Count(),
+                        Percentage = totalMessages > 0 ? (double)g.Count() / totalMessages * 100 : 0
+                    })
                     .ToListAsync();
 
-                return new
+                return new ContactMessageStatisticsDto
                 {
                     Total = totalMessages,
                     Unread = unreadMessages,
                     Resolved = resolvedMessages,
                     Read = readMessages,
+                    InProgress = inProgressMessages,
+                    Closed = closedMessages,
                     ResolutionRate = totalMessages > 0 ? (double)resolvedMessages / totalMessages * 100 : 0,
                     StatusStats = statusStats
                 };
             }
             catch
             {
-                return new
+                return new ContactMessageStatisticsDto
                 {
                     Total = 0,
                     Unread = 0,
                     Resolved = 0,
                     Read = 0,
+                    InProgress = 0,
+                    Closed = 0,
                     ResolutionRate = 0.0,
-                    StatusStats = new List<object>()
+                    StatusStats = new List<StatusStatDto>()
                 };
             }
         }

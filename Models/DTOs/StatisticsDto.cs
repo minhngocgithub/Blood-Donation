@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class DashboardStatisticsDto
@@ -28,7 +30,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int MaxDonors { get; set; }
         public int CurrentDonors { get; set; }
         public int CompletedDonations { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public EventStatus Status { get; set; }
         public string? LocationName { get; set; }
     }
 
@@ -42,5 +44,29 @@ namespace Blood_Donation_Website.Models.DTOs
         public DateTime? LastDonationDate { get; set; }
         public DateTime? NextEligibleDate { get; set; }
         public string? BloodTypeName { get; set; }
+    }
+
+    public class BloodTypeStatDto
+    {
+        public string BloodType { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+
+    public class TopDonorDto
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public int TotalDonations { get; set; }
+        public int TotalVolume { get; set; }
+        public DateTime LastDonation { get; set; }
+    }
+
+    public class EventStatDto
+    {
+        public string EventName { get; set; } = string.Empty;
+        public DateTime? EventDate { get; set; }
+        public int TotalDonations { get; set; }
+        public int TotalVolume { get; set; }
+        public int CompletedDonations { get; set; }
     }
 } 

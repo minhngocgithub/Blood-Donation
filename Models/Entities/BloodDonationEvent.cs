@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Models.Entities
 {
@@ -28,8 +29,7 @@ namespace Blood_Donation_Website.Models.Entities
         public int MaxDonors { get; set; } = 100;
         public int CurrentDonors { get; set; } = 0;
 
-        [StringLength(20)]
-        public string Status { get; set; } = "Active";
+        public EventStatus? Status { get; set; }
 
         [StringLength(255)]
         public string? ImageUrl { get; set; }

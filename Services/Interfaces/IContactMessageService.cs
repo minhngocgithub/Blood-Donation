@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Interfaces
 {
@@ -12,7 +13,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<bool> DeleteMessageAsync(int messageId);
 
         // Status management
-        Task<bool> UpdateMessageStatusAsync(int messageId, string status);
+        Task<bool> UpdateMessageStatusAsync(int messageId, MessageStatus status);
 
         // Read/Unread management
         Task<bool> MarkAsReadAsync(int messageId);
@@ -20,7 +21,7 @@ namespace Blood_Donation_Website.Services.Interfaces
 
         // Query operations
         Task<IEnumerable<ContactMessageDto>> GetUnreadMessagesAsync();
-        Task<IEnumerable<ContactMessageDto>> GetMessagesByStatusAsync(string status);
+        Task<IEnumerable<ContactMessageDto>> GetMessagesByStatusAsync(MessageStatus status);
         Task<IEnumerable<ContactMessageDto>> GetMessagesByCategoryAsync(string category);
         Task<IEnumerable<ContactMessageDto>> GetMessagesByPriorityAsync(string priority);
 
@@ -28,7 +29,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<bool> ReplyToMessageAsync(int messageId, ContactMessageDto replyDto);
 
         // Statistics
-        Task<object> GetMessageStatisticsAsync();
+        Task<ContactMessageStatisticsDto> GetMessageStatisticsAsync();
 
         // Search functionality
         Task<IEnumerable<ContactMessageDto>> SearchMessagesAsync(string searchTerm);

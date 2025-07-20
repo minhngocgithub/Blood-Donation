@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Interfaces
 {
@@ -16,7 +17,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<IEnumerable<NotificationDto>> GetNotificationsByUserAsync(int userId);
         Task<IEnumerable<NotificationDto>> GetUnreadNotificationsAsync(int userId);
         Task<IEnumerable<NotificationDto>> GetReadNotificationsAsync(int userId);
-        Task<IEnumerable<NotificationDto>> GetNotificationsByTypeAsync(string type);
+        Task<IEnumerable<NotificationDto>> GetNotificationsByTypeAsync(NotificationType type);
         Task<IEnumerable<NotificationDto>> GetNotificationsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IEnumerable<NotificationDto>> GetRecentNotificationsAsync(int userId, int count = 10);
         
@@ -36,7 +37,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<int> GetTotalNotificationsAsync();
         Task<int> GetUnreadNotificationsCountAsync(int userId);
         Task<int> GetNotificationsCountByUserAsync(int userId);
-        Task<int> GetNotificationsCountByTypeAsync(string type);
+        Task<int> GetNotificationsCountByTypeAsync(NotificationType type);
         Task<int> GetNotificationsCountByDateAsync(DateTime date);
         
         // Notification search and filtering
@@ -64,11 +65,11 @@ namespace Blood_Donation_Website.Services.Interfaces
         // Notification cleanup
         Task<bool> DeleteOldNotificationsAsync(int daysOld);
         Task<bool> DeleteReadNotificationsAsync(int userId);
-        Task<bool> DeleteNotificationsByTypeAsync(string type);
+        Task<bool> DeleteNotificationsByTypeAsync(NotificationType type);
         
         // Notification preferences (for future use)
-        Task<bool> SetNotificationPreferenceAsync(int userId, string type, bool enabled);
-        Task<bool> GetNotificationPreferenceAsync(int userId, string type);
-        Task<Dictionary<string, bool>> GetNotificationPreferencesAsync(int userId);
+        Task<bool> SetNotificationPreferenceAsync(int userId, NotificationType type, bool enabled);
+        Task<bool> GetNotificationPreferenceAsync(int userId, NotificationType type);
+        Task<Dictionary<NotificationType, bool>> GetNotificationPreferencesAsync(int userId);
     }
 } 

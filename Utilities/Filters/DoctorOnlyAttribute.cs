@@ -1,17 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Security.Claims;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
-namespace Blood_Donation_Website.Filters
+namespace Blood_Donation_Website.Utilities.Filters
 {
-    public class DoctorOnlyAttribute : ActionFilterAttribute
+    public class DoctorOnlyAttribute : Attribute, IAuthorizationFilter
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            if (!context.HttpContext.User.IsInRole("Doctor"))
+            var user = context.HttpContext.User;
+            if (!user.Identity?.IsAuthenticated ?? true)
             {
-                context.Result = new RedirectToActionResult("AccessDenied", "Account", null);
+                context.Result = new RedirectToActionResult("Login", "Account", null);
+                return;
             }
-            base.OnActionExecuting(context);
+
+            var roleClaim = user.FindFirst(ClaimTypes.Role)?.Value;
+            if (string.IsNullOrEmpty(roleClaim) || !Enum.TryParse<RoleType>(roleClaim, out var role) || role != RoleType.Doctor)
+            {
+                context.Result = new ForbidResult();
+            }
         }
     }
 } 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Blood_Donation_Website.Models.Entities;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Data.Configurations
 {
@@ -25,7 +26,7 @@ namespace Blood_Donation_Website.Data.Configurations
                 .HasMaxLength(1000);
             builder.Property(c => c.Status)
                 .HasMaxLength(20)
-                .HasDefaultValue("New");
+                .HasDefaultValue(EnumMapper.MessageStatus.New);
             builder.Property(c => c.CreatedDate).HasDefaultValueSql("getdate()");
             builder.Property(c => c.ResolvedDate);
             builder.Property(c => c.ResolvedBy);

@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Interfaces
 {
@@ -24,7 +25,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         // User role operations
         Task<bool> AssignRoleAsync(int userId, int roleId);
         Task<bool> RemoveRoleAsync(int userId, int roleId);
-        Task<bool> IsUserInRoleAsync(int userId, string roleName);
+        Task<bool> IsUserInRoleAsync(int userId, RoleType roleName);
         Task<IEnumerable<RoleDto>> GetUserRolesAsync(int userId);
         
         // User blood type operations
@@ -41,7 +42,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<IEnumerable<UserDto>> GetUsersByBloodTypeAsync(int bloodTypeId);
         Task<IEnumerable<UserDto>> GetUsersByRoleAsync(int roleId);
         Task<IEnumerable<UserDto>> GetActiveUsersAsync();
-        Task<IEnumerable<UserDto>> GetUsersByGenderAsync(string gender);
+        Task<IEnumerable<UserDto>> GetUsersByGenderAsync(Gender gender);
         
         // User validation
         Task<bool> IsEmailExistsAsync(string email);

@@ -60,7 +60,7 @@ namespace Blood_Donation_Website.Controllers
                     new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                     new Claim(ClaimTypes.Name, user.FullName),
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.RoleName ?? "User")
+                    new Claim(ClaimTypes.Role, user.RoleName.ToString() ?? "User")
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -296,7 +296,6 @@ namespace Blood_Donation_Website.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Lấy userId đúng từ Claims
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
@@ -312,10 +311,17 @@ namespace Blood_Donation_Website.Controllers
             }
             else
             {
-                // Thông báo lỗi rõ ràng cho SweetAlert
                 ModelState.AddModelError("", "Mật khẩu hiện tại không đúng.");
                 return View(model);
             }
+        }
+
+        [HttpGet("AccessDenied")]
+        [AllowAnonymous]
+        public IActionResult AccessDenied(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
         }
 
         private IActionResult RedirectToLocal(string? returnUrl)

@@ -1,62 +1,45 @@
 @using System.Text.Json
 
+@{
+    // Check for both Success and SuccessMessage
+    var successMessage = TempData["Success"] ?? TempData["SuccessMessage"];
+    var errorMessage = TempData["Error"] ?? TempData["ErrorMessage"];
+    var warningMessage = TempData["Warning"] ?? TempData["WarningMessage"];
+    var infoMessage = TempData["Info"] ?? TempData["InfoMessage"];
+}
 
-@if (TempData["Success"] != null)
+@if (successMessage != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công!',
-                text: '@Html.Raw(TempData["Success"])',
-                timer: 3000,
-                showConfirmButton: false
-            });
+            showSuccess('Thành công!', '@Html.Raw(successMessage)');
         });
     </script>
 }
 
-@if (TempData["Error"] != null)
+@if (errorMessage != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi!',
-                text: '@Html.Raw(TempData["Error"])',
-                timer: 4000,
-                showConfirmButton: true
-            });
+            showError('Lỗi!', '@Html.Raw(errorMessage)');
         });
     </script>
 }
 
-@if (TempData["Warning"] != null)
+@if (warningMessage != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Cảnh báo!',
-                text: '@Html.Raw(TempData["Warning"])',
-                timer: 3000,
-                showConfirmButton: false
-            });
+            showWarning('Cảnh báo!', '@Html.Raw(warningMessage)');
         });
     </script>
 }
 
-@if (TempData["Info"] != null)
+@if (infoMessage != null)
 {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'info',
-                title: 'Thông tin!',
-                text: '@Html.Raw(TempData["Info"])',
-                timer: 3000,
-                showConfirmButton: false
-            });
+            showInfo('Thông tin!', '@Html.Raw(infoMessage)');
         });
     </script>
 }

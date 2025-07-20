@@ -1,13 +1,13 @@
-using Blood_Donation_Website.Filters;
+using Blood_Donation_Website.Utilities.Filters;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace Blood_Donation_Website.Controllers.Admin
+namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Admin")]
-    [AdminOnly]
+    [Authorize(Roles = "Admin,Hospital")]
     [Route("admin/contact-messages")]
     public class ContactMessageController : Controller
     {
@@ -23,9 +23,19 @@ namespace Blood_Donation_Website.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string status = "")
         {   
-            var messages = await _contactMessageService.GetAllMessagesAsync();
+            IEnumerable<ContactMessageDto> messages;
+            
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<MessageStatus>(status, out var statusEnum))
+            {
+                messages = await _contactMessageService.GetMessagesByStatusAsync(statusEnum);
+            }
+            else
+            {
+                messages = await _contactMessageService.GetAllMessagesAsync();
+            }
+            
             return View(messages);
         }
 
@@ -45,8 +55,7 @@ namespace Blood_Donation_Website.Controllers.Admin
                 return NotFound();
             }
 
-            // Mark as read if it's unread
-            if (message.Status == "New")
+            if (message.Status == MessageStatus.New)
             {
                 await _contactMessageService.MarkAsReadAsync(id);
             }
@@ -74,25 +83,44 @@ namespace Blood_Donation_Website.Controllers.Admin
             if (ModelState.IsValid)
             {
                 try
-                {
-                    var success = await _contactMessageService.ReplyToMessageAsync(id, replyDto);
-                    if (success)
                     {
-                        TempData["SuccessMessage"] = "Phản hồi đã được gửi thành công!";
-                        return RedirectToAction(nameof(Index));
+                    if (string.IsNullOrWhiteSpace(replyDto.Subject))
+                    {
+                        ModelState.AddModelError("Subject", "Tiêu đề phản hồi không được để trống.");
                     }
-                    else
+                    
+                    if (string.IsNullOrWhiteSpace(replyDto.Message))
                     {
-                        ModelState.AddModelError("", "Không thể gửi phản hồi.");
+                        ModelState.AddModelError("Message", "Nội dung phản hồi không được để trống.");
+                    }
+                    
+                    if (ModelState.IsValid)
+                    {
+                        var success = await _contactMessageService.ReplyToMessageAsync(id, replyDto);
+                        if (success)
+                        {
+                            TempData["SuccessMessage"] = "Phản hồi đã được gửi thành công! Tin nhắn đã được đánh dấu là đã giải quyết.";
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Không thể gửi phản hồi. Vui lòng thử lại sau.");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    ModelState.AddModelError("", ex.Message);
+                    ModelState.AddModelError("", $"Lỗi: {ex.Message}");
                 }
             }
 
             var message = await _contactMessageService.GetMessageByIdAsync(id);
+            if (message == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy tin nhắn cần trả lời.";
+                return RedirectToAction(nameof(Index));
+            }
+            
             ViewBag.OriginalMessage = message;
             return View(replyDto);
         }
@@ -118,6 +146,11 @@ namespace Blood_Donation_Website.Controllers.Admin
                 TempData["ErrorMessage"] = ex.Message;
             }
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (referer.Contains("/details/"))
+            {
+                return RedirectToAction(nameof(Details), new { id });
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -142,6 +175,11 @@ namespace Blood_Donation_Website.Controllers.Admin
                 TempData["ErrorMessage"] = ex.Message;
             }
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (referer.Contains("/details/"))
+            {
+                return RedirectToAction(nameof(Details), new { id });
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -149,23 +187,35 @@ namespace Blood_Donation_Website.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status)
         {
-            try
+            if (Enum.TryParse<MessageStatus>(status, out var statusEnum))
             {
-                var success = await _contactMessageService.UpdateMessageStatusAsync(id, status);
-                if (success)
+                try
                 {
-                    TempData["SuccessMessage"] = "Trạng thái tin nhắn đã được cập nhật!";
+                    var success = await _contactMessageService.UpdateMessageStatusAsync(id, statusEnum);
+                    if (success)
+                    {
+                        TempData["SuccessMessage"] = "Trạng thái tin nhắn đã được cập nhật!";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Không thể cập nhật trạng thái tin nhắn.";
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = "Không thể cập nhật trạng thái tin nhắn.";
+                    TempData["ErrorMessage"] = ex.Message;
                 }
             }
-            catch (Exception ex)
+            else
             {
-                TempData["ErrorMessage"] = ex.Message;
+                TempData["ErrorMessage"] = "Trạng thái không hợp lệ.";
             }
 
+            var referer = Request.Headers["Referer"].ToString();
+            if (referer.Contains("/details/"))
+            {
+                return RedirectToAction(nameof(Details), new { id });
+            }
             return RedirectToAction(nameof(Index));
         }
 

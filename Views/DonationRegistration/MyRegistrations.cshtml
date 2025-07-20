@@ -1,4 +1,5 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationRegistrationDto>
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Đăng ký của tôi";
 }
@@ -26,7 +27,7 @@
                             <h4 class="mb-0">
                                 <i class="fas fa-calendar-check me-2"></i>Đăng ký hiến máu của tôi
                             </h4>
-                            <a href="@Url.Action("Statistics", "DonationRegistration")" class="btn btn-light btn-sm ms-3">
+                            <a href="@Url.Action("MyStatistics", "DonationRegistration")" class="btn btn-light btn-sm ms-3">
                                 <i class="fas fa-chart-bar me-1"></i>Thống kê
                             </a>
                         </div>
@@ -87,8 +88,11 @@
                                                         <span>@registration.LocationName</span>
                                                     </div>
                                                 </div>
-                                                <span class="badge status-badge @GetStatusBadgeClass(registration.Status)">
-                                                    @GetStatusText(registration.Status)
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(registration.Status);
+                                                }
+                                                <span class="badge status-badge @GetStatusBadgeClass(registration.Status.ToString())">
+                                                    @statusDisplayName
                                                 </span>
                                             </div>
                                         </div>
@@ -145,7 +149,7 @@
                                                 <span>Chi tiết</span>
                                             </a>
                                             
-                                            @if (registration.Status == "Registered" || registration.Status == "Approved")
+                                            @if (registration.Status == EnumMapper.RegistrationStatus.Registered)
                                             {
                                                 <button type="button" class="action-btn btn-cancel" 
                                                         onclick="showCancelConfirmation(@registration.RegistrationId, '@Html.Raw(registration.EventName!.Replace("'", "\\'"))')">
@@ -340,26 +344,17 @@
         return status switch
         {
             "Registered" => "bg-warning text-dark",
-            "Approved" => "bg-info text-white",
+            "Confirmed" => "bg-info text-white",
             "CheckedIn" => "bg-primary text-white",
+            "Screening" => "bg-warning text-dark",
+            "Eligible" => "bg-success text-white",
+            "Ineligible" => "bg-danger text-white",
+            "Donating" => "bg-info text-white",
             "Completed" => "bg-success text-white",
             "Cancelled" => "bg-danger text-white",
-            "Rejected" => "bg-secondary text-white",
+            "NoShow" => "bg-secondary text-white",
+            "Failed" => "bg-danger text-white",
             _ => "bg-light text-dark"
-        };
-    }
-
-    private string GetStatusText(string status)
-    {
-        return status switch
-        {
-            "Registered" => "Đã đăng ký",
-            "Approved" => "Đã duyệt",
-            "CheckedIn" => "Đã check-in",
-            "Completed" => "Hoàn thành",
-            "Cancelled" => "Đã hủy",
-            "Rejected" => "Từ chối",
-            _ => status
         };
     }
 }

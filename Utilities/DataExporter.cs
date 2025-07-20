@@ -101,7 +101,7 @@ namespace Blood_Donation_Website.Utilities
                     u.DateOfBirth,
                     u.Gender,
                     BloodType = u.BloodType != null ? u.BloodType.BloodTypeName : null,
-                    Role = u.Role != null ? u.Role.RoleName : null,
+                    Role = u.Role != null ? u.Role.RoleName.ToString() : null,
                     u.IsActive,
                     u.EmailVerified,
                     u.LastDonationDate,

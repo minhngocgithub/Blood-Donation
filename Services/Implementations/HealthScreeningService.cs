@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -46,7 +47,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserName = screening.Registration.User.FullName,
                     EventName = screening.Registration.Event.EventName,
                     ScreenedByUserName = screening.ScreenedByUser?.FullName,
-                    RegistrationStatus = screening.Registration.Status,
+                    RegistrationStatus = screening.Registration.Status.ToString(),
                     CheckInTime = screening.Registration.CheckInTime
                 };
             }
@@ -85,7 +86,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
                     ScreenedByUserName = h.ScreenedByUser?.FullName,
-                    RegistrationStatus = h.Registration.Status,
+                    RegistrationStatus = h.Registration.Status.ToString(),
                     CheckInTime = h.Registration.CheckInTime
                 });
             }
@@ -117,6 +118,9 @@ namespace Blood_Donation_Website.Services.Implementations
                 _context.HealthScreenings.Add(screening);
                 await _context.SaveChangesAsync();
 
+                // Cập nhật trạng thái DonationRegistration theo kết quả sàng lọc
+                await UpdateRegistrationStatusAfterScreeningAsync(screeningDto.RegistrationId, screeningDto.IsEligible, screeningDto.DisqualifyReason);
+
                 return await GetScreeningByIdAsync(screening.ScreeningId) ?? screeningDto;
             }
             catch
@@ -142,6 +146,10 @@ namespace Blood_Donation_Website.Services.Implementations
                 screening.DisqualifyReason = screeningDto.DisqualifyReason;
 
                 await _context.SaveChangesAsync();
+
+                // Cập nhật trạng thái DonationRegistration theo kết quả sàng lọc
+                await UpdateRegistrationStatusAfterScreeningAsync(screening.RegistrationId, screeningDto.IsEligible, screeningDto.DisqualifyReason);
+
                 return true;
             }
             catch
@@ -169,15 +177,14 @@ namespace Blood_Donation_Website.Services.Implementations
 
         // Status management - Since HealthScreening doesn't have Status property,
         // well use IsEligible to track status
-        public async Task<bool> UpdateScreeningStatusAsync(int screeningId, string status)
+        public async Task<bool> UpdateScreeningStatusAsync(int screeningId, bool isEligible)
         {
             try
             {
                 var screening = await _context.HealthScreenings.FindAsync(screeningId);
                 if (screening == null) return false;
 
-                // Map status to IsEligible
-                screening.IsEligible = status.ToLower() == "passed" || status.ToLower() == "eligible";
+                screening.IsEligible = isEligible;
 
                 await _context.SaveChangesAsync();
                 return true;
@@ -210,12 +217,10 @@ namespace Blood_Donation_Website.Services.Implementations
         }
 
         // Query operations
-        public async Task<IEnumerable<HealthScreeningDto>> GetScreeningsByStatusAsync(string status)
+        public async Task<IEnumerable<HealthScreeningDto>> GetScreeningsByStatusAsync(bool isEligible)
         {
             try
             {
-                bool isEligible = status.ToLower() == "passed" || status.ToLower() == "eligible";
-                
                 var screenings = await _context.HealthScreenings
                     .Include(h => h.Registration)
                     .Include(h => h.Registration.User)
@@ -242,13 +247,54 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
                     ScreenedByUserName = h.ScreenedByUser?.FullName,
-                    RegistrationStatus = h.Registration.Status,
+                    RegistrationStatus = h.Registration.Status.ToString(),
                     CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch
             {
                 return new List<HealthScreeningDto>();
+            }
+        }
+
+        public async Task<IEnumerable<DonationRegistrationDto>> GetPendingScreeningsAsync()
+        {
+            try
+            {
+                // Lấy các đăng ký đã check-in nhưng chưa có sàng lọc sức khỏe
+                var registrations = await _context.DonationRegistrations
+                    .Include(r => r.User)
+                    .Include(r => r.Event)
+                    .ThenInclude(e => e.Location)
+                    .Where(r => r.Status == RegistrationStatus.CheckedIn && !r.IsEligible)
+                    .OrderByDescending(r => r.CheckInTime)
+                    .ToListAsync();
+
+                return registrations.Select(r => new DonationRegistrationDto
+                {
+                    RegistrationId = r.RegistrationId,
+                    UserId = r.UserId,
+                    EventId = r.EventId,
+                    RegistrationDate = r.RegistrationDate,
+                    Status = r.Status,
+                    Notes = r.Notes,
+                    IsEligible = r.IsEligible,
+                    CheckInTime = r.CheckInTime,
+                    CompletionTime = r.CompletionTime,
+                    CancellationReason = r.CancellationReason,
+                    UserName = r.User?.FullName,
+                    UserEmail = r.User?.Email,
+                    EventName = r.Event?.EventName,
+                    EventDate = r.Event?.EventDate,
+                    LocationName = r.Event?.Location?.LocationName,
+                    FullName = r.User?.FullName,
+                    RegistrationCode = r.RegistrationId.ToString(),
+                    PhoneNumber = r.User?.Phone
+                });
+            }
+            catch
+            {
+                return new List<DonationRegistrationDto>();
             }
         }
 
@@ -282,7 +328,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
                     ScreenedByUserName = h.ScreenedByUser?.FullName,
-                    RegistrationStatus = h.Registration.Status,
+                    RegistrationStatus = h.Registration.Status.ToString(),
                     CheckInTime = h.Registration.CheckInTime
                 });
             }
@@ -322,13 +368,55 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserName = h.Registration.User.FullName,
                     EventName = h.Registration.Event.EventName,
                     ScreenedByUserName = h.ScreenedByUser?.FullName,
-                    RegistrationStatus = h.Registration.Status,
+                    RegistrationStatus = h.Registration.Status.ToString(),
                     CheckInTime = h.Registration.CheckInTime
                 });
             }
             catch
             {
                 return new List<HealthScreeningDto>();
+            }
+        }
+
+        public async Task<HealthScreeningDto?> GetLatestScreeningByRegistrationIdAsync(int registrationId)
+        {
+            try
+            {
+                var screening = await _context.HealthScreenings
+                    .Include(h => h.Registration)
+                    .Include(h => h.Registration.User)
+                    .Include(h => h.Registration.Event)
+                    .Include(h => h.ScreenedByUser)
+                    .Where(h => h.RegistrationId == registrationId)
+                    .OrderByDescending(h => h.ScreeningDate)
+                    .FirstOrDefaultAsync();
+
+                if (screening == null) return null;
+
+                return new HealthScreeningDto
+                {
+                    ScreeningId = screening.ScreeningId,
+                    RegistrationId = screening.RegistrationId,
+                    Weight = screening.Weight,
+                    Height = screening.Height,
+                    BloodPressure = screening.BloodPressure,
+                    HeartRate = screening.HeartRate,
+                    Temperature = screening.Temperature,
+                    Hemoglobin = screening.Hemoglobin,
+                    IsEligible = screening.IsEligible,
+                    DisqualifyReason = screening.DisqualifyReason,
+                    ScreenedBy = screening.ScreenedBy,
+                    ScreeningDate = screening.ScreeningDate,
+                    UserName = screening.Registration.User.FullName,
+                    EventName = screening.Registration.Event.EventName,
+                    ScreenedByUserName = screening.ScreenedByUser?.FullName,
+                    RegistrationStatus = screening.Registration.Status.ToString(),
+                    CheckInTime = screening.Registration.CheckInTime
+                };
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -381,6 +469,37 @@ namespace Blood_Donation_Website.Services.Implementations
             catch
             {
                 return false;
+            }
+        }
+
+        // Helper method để cập nhật trạng thái DonationRegistration sau sàng lọc
+        private async Task UpdateRegistrationStatusAfterScreeningAsync(int registrationId, bool isEligible, DisqualificationReason? disqualifyReason)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return;
+
+                if (isEligible)
+                {
+                    // Đạt -> Status = 'Eligible', IsEligible = 1
+                    registration.Status = RegistrationStatus.Eligible;
+                    registration.IsEligible = true;
+                }
+                else
+                {
+                    // Không đạt -> Status = 'Ineligible', IsEligible = 0
+                    registration.Status = RegistrationStatus.Ineligible;
+                    registration.IsEligible = false;
+                    // Có thể lưu lý do không đạt vào Notes nếu cần
+                    registration.Notes = disqualifyReason?.ToString() ?? string.Empty;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                // Log error if needed
             }
         }
     }

@@ -13,42 +13,42 @@ namespace Blood_Donation_Website.Data.Seeders
                 new BloodType 
                 { 
                     BloodTypeName = "A+", 
-                    Description = "Blood type A positive - Can donate to A+ and AB+, can receive from A+, A-, O+, O-" 
+                    Description = "Nhóm máu A dương tính - Có thể hiến cho A+ và AB+, nhận từ A+, A-, O+, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "A-", 
-                    Description = "Blood type A negative - Can donate to A+, A-, AB+, AB-, can receive from A-, O-" 
+                    Description = "Nhóm máu A âm tính - Có thể hiến cho A+, A-, AB+, AB-, nhận từ A-, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "B+", 
-                    Description = "Blood type B positive - Can donate to B+ and AB+, can receive from B+, B-, O+, O-" 
+                    Description = "Nhóm máu B dương tính - Có thể hiến cho B+ và AB+, nhận từ B+, B-, O+, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "B-", 
-                    Description = "Blood type B negative - Can donate to B+, B-, AB+, AB-, can receive from B-, O-" 
+                    Description = "Nhóm máu B âm tính - Có thể hiến cho B+, B-, AB+, AB-, nhận từ B-, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "AB+", 
-                    Description = "Blood type AB positive - Universal plasma donor, can receive from all blood types" 
+                    Description = "Nhóm máu AB dương tính - Hiến huyết tương toàn cầu, nhận từ tất cả các nhóm máu" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "AB-", 
-                    Description = "Blood type AB negative - Can donate to AB+, AB-, can receive from A-, B-, AB-, O-" 
+                    Description = "Nhóm máu AB âm tính - Có thể hiến cho AB+, AB-, nhận từ A-, B-, AB-, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "O+", 
-                    Description = "Blood type O positive - Can donate to A+, B+, AB+, O+, can receive from O+, O-" 
+                    Description = "Nhóm máu O dương tính - Có thể hiến cho A+, B+, AB+, O+, nhận từ O+, O-" 
                 },
                 new BloodType 
                 { 
                     BloodTypeName = "O-", 
-                    Description = "Blood type O negative - Universal donor, can donate to all blood types" 
+                    Description = "Nhóm máu O âm tính - Hiến máu toàn cầu, có thể hiến cho tất cả các nhóm máu" 
                 }
             };
 

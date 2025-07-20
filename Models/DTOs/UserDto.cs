@@ -1,4 +1,6 @@
-﻿namespace Blood_Donation_Website.Models.DTOs
+﻿using static Blood_Donation_Website.Utilities.EnumMapper;
+
+namespace Blood_Donation_Website.Models.DTOs
 {
     public class UserDto
     {
@@ -9,7 +11,7 @@
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
         public int? BloodTypeId { get; set; }
         public int RoleId { get; set; }
         public bool IsActive { get; set; }
@@ -20,7 +22,7 @@
         
         // Navigation properties
         public string? BloodTypeName { get; set; }
-        public string? RoleName { get; set; }
+        public RoleType? RoleName { get; set; }
         public string? RoleDescription { get; set; }
     }
 
@@ -33,7 +35,7 @@
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
         public int? BloodTypeId { get; set; }
         public int RoleId { get; set; } = 2; // Default to regular user
     }
@@ -44,7 +46,7 @@
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
         public int? BloodTypeId { get; set; }
         public bool IsActive { get; set; }
     }

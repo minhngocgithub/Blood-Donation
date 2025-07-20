@@ -1,4 +1,5 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@using Blood_Donation_Website.Utilities
 
 @if (Model != null && Model.Any())
 {
@@ -6,12 +7,12 @@
     {
         <div class="col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
             <div class="event-card w-100 d-flex flex-column">
-                <div class="event-image">
+                <div class="event-image" style="position: relative !important; height: 220px !important;">
                     <img src="@(!string.IsNullOrEmpty(eventItem.ImageUrl) ? eventItem.ImageUrl : "./image/default-image-event")"
                          alt="@eventItem.EventName" class="img-fluid">
-                    <div class="event-date">
-                        <span class="day">@eventItem.EventDate.Day</span>
-                        <span class="month">Th@(eventItem.EventDate.Month)</span>
+                    <div class="event-date" style="position: absolute !important; top: 10px !important; right: 10px !important; background: rgba(220, 53, 69, 0.9) !important; color: white !important; padding: 8px 6px !important; border-radius: 8px !important; text-align: center !important; min-width: 50px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important; z-index: 10 !important; display: block !important; backdrop-filter: blur(3px) !important;">
+                        <span class="day" style="display: block !important; font-size: 1.4rem !important; font-weight: bold !important; line-height: 1 !important; margin-bottom: 1px !important; color: white !important;">@eventItem.EventDate.Day</span>
+                        <span class="month" style="display: block !important; font-size: 0.65rem !important; text-transform: uppercase !important; font-weight: 500 !important; letter-spacing: 0.3px !important; color: white !important;">Th@(eventItem.EventDate.Month)</span>
                     </div>
                 </div>
                 <div class="event-content d-flex flex-column flex-grow-1 justify-content-between">
@@ -36,22 +37,18 @@
 
                     <div class="event-actions d-flex flex-wrap align-items-center justify-content-center gap-2 mt-2 mb-2">
                         @{
-                            var statusClass = eventItem.Status.ToLower() switch
+                            var statusClass = eventItem.Status switch
                             {
-                                "active" => "status-active",
-                                "full" => "status-full",
-                                "ended" => "status-ended",
+                                EnumMapper.EventStatus.Active => "status-active",
+                                EnumMapper.EventStatus.Full => "status-full",
+                                EnumMapper.EventStatus.Completed => "status-ended",
+                                EnumMapper.EventStatus.Cancelled => "status-ended",
+                                EnumMapper.EventStatus.Closed => "status-ended",
                                 _ => "status-active"
                             };
-                            var statusText = eventItem.Status.ToLower() switch
-                            {
-                                "active" => "Đang mở",
-                                "full" => "Đã đủ người",
-                                "ended" => "Đã kết thúc",
-                                _ => "Đang mở"
-                            };
+                            var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.EventStatus>(eventItem.Status);
                         }
-                        <span class="event-status @statusClass">@statusText</span>
+                        <span class="event-status @statusClass">@statusDisplayName</span>
                         
                         <div class="ms-auto">
                             <a href="/Events/Details/@eventItem.EventId" class="btn btn-outline-primary">

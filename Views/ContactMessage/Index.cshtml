@@ -1,6 +1,14 @@
 @model IEnumerable<Blood_Donation_Website.Models.DTOs.ContactMessageDto>
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Quản lý tin nhắn liên hệ";
+    var currentStatus = Context.Request.Query["status"].ToString();
+    var messageStatusOptions = EnumMapper.GetMessageStatusOptions();
+    
+    string GetStatusDisplayName(EnumMapper.MessageStatus status)
+    {
+        return EnumMapper.GetDisplayName<EnumMapper.MessageStatus>(status);
+    }
 }
 
 <div class="container py-5">
@@ -20,30 +28,65 @@
                 </div>
             </div>
 
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+            <!-- SweetAlert notifications will be handled by _SweetAlertNotifications partial -->
 
             <div class="card shadow-sm">
                 <div class="card-body">
+                    <!-- Filter Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex gap-2">
+                                <select name="status" class="form-select" style="max-width: 200px;">
+                                    <option value="">Tất cả trạng thái</option>
+                                    @foreach (var option in messageStatusOptions)
+                                    {
+                                        if (currentStatus == option.Value)
+                                        {
+                                            <option value="@option.Value" selected>@option.Text</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@option.Value">@option.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-filter me-2"></i>Lọc
+                                </button>
+                                @if (!string.IsNullOrEmpty(currentStatus))
+                                {
+                                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Xóa lọc
+                                    </a>
+                                }
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">
+                                Hiển thị @Model.Count() tin nhắn
+                                @if (!string.IsNullOrEmpty(currentStatus))
+                                {
+                                    <span>với trạng thái "@GetStatusDisplayName((EnumMapper.MessageStatus)Enum.Parse(typeof(EnumMapper.MessageStatus), currentStatus))"</span>
+                                }
+                            </small>
+                        </div>
+                    </div>
+
                     @if (!Model.Any())
                     {
                         <div class="text-center py-5">
                             <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">Chưa có tin nhắn nào</h5>
-                            <p class="text-muted">Hộp thư liên hệ trống.</p>
+                            <p class="text-muted">
+                                @if (!string.IsNullOrEmpty(currentStatus))
+                                {
+                                    <span>Không có tin nhắn nào với trạng thái "@GetStatusDisplayName((EnumMapper.MessageStatus)Enum.Parse(typeof(EnumMapper.MessageStatus), currentStatus))"</span>
+                                }
+                                else
+                                {
+                                    <span>Hộp thư liên hệ trống.</span>
+                                }
+                            </p>
                         </div>
                     }
                     else
@@ -62,7 +105,7 @@
                                 <tbody>
                                     @foreach (var message in Model)
                                     {
-                                        <tr class="@(message.Status == "New" ? "table-warning" : "")">
+                                        <tr class="@(message.Status == EnumMapper.MessageStatus.New ? "table-warning" : message.Status == EnumMapper.MessageStatus.Read ? "table-info" : "")">
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="bg-primary rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -76,7 +119,7 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    <h6 class="mb-0 @(message.Status == "New" ? "fw-bold" : "")">@message.Subject</h6>
+                                                    <h6 class="mb-0 @(message.Status == EnumMapper.MessageStatus.New || message.Status == EnumMapper.MessageStatus.Read ? "fw-bold" : "")">@message.Subject</h6>
                                                     <small class="text-muted">@message.Message?.Substring(0, Math.Min(50, message.Message.Length))...</small>
                                                 </div>
                                             </td>
@@ -87,21 +130,15 @@
                                                 @{
                                                     var statusClass = message.Status switch
                                                     {
-                                                        "New" => "bg-primary",
-                                                        "InProgress" => "bg-warning",
-                                                        "Resolved" => "bg-success",
-                                                        "Closed" => "bg-secondary",
+                                                        EnumMapper.MessageStatus.New => "bg-primary",
+                                                        EnumMapper.MessageStatus.Read => "bg-info",
+                                                        EnumMapper.MessageStatus.InProgress => "bg-warning",
+                                                        EnumMapper.MessageStatus.Resolved => "bg-success",
+                                                        EnumMapper.MessageStatus.Closed => "bg-secondary",
                                                         _ => "bg-secondary"
                                                     };
                                                     
-                                                    var statusText = message.Status switch
-                                                    {
-                                                        "New" => "Mới",
-                                                        "InProgress" => "Đang xử lý",
-                                                        "Resolved" => "Đã giải quyết",
-                                                        "Closed" => "Đã đóng",
-                                                        _ => message.Status
-                                                    };
+                                                    var statusText = GetStatusDisplayName(message.Status);
                                                 }
                                                 <span class="badge @statusClass">@statusText</span>
                                             </td>
@@ -113,18 +150,24 @@
                                                     <a asp-action="Reply" asp-route-id="@message.MessageId" class="btn btn-sm btn-outline-primary" title="Trả lời">
                                                         <i class="fas fa-reply"></i>
                                                     </a>
-                                                    @if (message.Status == "New")
+                                                    @if (message.Status == EnumMapper.MessageStatus.New)
                                                     {
                                                         <button type="button" class="btn btn-sm btn-outline-success" title="Đánh dấu đã đọc" 
                                                                 onclick="markAsRead(@message.MessageId)">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     }
-                                                    else
+                                                    else if (message.Status == EnumMapper.MessageStatus.Read)
                                                     {
                                                         <button type="button" class="btn btn-sm btn-outline-warning" title="Đánh dấu chưa đọc" 
                                                                 onclick="markAsUnread(@message.MessageId)">
                                                             <i class="fas fa-envelope"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Không thể thay đổi trạng thái" disabled>
+                                                            <i class="fas fa-lock"></i>
                                                         </button>
                                                     }
                                                     <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" 
@@ -145,38 +188,36 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận xóa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn xóa tin nhắn "<span id="messageSubject"></span>"?</p>
-                <p class="text-danger"><small>Hành động này không thể hoàn tác.</small></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <form id="deleteForm" method="post" style="display: inline;">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">Xóa</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- SweetAlert will handle all confirmations -->
 
 @section Scripts {
+    <!-- SweetAlert Helper -->
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    
     <script>
         function confirmDelete(messageId, messageSubject) {
-            document.getElementById('messageSubject').textContent = messageSubject;
-            document.getElementById('deleteForm').action = `/admin/contact-messages/delete/${messageId}`;
-            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+            showDeleteConfirm(`tin nhắn "${messageSubject}"`, 'Hành động này không thể hoàn tác.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/contact-messages/delete/${messageId}`;
+                        
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
         }
 
         function markAsRead(messageId) {
+            showLoading('Đang xử lý...', 'Đánh dấu tin nhắn đã đọc');
+            
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = `/admin/contact-messages/mark-read/${messageId}`;
@@ -192,6 +233,8 @@
         }
 
         function markAsUnread(messageId) {
+            showLoading('Đang xử lý...', 'Đánh dấu tin nhắn chưa đọc');
+            
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = `/admin/contact-messages/mark-unread/${messageId}`;
@@ -205,5 +248,22 @@
             document.body.appendChild(form);
             form.submit();
         }
+
+        // Show toast notification when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageCount = @Model.Count();
+            const currentStatus = '@currentStatus';
+            
+            if (messageCount > 0) {
+                let statusText = '';
+                if (currentStatus) {
+                    const statusOptions = @Html.Raw(Json.Serialize(messageStatusOptions));
+                    const statusOption = statusOptions.find(opt => opt.value === currentStatus);
+                    statusText = statusOption ? ` với trạng thái "${statusOption.text}"` : '';
+                }
+                
+                showToast('info', `Hiển thị ${messageCount} tin nhắn${statusText}`, 3000);
+            }
+        });
     </script>
 } 

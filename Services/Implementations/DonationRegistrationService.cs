@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -24,10 +25,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 .Include(r => r.User)
                 .Include(r => r.Event)
                 .ThenInclude(e => e.Location)
-                .Where(r => r.Status != "Cancelled" && r.Status != "Rejected" && r.Status != "Completed");
-
-            // Tìm theo mã đăng ký hoặc số điện thoại
-            query = query.Where(r => r.RegistrationId.ToString() == code || r.User.Phone == code);
+                .Where(r => r.RegistrationId.ToString() == code || r.User.Phone == code);
 
             var registrations = await query.OrderByDescending(r => r.RegistrationDate).ToListAsync();
 
@@ -38,17 +36,24 @@ namespace Blood_Donation_Website.Services.Implementations
                 RegistrationCode = r.RegistrationId.ToString(),
                 PhoneNumber = r.User?.Phone,
                 RegistrationDate = r.RegistrationDate,
-                Status = r.Status
+                Status = r.Status,
+                EventName = r.Event?.EventName,
+                EventDate = r.Event?.EventDate,
+                EventStartTime = r.Event?.StartTime,
+                EventEndTime = r.Event?.EndTime
             });
         }
 
         public async Task<bool> CheckinRegistrationAsync(int registrationId)
-
         {
             var registration = await _context.DonationRegistrations.FindAsync(registrationId);
             if (registration == null) return false;
-            if (registration.Status == "CheckedIn") return false;
-            registration.Status = "CheckedIn";
+            if (registration.Status == RegistrationStatus.CheckedIn) return false;
+            
+            // Check-in được thực hiện trước khi sàng lọc sức khỏe
+            // Theo quy trình: Status = 'CheckedIn', IsEligible = 0, CheckInTime = [thời gian]
+            registration.Status = RegistrationStatus.CheckedIn;
+            registration.IsEligible = false; // Đảm bảo IsEligible = 0 (chưa sàng lọc sức khỏe)
             registration.CheckInTime = DateTime.Now;
             await _context.SaveChangesAsync();
             return true;
@@ -83,6 +88,8 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = registration.User?.Email,
                     EventName = registration.Event?.EventName,
                     EventDate = registration.Event?.EventDate,
+                    EventStartTime = registration.Event?.StartTime,
+                    EventEndTime = registration.Event?.EndTime,
                     LocationName = registration.Event?.Location?.LocationName
                 };
             }
@@ -119,7 +126,12 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = r.User?.Email,
                     EventName = r.Event?.EventName,
                     EventDate = r.Event?.EventDate,
-                    LocationName = r.Event?.Location?.LocationName
+                    EventStartTime = r.Event?.StartTime,
+                    EventEndTime = r.Event?.EndTime,
+                    LocationName = r.Event?.Location?.LocationName,
+                    FullName = r.User?.FullName,
+                    RegistrationCode = r.RegistrationId.ToString(),
+                    PhoneNumber = r.User?.Phone
                 });
             }
             catch
@@ -223,38 +235,103 @@ namespace Blood_Donation_Website.Services.Implementations
         {
             try
             {
-                // Validate user eligibility
-                if (!await IsUserEligibleForEventAsync(createDto.UserId, createDto.EventId))
-                {
-                    throw new InvalidOperationException("User is not eligible for this event");
-                }
+                // Lấy thông tin sự kiện
+                var eventEntity = await _context.BloodDonationEvents.FindAsync(createDto.EventId);
+                if (eventEntity == null)
+                    throw new InvalidOperationException("Event does not exist");
 
-                // Check if user is already registered
+                var now = DateTime.Now;
+                var eventDate = eventEntity.EventDate.Date;
+                var eventStart = eventDate + eventEntity.StartTime;
+                var eventEnd = eventDate + eventEntity.EndTime;
+
+                // Chỉ cho phép đăng ký nếu sự kiện ở trạng thái Published hoặc Active và chưa bắt đầu
+                if (!(eventEntity.Status == EventStatus.Published || eventEntity.Status == EventStatus.Active))
+                    throw new InvalidOperationException("Sự kiện không được phép đăng ký");
+                if (now >= eventStart)
+                    throw new InvalidOperationException("Đăng ký sự kiện đã đóng (sự kiện đã bắt đầu)");
+                if (eventEntity.EventDate < now.Date)
+                    throw new InvalidOperationException("Ngày sự kiện đã qua");
+
+                // 0. Đã đăng ký sự kiện này trước đó
                 if (await IsUserRegisteredForEventAsync(createDto.UserId, createDto.EventId))
                 {
-                    throw new InvalidOperationException("User is already registered for this event");
+                    return new DonationRegistrationDto
+                    {
+                        Status = RegistrationStatus.Cancelled,
+                        CancellationReason = "Bạn đã đăng ký sự kiện này trước đó"
+                    };
                 }
 
-                // Check if event is full
-                if (await IsEventFullAsync(createDto.EventId))
-                {
-                    throw new InvalidOperationException("Event is full");
-                }
-
+                // Sau đó mới tạo bản ghi mới nếu không trùng
                 var registration = new DonationRegistration
                 {
                     UserId = createDto.UserId,
                     EventId = createDto.EventId,
                     RegistrationDate = DateTime.Now,
-                    Status = "Registered",
+                    Status = RegistrationStatus.Registered,
                     Notes = createDto.Notes,
-                    IsEligible = false // Chưa đủ điều kiện cho đến khi qua health screening
+                    IsEligible = false
                 };
-
                 _context.DonationRegistrations.Add(registration);
                 await _context.SaveChangesAsync();
 
-                // Increment current donors count
+                // Kiểm tra các điều kiện sau khi đăng ký
+                var user = await _context.Users.Include(u => u.BloodType).FirstOrDefaultAsync(u => u.UserId == createDto.UserId);
+                if (user == null)
+                    throw new InvalidOperationException("Người dùng không tồn tại");
+
+                // 1. Sự kiện đã đầy
+                if (eventEntity.CurrentDonors >= eventEntity.MaxDonors)
+                {
+                    registration.Status = RegistrationStatus.Cancelled;
+                    registration.CancellationReason = "Sự kiện đã đầy";
+                    await _context.SaveChangesAsync();
+                    return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
+                }
+
+                // 2. Nhóm máu không phù hợp
+                if (!string.IsNullOrEmpty(eventEntity.RequiredBloodTypes) &&
+                    !string.IsNullOrEmpty(user.BloodType?.BloodTypeName) &&
+                    !eventEntity.RequiredBloodTypes.Contains(user.BloodType.BloodTypeName))
+                {
+                    registration.Status = RegistrationStatus.Cancelled;
+                    registration.CancellationReason = "Nhóm máu không phù hợp";
+                    await _context.SaveChangesAsync();
+                    return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
+                }
+
+                // 3. Hiến máu gần đây (<56 ngày)
+                var lastDonation = await _context.DonationHistories
+                    .Where(d => d.UserId == user.UserId)
+                    .OrderByDescending(d => d.DonationDate)
+                    .FirstOrDefaultAsync();
+                if (lastDonation != null)
+                {
+                    var daysSinceLastDonation = (DateTime.Now - lastDonation.DonationDate).Days;
+                    if (daysSinceLastDonation < 56)
+                    {
+                        registration.Status = RegistrationStatus.Deferred;
+                        registration.CancellationReason = "Bạn đã hiến máu gần đây";
+                        await _context.SaveChangesAsync();
+                        return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
+                    }
+                }
+
+                // 4. Tài khoản bị khoá
+                if (!user.IsActive)
+                {
+                    registration.Status = RegistrationStatus.Cancelled;
+                    registration.CancellationReason = "Tài khoản bị khóa";
+                    await _context.SaveChangesAsync();
+                    return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
+                }
+
+                // 5. Nếu thỏa mãn hết, chuyển sang Confirmed
+                registration.Status = RegistrationStatus.Confirmed;
+                await _context.SaveChangesAsync();
+
+                // Tăng số lượng CurrentDonors nếu đăng ký thành công
                 await IncrementEventCurrentDonorsAsync(createDto.EventId);
 
                 return await GetRegistrationByIdAsync(registration.RegistrationId) ?? new DonationRegistrationDto();
@@ -317,7 +394,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 if (registration == null) return false;
 
-                registration.Status = "Approved";
+                registration.Status = RegistrationStatus.Confirmed;
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -327,15 +404,49 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> RejectRegistrationAsync(int registrationId, string reason)
+        // Xác nhận đăng ký (Confirm) - theo quy trình
+        public async Task<bool> ConfirmRegistrationAsync(int registrationId)
         {
             try
             {
-                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                var registration = await _context.DonationRegistrations
+                    .Include(r => r.User)
+                    .Include(r => r.Event)
+                    .FirstOrDefaultAsync(r => r.RegistrationId == registrationId);
+                
                 if (registration == null) return false;
+                if (registration.Status != RegistrationStatus.Registered) return false;
 
-                registration.Status = "Rejected";
-                registration.CancellationReason = reason;
+                // Kiểm tra các điều kiện theo quy trình
+                if (registration.Event.CurrentDonors >= registration.Event.MaxDonors)
+                {
+                    return false; // Sự kiện đầy
+                }
+
+                if (registration.Event.RequiredBloodTypes != null && 
+                    !string.IsNullOrEmpty(registration.User.BloodType?.BloodTypeName) &&
+                    !registration.Event.RequiredBloodTypes.Contains(registration.User.BloodType.BloodTypeName))
+                {
+                    return false; // Nhóm máu không phù hợp
+                }
+
+                // Kiểm tra lần hiến máu gần đây (56 ngày)
+                var lastDonation = await _context.DonationHistories
+                    .Where(d => d.UserId == registration.UserId)
+                    .OrderByDescending(d => d.DonationDate)
+                    .FirstOrDefaultAsync();
+
+                if (lastDonation != null)
+                {
+                    var daysSinceLastDonation = (DateTime.Now - lastDonation.DonationDate).Days;
+                    if (daysSinceLastDonation < 56) return false; // Gần đây hiến máu
+                }
+
+                if (!registration.User.IsActive) return false; // Tài khoản bị khóa
+
+                // Xác nhận đăng ký
+                registration.Status = RegistrationStatus.Confirmed;
+                registration.IsEligible = false; // Theo quy trình: IsEligible = 0 (chưa sàng lọc sức khỏe)
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -345,15 +456,33 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> CancelRegistrationAsync(int registrationId, string reason)
+        public async Task<bool> RejectRegistrationAsync(int registrationId, DisqualificationReason reason)
         {
             try
             {
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 if (registration == null) return false;
 
-                registration.Status = "Cancelled";
-                registration.CancellationReason = reason;
+                registration.Status = RegistrationStatus.Cancelled;
+                registration.CancellationReason = reason.ToString();
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CancelRegistrationAsync(int registrationId, DisqualificationReason reason)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return false;
+
+                registration.Status = RegistrationStatus.Cancelled;
+                registration.CancellationReason = reason.ToString();
                 await _context.SaveChangesAsync();
 
                 // Decrement current donors count
@@ -374,7 +503,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 if (registration == null) return false;
 
-                registration.Status = "CheckedIn";
+                registration.Status = RegistrationStatus.CheckedIn;
                 registration.CheckInTime = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
@@ -392,8 +521,64 @@ namespace Blood_Donation_Website.Services.Implementations
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 if (registration == null) return false;
 
-                registration.Status = "Completed";
+                registration.Status = RegistrationStatus.Completed;
                 registration.CompletionTime = DateTime.Now;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Cập nhật trạng thái bắt đầu hiến máu
+        public async Task<bool> StartDonatingAsync(int registrationId)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return false;
+                if (registration.Status != RegistrationStatus.Eligible) return false; // Chỉ có thể bắt đầu hiến khi đã đủ điều kiện
+
+                registration.Status = RegistrationStatus.Donating;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Cập nhật trạng thái thất bại
+        public async Task<bool> MarkAsFailedAsync(int registrationId, DisqualificationReason? reason = null)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return false;
+
+                registration.Status = RegistrationStatus.Failed;
+                registration.Notes = reason?.ToString() ?? string.Empty;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Cập nhật trạng thái không đến
+        public async Task<bool> MarkAsNoShowAsync(int registrationId)
+        {
+            try
+            {
+                var registration = await _context.DonationRegistrations.FindAsync(registrationId);
+                if (registration == null) return false;
+
+                registration.Status = RegistrationStatus.NoShow;
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -408,7 +593,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
-                return registration?.Status ?? "Unknown";
+                return registration?.Status.ToString() ?? "Unknown";
             }
             catch
             {
@@ -491,7 +676,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<DonationRegistrationDto>> GetRegistrationsByStatusAsync(string status)
+        public async Task<IEnumerable<DonationRegistrationDto>> GetRegistrationsByStatusAsync(RegistrationStatus status)
         {
             try
             {
@@ -573,7 +758,15 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 // Chỉ lấy bản ghi có trạng thái còn hiệu lực, mới nhất
-                var validStatuses = new[] { "Registered", "Approved", "CheckedIn", "Completed" };
+                var validStatuses = new[] {
+                    RegistrationStatus.Registered,
+                    RegistrationStatus.Confirmed,
+                    RegistrationStatus.CheckedIn,
+                    RegistrationStatus.Screening,
+                    RegistrationStatus.Eligible,
+                    RegistrationStatus.Donating,
+                    RegistrationStatus.Completed
+                };
                 var registration = await _context.DonationRegistrations
                     .Include(r => r.User)
                     .Include(r => r.Event)
@@ -627,7 +820,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 // Chỉ tính các trạng thái còn hiệu lực
-                var validStatuses = new[] { "Registered", "Approved", "CheckedIn", "Completed" };
+                var validStatuses = new[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed, RegistrationStatus.CheckedIn, RegistrationStatus.Completed };
                 return await _context.DonationRegistrations
                     .AnyAsync(r => r.UserId == userId && r.EventId == eventId && validStatuses.Contains(r.Status));
             }
@@ -647,7 +840,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 // Check if event exists and is active
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
-                if (eventEntity == null || eventEntity.Status != "Active") return false;
+                if (eventEntity == null || eventEntity.Status != EventStatus.Active) return false;
 
                 // Check if event date is in the future
                 if (eventEntity.EventDate <= DateTime.Now) return false;
@@ -727,7 +920,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<int> GetRegistrationCountByStatusAsync(string status)
+        public async Task<int> GetRegistrationCountByStatusAsync(RegistrationStatus status)
         {
             try
             {
@@ -741,7 +934,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<int> GetRegistrationCountByUserAndStatusAsync(int userId, string status)
+        public async Task<int> GetRegistrationCountByUserAndStatusAsync(int userId, RegistrationStatus status)
         {
             try
             {
@@ -855,7 +1048,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Include(r => r.User)
                     .Include(r => r.Event)
                     .ThenInclude(e => e.Location)
-                    .Where(r => r.Status == "Registered")
+                    .Where(r => r.Status == RegistrationStatus.Registered)
                     .OrderByDescending(r => r.RegistrationDate)
                     .ToListAsync();
 
@@ -892,7 +1085,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     .Include(r => r.User)
                     .Include(r => r.Event)
                     .ThenInclude(e => e.Location)
-                    .Where(r => r.Status == "Approved")
+                    .Where(r => r.Status == RegistrationStatus.Confirmed)
                     .OrderByDescending(r => r.RegistrationDate)
                     .ToListAsync();
 
@@ -1068,8 +1261,8 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 var registration = await _context.DonationRegistrations.FindAsync(registrationId);
                 if (registration == null) return false;
-                if (registration.Status != "CheckedIn") return false;
-                registration.Status = "Registered";
+                if (registration.Status != RegistrationStatus.CheckedIn) return false;
+                registration.Status = RegistrationStatus.Registered;
                 registration.CheckInTime = null;
                 await _context.SaveChangesAsync();
                 return true;
@@ -1078,6 +1271,96 @@ namespace Blood_Donation_Website.Services.Implementations
             {
                 return false;
             }
+        }
+
+        public async Task<DonationRegistrationDto> RegisterUserForEventAsync(int userId, int eventId, string? notes = null)
+        {
+            try
+            {
+                var createDto = new DonationRegistrationCreateDto
+                {
+                    UserId = userId,
+                    EventId = eventId,
+                    Notes = notes
+                };
+                
+                return await CreateRegistrationAsync(createDto);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        // Lấy danh sách đăng ký chờ sàng lọc sức khỏe
+        public async Task<IEnumerable<DonationRegistrationDto>> GetPendingHealthScreeningsAsync()
+        {
+            try
+            {
+                // Theo quy trình: Status = 'CheckedIn' AND IsEligible = 0
+                // Hoặc: Status = 'Ineligible' AND IsEligible = 0
+                var registrations = await _context.DonationRegistrations
+                    .Include(r => r.User)
+                    .Include(r => r.Event)
+                    .ThenInclude(e => e.Location)
+                    .Where(r => (r.Status == RegistrationStatus.CheckedIn && !r.IsEligible) || 
+                               (r.Status == RegistrationStatus.Ineligible && !r.IsEligible))
+                    .OrderByDescending(r => r.CheckInTime)
+                    .ToListAsync();
+
+                return registrations.Select(r => new DonationRegistrationDto
+                {
+                    RegistrationId = r.RegistrationId,
+                    UserId = r.UserId,
+                    EventId = r.EventId,
+                    RegistrationDate = r.RegistrationDate,
+                    Status = r.Status,
+                    Notes = r.Notes,
+                    IsEligible = r.IsEligible,
+                    CheckInTime = r.CheckInTime,
+                    CompletionTime = r.CompletionTime,
+                    CancellationReason = r.CancellationReason,
+                    UserName = r.User?.FullName,
+                    UserEmail = r.User?.Email,
+                    EventName = r.Event?.EventName,
+                    EventDate = r.Event?.EventDate,
+                    LocationName = r.Event?.Location?.LocationName,
+                    FullName = r.User?.FullName,
+                    RegistrationCode = r.RegistrationId.ToString(),
+                    PhoneNumber = r.User?.Phone
+                });
+            }
+            catch
+            {
+                return new List<DonationRegistrationDto>();
+            }
+        }
+
+        /// <summary>
+        /// Huỷ tất cả đăng ký còn hiệu lực của user (trừ registrationId vừa hoàn thành)
+        /// </summary>
+        public async Task<int> CancelAllActiveRegistrationsExceptAsync(int userId, int exceptRegistrationId, DisqualificationReason reason)
+        {
+            // Các trạng thái còn hiệu lực (chưa hoàn thành, chưa huỷ, chưa thất bại, chưa tạm hoãn, chưa no-show)
+            var activeStatuses = new[]
+            {
+                RegistrationStatus.Registered,
+                RegistrationStatus.Confirmed,
+                RegistrationStatus.CheckedIn,
+                RegistrationStatus.Screening,
+                RegistrationStatus.Eligible,
+                RegistrationStatus.Donating
+            };
+            var registrations = await _context.DonationRegistrations
+                .Where(r => r.UserId == userId && r.RegistrationId != exceptRegistrationId && activeStatuses.Contains(r.Status))
+                .ToListAsync();
+            foreach (var reg in registrations)
+            {
+                reg.Status = RegistrationStatus.Cancelled;
+                reg.CancellationReason = reason.ToString();
+            }
+            await _context.SaveChangesAsync();
+            return registrations.Count;
         }
     }
 }

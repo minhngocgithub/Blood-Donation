@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Models.Entities
 {
@@ -31,8 +32,7 @@ namespace Blood_Donation_Website.Models.Entities
 
         public bool IsEligible { get; set; } = true;
 
-        [StringLength(500)]
-        public string? DisqualifyReason { get; set; }
+        public DisqualificationReason? DisqualifyReason { get; set; }
 
         public int? ScreenedBy { get; set; }
         public DateTime ScreeningDate { get; set; } = DateTime.Now;

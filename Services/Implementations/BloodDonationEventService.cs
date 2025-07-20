@@ -4,6 +4,8 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -28,6 +30,9 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 if (eventEntity == null) return null;
 
+                // Auto-update status for past events
+                await AutoUpdateEventStatusAsync(eventEntity);
+
                 return new BloodDonationEventDto
                 {
                     EventId = eventEntity.EventId,
@@ -39,7 +44,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = eventEntity.LocationId,
                     MaxDonors = eventEntity.MaxDonors,
                     CurrentDonors = eventEntity.CurrentDonors,
-                    Status = eventEntity.Status,
+                    Status = eventEntity.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = eventEntity.ImageUrl,
                     RequiredBloodTypes = eventEntity.RequiredBloodTypes,
                     CreatedBy = eventEntity.CreatedBy,
@@ -90,7 +95,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -130,7 +135,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = eventEntity.LocationId,
                     MaxDonors = eventEntity.MaxDonors,
                     CurrentDonors = eventEntity.CurrentDonors,
-                    Status = eventEntity.Status,
+                    Status = eventEntity.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = eventEntity.ImageUrl,
                     RequiredBloodTypes = eventEntity.RequiredBloodTypes,
                     CreatedBy = eventEntity.CreatedBy,
@@ -157,6 +162,12 @@ namespace Blood_Donation_Website.Services.Implementations
                     .OrderByDescending(e => e.EventDate)
                     .ToListAsync();
 
+                // Auto-update status for past events
+                foreach (var eventEntity in events)
+                {
+                    await AutoUpdateEventStatusAsync(eventEntity);
+                }
+
                 return events.Select(e => new BloodDonationEventDto
                 {
                     EventId = e.EventId,
@@ -168,7 +179,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -217,7 +228,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     query = query.Where(e => e.LocationId == searchDto.LocationId);
                 }
 
-                if (!string.IsNullOrEmpty(searchDto.Status))
+                if (!string.IsNullOrEmpty(searchDto.Status.ToString()))
                 {
                     query = query.Where(e => e.Status == searchDto.Status);
                 }
@@ -264,7 +275,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -330,7 +341,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = createDto.LocationId,
                     MaxDonors = createDto.MaxDonors,
                     CurrentDonors = 0,
-                    Status = "Active",
+                    Status = EventStatus.Active,
                     ImageUrl = createDto.ImageUrl,
                     RequiredBloodTypes = createDto.RequiredBloodTypes,
                     CreatedBy = createDto.CreatedBy,
@@ -411,7 +422,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 if (eventEntity == null) return false;
 
-                eventEntity.Status = "Active";
+                eventEntity.Status = EventStatus.Active;
                 eventEntity.UpdatedDate = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
@@ -429,7 +440,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 if (eventEntity == null) return false;
 
-                eventEntity.Status = "Inactive";
+                eventEntity.Status = EventStatus.Draft;
                 eventEntity.UpdatedDate = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
@@ -447,7 +458,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 if (eventEntity == null) return false;
 
-                eventEntity.Status = "Cancelled";
+                eventEntity.Status = EventStatus.Cancelled;
                 eventEntity.UpdatedDate = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
@@ -465,7 +476,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
                 if (eventEntity == null) return false;
 
-                eventEntity.Status = "Completed";
+                eventEntity.Status = EventStatus.Completed;
                 eventEntity.UpdatedDate = DateTime.Now;
                 await _context.SaveChangesAsync();
                 return true;
@@ -481,7 +492,7 @@ namespace Blood_Donation_Website.Services.Implementations
             try
             {
                 var eventEntity = await _context.BloodDonationEvents.FindAsync(eventId);
-                return eventEntity?.Status ?? "Unknown";
+                return eventEntity?.Status.ToString() ?? "Unknown";
             }
             catch
             {
@@ -593,9 +604,15 @@ namespace Blood_Donation_Website.Services.Implementations
                 var events = await _context.BloodDonationEvents
                     .Include(e => e.Location)
                     .Include(e => e.Creator)
-                    .Where(e => e.EventDate >= DateTime.Now && e.Status == "Active")
+                    .Where(e => e.EventDate >= DateTime.Now && e.Status == EventStatus.Active)
                     .OrderBy(e => e.EventDate)
                     .ToListAsync();
+
+                // Auto-update status for any past events that might still be Active
+                foreach (var eventEntity in events)
+                {
+                    await AutoUpdateEventStatusAsync(eventEntity);
+                }
 
                 return events.Select(e => new BloodDonationEventDto
                 {
@@ -608,7 +625,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -647,7 +664,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -686,7 +703,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -725,7 +742,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -764,7 +781,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -805,7 +822,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -822,7 +839,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(string status)
+        public async Task<IEnumerable<BloodDonationEventDto>> GetEventsByStatusAsync(EventStatus status)
         {
             try
             {
@@ -844,7 +861,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -883,7 +900,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -912,7 +929,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 if (eventEntity == null) return new EventStatisticsDto();
 
                 var completedDonations = await _context.DonationHistories
-                    .Where(d => d.EventId == eventId && d.Status == "Completed")
+                    .Where(d => d.EventId == eventId && d.Status == DonationStatus.Completed)
                     .CountAsync();
 
                 return new EventStatisticsDto
@@ -923,7 +940,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     MaxDonors = eventEntity.MaxDonors,
                     CurrentDonors = eventEntity.CurrentDonors,
                     CompletedDonations = completedDonations,
-                    Status = eventEntity.Status,
+                    Status = eventEntity.Status ?? EnumMapper.EventStatus.Active,
                     LocationName = eventEntity.Location?.LocationName
                 };
             }
@@ -1037,7 +1054,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 var registeredUsers = await _context.DonationRegistrations
                     .Include(r => r.User)
-                    .Where(r => r.EventId == eventId && r.Status == "Approved")
+                    .Where(r => r.EventId == eventId && r.Status == RegistrationStatus.Registered)
                     .ToListAsync();
 
                 if (!registeredUsers.Any())
@@ -1072,7 +1089,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var registeredUsers = await _context.DonationRegistrations
                     .Include(r => r.User)
                     .Where(r => r.EventId == eventId && 
-                           (r.Status == "Approved" || r.Status == "Registered"))
+                           (r.Status == RegistrationStatus.Registered || r.Status == RegistrationStatus.Confirmed))
                     .ToListAsync();
 
                 if (!registeredUsers.Any())
@@ -1087,6 +1104,110 @@ namespace Blood_Donation_Website.Services.Implementations
             catch
             {
                 return false;
+            }
+        }
+
+        // Auto-update all past events status
+        public async Task<int> UpdateAllPastEventsStatusAsync()
+        {
+            try
+            {
+                var pastActiveEvents = await _context.BloodDonationEvents
+                    .Where(e => e.EventDate < DateTime.Now && e.Status == EventStatus.Active)
+                    .ToListAsync();
+
+                int updatedCount = 0;
+                foreach (var eventEntity in pastActiveEvents)
+                {
+                    eventEntity.Status = EventStatus.Completed;
+                    eventEntity.UpdatedDate = DateTime.Now;
+                    updatedCount++;
+                }
+
+                if (updatedCount > 0)
+                {
+                    await _context.SaveChangesAsync();
+                }
+
+                return updatedCount;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        // Get events that need status update
+        public async Task<IEnumerable<BloodDonationEventDto>> GetEventsNeedingStatusUpdateAsync()
+        {
+            try
+            {
+                var events = await _context.BloodDonationEvents
+                    .Include(e => e.Location)
+                    .Include(e => e.Creator)
+                    .Where(e => e.EventDate < DateTime.Now && e.Status == EventStatus.Active)
+                    .OrderByDescending(e => e.EventDate)
+                    .ToListAsync();
+
+                return events.Select(e => new BloodDonationEventDto
+                {
+                    EventId = e.EventId,
+                    EventName = e.EventName,
+                    EventDescription = e.EventDescription,
+                    EventDate = e.EventDate,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    LocationId = e.LocationId,
+                    MaxDonors = e.MaxDonors,
+                    CurrentDonors = e.CurrentDonors,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
+                    ImageUrl = e.ImageUrl,
+                    RequiredBloodTypes = e.RequiredBloodTypes,
+                    CreatedBy = e.CreatedBy,
+                    CreatedDate = e.CreatedDate,
+                    UpdatedDate = e.UpdatedDate,
+                    LocationName = e.Location?.LocationName,
+                    LocationAddress = e.Location?.Address,
+                    CreatorName = e.Creator?.FullName
+                });
+            }
+            catch
+            {
+                return new List<BloodDonationEventDto>();
+            }
+        }
+
+        private async Task AutoUpdateEventStatusAsync(BloodDonationEvent eventEntity)
+        {
+            var now = DateTime.Now;
+            var eventDate = eventEntity.EventDate.Date;
+            var eventStart = eventDate + eventEntity.StartTime;
+            var eventEnd = eventDate + eventEntity.EndTime;
+
+            if (now < eventStart)
+            {
+                // Sự kiện chưa bắt đầu, giữ nguyên status gốc
+                return;
+            }
+            else if (now >= eventStart && now <= eventEnd)
+            {
+                // Đang diễn ra, chuyển sang Closed nếu chưa đúng
+                if (eventEntity.Status != EventStatus.Closed)
+                {
+                    eventEntity.Status = EventStatus.Closed;
+                    eventEntity.UpdatedDate = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else // now > eventEnd
+            {
+                // Đã kết thúc, chuyển sang Completed nếu chưa đúng
+                if (eventEntity.Status != EventStatus.Completed)
+                {
+                    eventEntity.Status = EventStatus.Completed;
+                    eventEntity.UpdatedDate = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                }
             }
         }
     }

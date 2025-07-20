@@ -6,68 +6,41 @@ namespace Blood_Donation_Website.Data.Seeders
     {
         public static void Seed(ApplicationDbContext context)
         {
-            if (context.Locations.Any()) return;
-
-            var locations = new List<Location>
+            if (!context.Locations.Any())
             {
-               new Location
-               {
-                   LocationName = "Bach Mai Hospital",
-                   Address = "78 Giai Phong, Phuong Mai, Dong Da, Hanoi",
-                   ContactPhone = "024-3869-3731",
-                   Capacity = 100,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               },
-               new Location
-               {
-                   LocationName = "Viet Duc Hospital",
-                   Address = "40 Trang Thi, Hoan Kiem, Hanoi",
-                   ContactPhone = "024-3825-3531",
-                   Capacity = 80,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               },
-               new Location
-               {
-                   LocationName = "National Institute of Hematology and Blood Transfusion",
-                   Address = "26 Nguyen Trai, Thanh Xuan, Hanoi",
-                   ContactPhone = "024-3553-9206",
-                   Capacity = 150,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               },
-               new Location
-               {
-                   LocationName = "Hanoi Medical University",
-                   Address = "1 Ton That Tung, Dong Da, Hanoi",
-                   ContactPhone = "024-3852-3798",
-                   Capacity = 60,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               },
-               new Location
-               {
-                   LocationName = "Community Health Center - District 1",
-                   Address = "123 Main Street, District 1, Ho Chi Minh City",
-                   ContactPhone = "028-3822-1234",
-                   Capacity = 75,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               },
-               new Location
-               {
-                   LocationName = "Red Cross Blood Donation Center",
-                   Address = "456 Le Loi Boulevard, District 3, Ho Chi Minh City",
-                   ContactPhone = "028-3933-5678",
-                   Capacity = 120,
-                   IsActive = true,
-                   CreatedDate = DateTime.Now
-               }
-            };
-
-            context.Locations.AddRange(locations);
-            context.SaveChanges();
+                var locations = new List<Location>
+                {
+                    new Location 
+                    { 
+                        LocationName = "Bệnh viện Trung ương",
+                        Address = "123 Đường ABC, Quận 1, TP.HCM",
+                        ContactPhone = "028-12345678",
+                        Capacity = 100,
+                        IsActive = true,
+                        CreatedDate = DateTime.Now
+                    },
+                    new Location 
+                    { 
+                        LocationName = "Trung tâm Y tế Quận 3",
+                        Address = "456 Đường XYZ, Quận 3, TP.HCM",
+                        ContactPhone = "028-87654321",
+                        Capacity = 75,
+                        IsActive = true,
+                        CreatedDate = DateTime.Now
+                    },
+                    new Location 
+                    { 
+                        LocationName = "Bệnh viện Đa khoa Quận 7",
+                        Address = "789 Đường DEF, Quận 7, TP.HCM",
+                        ContactPhone = "028-11223344",
+                        Capacity = 50,
+                        IsActive = true,
+                        CreatedDate = DateTime.Now
+                    }
+                };
+                context.Locations.AddRange(locations);
+                context.SaveChanges();
+            }
         }
     }
 }

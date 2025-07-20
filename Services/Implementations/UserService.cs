@@ -4,6 +4,7 @@ using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Services.Utilities;
 using Microsoft.EntityFrameworkCore;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -211,7 +212,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     query = query.Where(u => u.EmailVerified == searchDto.EmailVerified);
                 }
 
-                if (!string.IsNullOrEmpty(searchDto.Gender))
+                if (searchDto.Gender.HasValue)
                 {
                     query = query.Where(u => u.Gender == searchDto.Gender);
                 }
@@ -507,7 +508,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<bool> IsUserInRoleAsync(int userId, string roleName)
+        public async Task<bool> IsUserInRoleAsync(int userId, RoleType roleName)
         {
             try
             {
@@ -797,7 +798,7 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<UserDto>> GetUsersByGenderAsync(string gender)
+        public async Task<IEnumerable<UserDto>> GetUsersByGenderAsync(Gender gender)
         {
             try
             {

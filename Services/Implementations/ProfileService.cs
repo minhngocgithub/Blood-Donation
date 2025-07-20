@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.ViewModels.Profile;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -73,7 +74,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     Ward = ward,
                     AddressDetail = addressDetail,
                     Address = user.Address,
-                    Gender = user.Gender,
+                    Gender = user.Gender?.ToString(),
                     BloodType = user.BloodTypeId?.ToString(),
                     DateOfBirth = user.DateOfBirth,
                     LastDonationDate = lastDonation?.DonationDate,
@@ -103,7 +104,7 @@ namespace Blood_Donation_Website.Services.Implementations
 
                 user.FullName = model.FullName;
                 user.Phone = model.Phone;
-                user.Gender = model.Gender;
+                user.Gender = Enum.TryParse<EnumMapper.Gender>(model.Gender, out var gender) ? gender : (EnumMapper.Gender?)null;
                 user.DateOfBirth = model.DateOfBirth;
 
                 var addressParts = new List<string>();

@@ -341,105 +341,6 @@
     background: #fff;
 }
 
-.index-page .event-card {
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-    border: 1px solid #e9ecef;
-}
-
-.index-page .event-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.index-page .event-image {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-}
-
-.index-page .event-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.index-page .event-date {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: #e74c3c;
-    color: #fff;
-    padding: 0.5rem;
-    border-radius: 8px;
-    text-align: center;
-    min-width: 60px;
-}
-
-.index-page .event-date .day {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.index-page .event-date .month {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.index-page .event-content {
-    padding: 1.5rem;
-}
-
-.index-page .event-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    line-height: 1.4;
-}
-
-.index-page .event-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.index-page .event-location,
-.index-page .event-time {
-    color: #6c757d;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-}
-
-.index-page .event-location i,
-.index-page .event-time i {
-    color: #e74c3c;
-    margin-right: 0.5rem;
-}
-
-.index-page .event-description {
-    color: #6c757d;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
-    height: 40px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
 /* CTA Section */
 .index-page .cta-section {
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
@@ -540,8 +441,7 @@
 }
 
 .index-page .stat-card,
-.index-page .feature-card,
-.index-page .event-card {
+.index-page .feature-card {
     margin-right: 0.5rem;
 }
 

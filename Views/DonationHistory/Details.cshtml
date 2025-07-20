@@ -1,4 +1,5 @@
 @model Blood_Donation_Website.Models.DTOs.DonationHistoryDto
+@using Blood_Donation_Website.Utilities
 @{
     ViewData["Title"] = "Chi tiết hiến máu";
 }
@@ -60,7 +61,10 @@
                             <div class="col-md-6 mb-3">
                                 <label class="details-label">Trạng thái</label>
                                 <div>
-                                    <span class="details-status-badge @GetStatusBadgeClass(Model.Status)">@GetStatusText(Model.Status)</span>
+                                    @{
+                                        var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(Model.Status);
+                                    }
+                                    <span class="details-status-badge @GetStatusBadgeClass(Model.Status)">@statusDisplayName</span>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -106,22 +110,17 @@
     </div>
 </div>
 @functions {
-    private string GetStatusBadgeClass(string status)
+    private string GetStatusBadgeClass(EnumMapper.DonationStatus status)
     {
         return status switch
         {
-            "Completed" => "bg-success text-white",
-            "Cancelled" => "bg-danger text-white",
+            EnumMapper.DonationStatus.Completed => "bg-success text-white",
+            EnumMapper.DonationStatus.InProgress => "bg-primary text-white",
+            EnumMapper.DonationStatus.Started => "bg-info text-white",
+            EnumMapper.DonationStatus.Stopped => "bg-warning text-white",
+            EnumMapper.DonationStatus.Failed => "bg-danger text-white",
+            EnumMapper.DonationStatus.Cancelled => "bg-secondary text-white",
             _ => "bg-secondary text-white"
-        };
-    }
-    private string GetStatusText(string status)
-    {
-        return status switch
-        {
-            "Completed" => "Hoàn thành",
-            "Cancelled" => "Đã hủy",
-            _ => status
         };
     }
 } 

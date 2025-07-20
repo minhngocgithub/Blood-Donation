@@ -46,6 +46,16 @@ namespace Blood_Donation_Website.Data
             modelBuilder.ApplyConfiguration(new NotificationConfiguration());
             modelBuilder.ApplyConfiguration(new SettingConfiguration());
             modelBuilder.ApplyConfiguration(new ContactMessageConfiguration());
+
+            // Enum to string conversions
+            modelBuilder.Entity<BloodDonationEvent>().Property(e => e.Status).HasConversion<string>();
+            modelBuilder.Entity<DonationRegistration>().Property(e => e.Status).HasConversion<string>();
+            modelBuilder.Entity<HealthScreening>().Property(e => e.DisqualifyReason).HasConversion<string>();
+            modelBuilder.Entity<DonationHistory>().Property(e => e.Status).HasConversion<string>();
+            modelBuilder.Entity<Notification>().Property(e => e.Type).HasConversion<string>();
+            modelBuilder.Entity<ContactMessage>().Property(e => e.Status).HasConversion<string>();
+            modelBuilder.Entity<User>().Property(e => e.Gender).HasConversion<string>();
+            modelBuilder.Entity<Role>().Property(e => e.RoleName).HasConversion<string>();
         }
 
         /// <summary>

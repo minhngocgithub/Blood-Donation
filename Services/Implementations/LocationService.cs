@@ -3,6 +3,7 @@ using Blood_Donation_Website.Models.Entities;
 using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Blood_Donation_Website.Utilities;
 
 namespace Blood_Donation_Website.Services.Implementations
 {
@@ -291,7 +292,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 if (location == null) return 0;
 
                 var currentEvents = await _context.BloodDonationEvents
-                    .Where(e => e.LocationId == locationId && e.Status == "Active")
+                    .Where(e => e.LocationId == locationId && e.Status == EnumMapper.EventStatus.Active)
                     .SumAsync(e => e.CurrentDonors);
 
                 return Math.Max(0, location.Capacity - currentEvents);
@@ -325,7 +326,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,
@@ -349,7 +350,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var events = await _context.BloodDonationEvents
                     .Include(e => e.Location)
                     .Include(e => e.Creator)
-                    .Where(e => e.LocationId == locationId && e.EventDate >= DateTime.Now && e.Status == "Active")
+                    .Where(e => e.LocationId == locationId && e.EventDate >= DateTime.Now && e.Status == EnumMapper.EventStatus.Active)
                     .OrderBy(e => e.EventDate)
                     .ToListAsync();
 
@@ -364,7 +365,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     LocationId = e.LocationId,
                     MaxDonors = e.MaxDonors,
                     CurrentDonors = e.CurrentDonors,
-                    Status = e.Status,
+                    Status = e.Status ?? EnumMapper.EventStatus.Active,
                     ImageUrl = e.ImageUrl,
                     RequiredBloodTypes = e.RequiredBloodTypes,
                     CreatedBy = e.CreatedBy,

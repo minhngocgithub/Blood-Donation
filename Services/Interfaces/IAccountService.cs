@@ -1,5 +1,6 @@
 ﻿using Blood_Donation_Website.Models.ViewModels.Account;
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 
 namespace Blood_Donation_Website.Services.Interfaces
@@ -41,7 +42,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         /// <summary>
         /// Kiểm tra xem người dùng có thuộc vai trò cụ thể hay không.
         /// </summary>
-        Task<bool> IsUserInRoleAsync(string userId, string role);
+        Task<bool> IsUserInRoleAsync(string userId, RoleType role);
         /// <summary>
         /// Khóa tài khoản người dùng.
         /// </summary>

@@ -1,4 +1,5 @@
 using Blood_Donation_Website.Models.DTOs;
+using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Services.Interfaces
 {
@@ -14,7 +15,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         
         // Donation status operations
         Task<bool> CompleteDonationAsync(int donationId);
-        Task<bool> CancelDonationAsync(int donationId, string reason);
+        Task<bool> CancelDonationAsync(int donationId, DisqualificationReason reason);
         Task<bool> IssueCertificateAsync(int donationId);
         Task<string> GetDonationStatusAsync(int donationId);
         
@@ -22,9 +23,10 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<IEnumerable<DonationHistoryDto>> GetDonationsByUserAsync(int userId);
         Task<IEnumerable<DonationHistoryDto>> GetDonationsByEventAsync(int eventId);
         Task<IEnumerable<DonationHistoryDto>> GetDonationsByBloodTypeAsync(int bloodTypeId);
-        Task<IEnumerable<DonationHistoryDto>> GetDonationsByStatusAsync(string status);
+        Task<IEnumerable<DonationHistoryDto>> GetDonationsByStatusAsync(DonationStatus status);
         Task<IEnumerable<DonationHistoryDto>> GetDonationsByDateRangeAsync(DateTime startDate, DateTime endDate);
         Task<IEnumerable<DonationHistoryDto>> GetDonationsByRegistrationAsync(int registrationId);
+        Task<IEnumerable<DonationHistoryDto>> GetDonationsByDisqualificationReasonAsync(DisqualificationReason reason);
         
         // Donation statistics
         Task<int> GetTotalDonationsAsync();

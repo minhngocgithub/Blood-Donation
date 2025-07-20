@@ -1,3 +1,5 @@
+using static Blood_Donation_Website.Utilities.EnumMapper;
+
 namespace Blood_Donation_Website.Models.DTOs
 {
     public class BloodDonationEventDto
@@ -11,7 +13,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public int? LocationId { get; set; }
         public int MaxDonors { get; set; }
         public int CurrentDonors { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public EventStatus Status { get; set; }
         public string? ImageUrl { get; set; }
         public string? RequiredBloodTypes { get; set; }
         public int? CreatedBy { get; set; }
@@ -33,6 +35,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public TimeSpan EndTime { get; set; }
         public int? LocationId { get; set; }
         public int MaxDonors { get; set; } = 100;
+        public EventStatus Status { get; set; }
         public string? ImageUrl { get; set; }
         public string? RequiredBloodTypes { get; set; }
         public int? CreatedBy { get; set; }
@@ -47,7 +50,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public TimeSpan EndTime { get; set; }
         public int? LocationId { get; set; }
         public int MaxDonors { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public EventStatus Status { get; set; }
         public string? ImageUrl { get; set; }
         public string? RequiredBloodTypes { get; set; }
     }

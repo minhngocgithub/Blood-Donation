@@ -209,12 +209,10 @@
         border: 1px solid rgba(220, 53, 69, 0.3);
     }
     .details-card-header {
-        background: linear-gradient(135deg, #4a1c1c 0%, #6b2b2b 100%) !important;
         color: #f8f9fa;
     }
     .details-notes {
-        background: linear-gradient(135deg, #4a1c1c 0%, #6b2b2b 100%);
-        color: #f8f9fa;
+        color: #000;
         border: 1px solid #dc3545;
     }
 } 
