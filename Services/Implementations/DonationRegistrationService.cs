@@ -962,6 +962,18 @@ namespace Blood_Donation_Website.Services.Implementations
             }
         }
 
+        public async Task<int> GetRegistrationCountAsync()
+        {
+            try
+            {
+                return await _context.DonationRegistrations.CountAsync();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
         // Registration search and filtering
         public async Task<IEnumerable<DonationRegistrationDto>> SearchRegistrationsAsync(string searchTerm)
         {

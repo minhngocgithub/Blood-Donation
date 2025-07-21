@@ -1,0 +1,53 @@
+@model Blood_Donation_Website.Models.ViewModels.RegistrationStatisticsViewModel
+@{
+    ViewData["Title"] = "Thống kê đăng ký";
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Thống kê đăng ký hiến máu</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-primary shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-primary">Tổng số đăng ký</h5>
+                            <p class="display-5 fw-bold">@Model.TotalRegistrations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-success shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-success">Đã hoàn thành</h5>
+                            <p class="display-5 fw-bold">@Model.CompletedRegistrations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-warning shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-warning">Đang chờ</h5>
+                            <p class="display-5 fw-bold">@Model.PendingRegistrations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-danger shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-danger">Đã hủy</h5>
+                            <p class="display-5 fw-bold">@Model.CancelledRegistrations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mx-auto">
+                    <div class="card border-info shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-info">Đã check-in</h5>
+                            <p class="display-5 fw-bold">@Model.CheckedInRegistrations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

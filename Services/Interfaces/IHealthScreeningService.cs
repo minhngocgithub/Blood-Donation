@@ -25,7 +25,7 @@ namespace Blood_Donation_Website.Services.Interfaces
         Task<IEnumerable<DonationRegistrationDto>> GetPendingScreeningsAsync();
 
         // Statistics
-        Task<object> GetScreeningStatisticsAsync();
+        Task<HealthScreeningStatisticsDto> GetScreeningStatisticsAsync();
 
         // Validation
         Task<bool> IsEligibleForDonationAsync(int screeningId);

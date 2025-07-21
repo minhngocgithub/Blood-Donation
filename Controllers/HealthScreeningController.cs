@@ -2,10 +2,10 @@ using Blood_Donation_Website.Models.DTOs;
 using Blood_Donation_Website.Services.Interfaces;
 using Blood_Donation_Website.Utilities.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blood_Donation_Website.Controllers
 {
-    [HospitalOrDoctor]
     [Route("screening")]
     public class HealthScreeningController : Controller
     {
@@ -27,6 +27,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet]
+        [HospitalOrDoctor]
         public async Task<IActionResult> Index()
         {
             var screenings = await _screeningService.GetAllScreeningsAsync();
@@ -34,6 +35,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("pending")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> PendingScreenings()
         {
             var pendingRegistrations = await _screeningService.GetPendingScreeningsAsync();
@@ -41,6 +43,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("create/{registrationId}")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> Create(int registrationId)
         {
             var registration = await _registrationService.GetRegistrationByIdAsync(registrationId);
@@ -60,6 +63,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost("create/{registrationId}")]
+        [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int registrationId, HealthScreeningDto screeningDto)
         {
@@ -91,6 +95,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("edit/{id}")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> Edit(int id)
         {
             var screening = await _screeningService.GetScreeningByIdAsync(id);
@@ -115,6 +120,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost("edit/{id}")]
+        [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, HealthScreeningDto screeningDto)
         {
@@ -152,6 +158,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("details/{id}")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> Details(int id)
         {
             var screening = await _screeningService.GetScreeningByIdAsync(id);
@@ -173,6 +180,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost("checkin/{id}")]
+        [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CheckIn(int id)
         {
@@ -197,6 +205,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost("status/{id}")]
+        [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, bool isEligible)
         {
@@ -221,6 +230,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpPost("update-blood-type/{userId}")]
+        [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateBloodType(int userId, int bloodTypeId)
         {
@@ -245,6 +255,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("update-blood-type/{userId?}")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> UpdateBloodTypeForm(int userId = 0)
         {
             if (userId == 0)
@@ -280,6 +291,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("search-user")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> SearchUser(string? email = null, string? phone = null)
         {
             try
@@ -309,6 +321,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("debug-users")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> DebugUsers()
         {
             try
@@ -334,6 +347,7 @@ namespace Blood_Donation_Website.Controllers
         }
 
         [HttpGet("get-all-users")]
+        [HospitalOrDoctor]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -351,6 +365,14 @@ namespace Blood_Donation_Website.Controllers
                 Console.WriteLine($"Error getting users: {ex.Message}");
                 return Json(new { error = ex.Message });
             }
+        }
+
+        [HttpGet("statistics")]
+        [Authorize(Roles = "Admin,Hospital,Doctor")]
+        public async Task<IActionResult> Statistics()
+        {
+            var stats = await _screeningService.GetScreeningStatisticsAsync();
+            return View(stats);
         }
     }
 }

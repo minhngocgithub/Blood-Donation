@@ -421,30 +421,29 @@ namespace Blood_Donation_Website.Services.Implementations
         }
 
         // Statistics
-        public async Task<object> GetScreeningStatisticsAsync()
+        public async Task<HealthScreeningStatisticsDto> GetScreeningStatisticsAsync()
         {
-            try
+            var all = await _context.HealthScreenings.ToListAsync();
+            var total = all.Count;
+            var eligible = all.Count(x => x.IsEligible);
+            var ineligible = all.Count(x => !x.IsEligible);
+            var topReasons = all.Where(x => !x.IsEligible && !string.IsNullOrEmpty(x.DisqualifyReason.ToString()))
+                .GroupBy(x => x.DisqualifyReason)
+                .Select(g => new ReasonStat { Reason = g.Key.ToString()!, Count = g.Count() })
+                .OrderByDescending(x => x.Count).Take(5).ToList();
+            var bloodTypeStats = all
+                .Where(x => x.Registration != null && x.Registration.User != null && x.Registration.User.BloodType != null && !string.IsNullOrEmpty(x.Registration.User.BloodType.BloodTypeName))
+                .GroupBy(x => x.Registration.User.BloodType!.BloodTypeName)
+                .Select(g => new BloodTypeStat { BloodType = g.Key!, Count = g.Count() })
+                .OrderByDescending(x => x.Count).ToList();
+            return new HealthScreeningStatisticsDto
             {
-                var totalScreenings = await _context.HealthScreenings.CountAsync();
-                var eligibleScreenings = await _context.HealthScreenings.CountAsync(h => h.IsEligible);
-                var ineligibleScreenings = await _context.HealthScreenings.CountAsync(h => !h.IsEligible);
-
-                return new
-                {
-                    Total = totalScreenings,
-                    Eligible = eligibleScreenings,
-                    Ineligible = ineligibleScreenings,
-                    EligibilityRate = totalScreenings > 0 ? (double)eligibleScreenings / totalScreenings * 100 :0               };
-            }
-            catch
-            {
-                return new
-                {
-                    Total = 0,
-                    Eligible = 0,
-                    Ineligible = 0,
-                    EligibilityRate = 00               };
-            }
+                TotalScreenings = total,
+                EligibleCount = eligible,
+                IneligibleCount = ineligible,
+                TopDisqualifyReasons = topReasons,
+                BloodTypeStats = bloodTypeStats
+            };
         }
 
         // Validation

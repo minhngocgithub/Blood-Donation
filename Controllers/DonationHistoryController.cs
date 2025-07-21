@@ -108,7 +108,7 @@ namespace Blood_Donation_Website.Controllers
             var bloodTypeStats = allDonations
                 .Where(d => !string.IsNullOrEmpty(d.BloodTypeName))
                 .GroupBy(d => d.BloodTypeName)
-                .Select(g => new BloodTypeStatDto { BloodType = g.Key, Count = g.Count() })
+                .Select(g => new BloodTypeStatDto { BloodType = g.Key!, Count = g.Count() })
                 .OrderByDescending(x => x.Count)
                 .ToList();
             
@@ -149,7 +149,7 @@ namespace Blood_Donation_Website.Controllers
                 .Where(d => !string.IsNullOrEmpty(d.EventName))
                 .GroupBy(d => new { d.EventId, d.EventName, d.EventDate })
                 .Select(g => new EventStatDto {
-                    EventName = g.Key.EventName,
+                    EventName = g.Key.EventName!,
                     EventDate = g.Key.EventDate,
                     TotalDonations = g.Count(),
                     TotalVolume = g.Sum(d => d.Volume),
@@ -172,6 +172,80 @@ namespace Blood_Donation_Website.Controllers
             ViewBag.EventStats = eventStats;
             ViewBag.AllDonations = allDonations;
             
+            return View();
+        }
+
+        // GET: /DonationHistory/Reports
+        [AuthenticatedUser]
+        public async Task<IActionResult> Reports()
+        {
+            // Chỉ cho phép Admin, Hospital, Doctor truy cập
+            if (!User.IsInRole("Admin") && !User.IsInRole("Hospital") && !User.IsInRole("Doctor"))
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền truy cập trang báo cáo này.";
+                return RedirectToAction("MyHistory");
+            }
+
+            // Lấy dữ liệu như action Statistics
+            var allDonations = await _donationHistoryService.GetAllDonationsAsync();
+            var totalDonations = await _donationHistoryService.GetTotalDonationsAsync();
+            var totalVolume = await _donationHistoryService.GetTotalVolumeAsync();
+            var completedDonations = allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Completed);
+            var cancelledDonations = allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Cancelled);
+            var certificatesIssued = allDonations.Count(d => d.CertificateIssued);
+            var totalUsers = allDonations.Select(d => d.UserId).Distinct().Count();
+            var bloodTypeStats = allDonations
+                .Where(d => !string.IsNullOrEmpty(d.BloodTypeName))
+                .GroupBy(d => d.BloodTypeName)
+                .Select(g => new BloodTypeStatDto { BloodType = g.Key!, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+            var monthlyStats = new Dictionary<string, int>();
+            for (int i = 11; i >= 0; i--)
+            {
+                var month = DateTime.Now.AddMonths(-i);
+                var monthKey = month.ToString("MM/yyyy");
+                var monthDonations = allDonations.Count(d => d.DonationDate.Month == month.Month && d.DonationDate.Year == month.Year);
+                monthlyStats[monthKey] = monthDonations;
+            }
+            var recentDonations = allDonations.OrderByDescending(d => d.DonationDate).Take(10).ToList();
+            var topDonors = allDonations
+                .GroupBy(d => new { d.UserId, d.UserName, d.UserEmail })
+                .Select(g => new TopDonorDto {
+                    UserName = g.Key.UserName ?? "Không xác định",
+                    UserEmail = g.Key.UserEmail ?? "N/A",
+                    TotalDonations = g.Count(),
+                    TotalVolume = g.Sum(d => d.Volume),
+                    LastDonation = g.Max(d => d.DonationDate)
+                })
+                .OrderByDescending(x => x.TotalDonations)
+                .Take(10)
+                .ToList();
+            var eventStats = allDonations
+                .Where(d => !string.IsNullOrEmpty(d.EventName))
+                .GroupBy(d => new { d.EventId, d.EventName, d.EventDate })
+                .Select(g => new EventStatDto {
+                    EventName = g.Key.EventName!,
+                    EventDate = g.Key.EventDate,
+                    TotalDonations = g.Count(),
+                    TotalVolume = g.Sum(d => d.Volume),
+                    CompletedDonations = g.Count(d => d.Status == EnumMapper.DonationStatus.Completed)
+                })
+                .OrderByDescending(x => x.TotalDonations)
+                .Take(10)
+                .ToList();
+            ViewBag.TotalDonations = totalDonations;
+            ViewBag.TotalVolume = totalVolume;
+            ViewBag.CompletedDonations = completedDonations;
+            ViewBag.CancelledDonations = cancelledDonations;
+            ViewBag.CertificatesIssued = certificatesIssued;
+            ViewBag.TotalUsers = totalUsers;
+            ViewBag.BloodTypeStats = bloodTypeStats;
+            ViewBag.MonthlyStats = monthlyStats;
+            ViewBag.RecentDonations = recentDonations;
+            ViewBag.TopDonors = topDonors;
+            ViewBag.EventStats = eventStats;
+            ViewBag.AllDonations = allDonations;
             return View();
         }
 

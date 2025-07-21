@@ -1,0 +1,43 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.UserDto>
+@{
+    ViewData["Title"] = "Quản lý người dùng đã hiến máu";
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Danh sách người dùng đã hiến máu</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Nhóm máu</th>
+                    <th>Tổng lượt hiến</th>
+                    <th>Ngày hiến gần nhất</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var user in Model)
+                    {
+                        var totalDonations = user.TotalDonations;
+                        var lastDonation = user.LastDonationDate;
+                        <tr>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>@user.Phone</td>
+                            <td>@user.BloodTypeName</td>
+                            <td>@(totalDonations > 0 ? totalDonations.ToString() : "-")</td>
+                            <td>@(lastDonation.HasValue ? lastDonation.Value.ToString("dd/MM/yyyy") : "-")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center">Không có người dùng nào đã hiến máu.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div> 

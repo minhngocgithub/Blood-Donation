@@ -373,6 +373,29 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        // GET: /DonationRegistration/Statistics
+        [Authorize(Roles = "Admin, Staff, Doctor, Hospital")]
+        public async Task<IActionResult> Statistics()
+        {
+            try
+            {
+                var statistics = new RegistrationStatisticsViewModel
+                {
+                    TotalRegistrations = await _registrationService.GetRegistrationCountAsync(),
+                    CompletedRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Completed),
+                    PendingRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Registered),
+                    CancelledRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Cancelled),
+                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.CheckedIn)
+                };
+                return View("Statistics", statistics);
+            }
+            catch
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi tải thống kê.";
+                return RedirectToAction("MyRegistrations");
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
