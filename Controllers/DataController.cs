@@ -10,22 +10,23 @@ using Blood_Donation_Website.Models.Entities;
 namespace Blood_Donation_Website.Controllers
 {
     [AdminOnly]
-    [Route("admin/data-export")]
-    public class DataExportController : Controller
+    [Route("admin")]
+    public class DataController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly DataExporter _dataExporter;
 
-        public DataExportController(ApplicationDbContext context, DataExporter dataExporter)
+        public DataController(ApplicationDbContext context, DataExporter dataExporter)
         {
             _context = context;
             _dataExporter = dataExporter;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        // DataExport
+        [HttpGet("data-export")]
+        public IActionResult DataExport()
         {
-            return View();
+            return View("DataExport");
         }
 
         [HttpPost("export-all")]

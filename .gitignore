@@ -527,5 +527,7 @@ DatabaseExport/
 *.export.json
 *.export.csv
 
+.config/
+
 note.txt
 INSTRUCTION.md

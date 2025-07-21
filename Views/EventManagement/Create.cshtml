@@ -1,16 +1,16 @@
 @model Blood_Donation_Website.Models.DTOs.BloodDonationEventCreateDto
 @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
 {
-    <div class="alert alert-danger">
+    <div class="alert alert-danger d-none" id="server-error-alert">
         @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
         {
-            <div>@error.ErrorMessage</div>
+            <div class="server-error-message">@error.ErrorMessage</div>
         }
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    <div class="alert alert-danger d-none" id="tempdata-error-alert">@TempData["ErrorMessage"]</div>
 }
 @using Blood_Donation_Website.Utilities
 @{
@@ -136,6 +136,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/sweetalert-helper.js"></script>
     <script>
         $(document).ready(function() {
             $('#RequiredBloodTypesSelect').select2({
@@ -152,6 +153,18 @@
 
             // Set initial value for hidden input
             updateRequiredBloodTypes();
+
+            // SweetAlert for server-side errors
+            var errorMessages = [];
+            $("#server-error-alert .server-error-message").each(function() {
+                var msg = $(this).text().trim();
+                if (msg) errorMessages.push(msg);
+            });
+            var tempError = $("#tempdata-error-alert").text().trim();
+            if (tempError) errorMessages.push(tempError);
+            if (errorMessages.length > 0) {
+                showError("Lỗi tạo sự kiện", errorMessages.join("\n"));
+            }
         });
 
         // Update hidden input when selection changes

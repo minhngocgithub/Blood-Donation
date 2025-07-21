@@ -1,0 +1,86 @@
+@model Blood_Donation_Website.Models.DTOs.HealthScreeningStatisticsDto
+@{
+    ViewData["Title"] = "Thống kê sàng lọc sức khỏe";
+    var totalScreenings = Model.TotalScreenings;
+    var eligibleCount = Model.EligibleCount;
+    var ineligibleCount = Model.IneligibleCount;
+    var topReasons = Model.TopDisqualifyReasons;
+    var bloodTypeStats = Model.BloodTypeStats;
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Thống kê sàng lọc sức khỏe</h2>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Tổng lượt sàng lọc</h5>
+                    <p class="display-6 fw-bold">@totalScreenings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Đạt điều kiện</h5>
+                    <p class="display-6 fw-bold">@eligibleCount</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-danger">Không đạt</h5>
+                    <p class="display-6 fw-bold">@ineligibleCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Lý do loại phổ biến</h5>
+                    <ul class="list-group">
+                        @if (topReasons != null && topReasons.Any())
+                        {
+                            foreach (var reason in topReasons)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@reason.Reason</span>
+                                    <span class="badge bg-danger rounded-pill">@reason.Count</span>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Không có dữ liệu</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Phân bố theo nhóm máu</h5>
+                    <ul class="list-group">
+                        @if (bloodTypeStats != null && bloodTypeStats.Any())
+                        {
+                            foreach (var stat in bloodTypeStats)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@stat.BloodType</span>
+                                    <span class="badge bg-primary rounded-pill">@stat.Count</span>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Không có dữ liệu</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -19,6 +19,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public DateTime? LastDonationDate { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        public int TotalDonations { get; set; }
         
         // Navigation properties
         public string? BloodTypeName { get; set; }

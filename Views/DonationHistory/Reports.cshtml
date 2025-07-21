@@ -1,0 +1,210 @@
+@using Blood_Donation_Website.Models.DTOs;
+@{
+    ViewData["Title"] = "Báo cáo hiến máu";
+    var totalDonations = ViewBag.TotalDonations ?? 0;
+    var totalVolume = ViewBag.TotalVolume ?? 0;
+    var completedDonations = ViewBag.CompletedDonations ?? 0;
+    var cancelledDonations = ViewBag.CancelledDonations ?? 0;
+    var certificatesIssued = ViewBag.CertificatesIssued ?? 0;
+    var totalUsers = ViewBag.TotalUsers ?? 0;
+    var bloodTypeStats = ViewBag.BloodTypeStats as List<BloodTypeStatDto>;
+    var monthlyStats = ViewBag.MonthlyStats as Dictionary<string, int>;
+    var topDonors = ViewBag.TopDonors as List<TopDonorDto>;
+    var eventStats = ViewBag.EventStats as List<EventStatDto>;
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Báo cáo tổng hợp hiến máu</h2>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Tổng lượt hiến</h5>
+                    <p class="display-6 fw-bold">@totalDonations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Tổng thể tích (ml)</h5>
+                    <p class="display-6 fw-bold">@totalVolume</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">Số người tham gia</h5>
+                    <p class="display-6 fw-bold">@totalUsers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-success">Hoàn thành</h6>
+                    <p class="h4 fw-bold">@completedDonations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-danger">Đã hủy</h6>
+                    <p class="h4 fw-bold">@cancelledDonations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-warning">Chứng nhận đã cấp</h6>
+                    <p class="h4 fw-bold">@certificatesIssued</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Thống kê nhóm máu</h5>
+                    <ul class="list-group">
+                        @if (bloodTypeStats != null && bloodTypeStats.Count > 0)
+                        {
+                            foreach (var stat in bloodTypeStats)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@stat.BloodType</span>
+                                    <span class="badge bg-primary rounded-pill">@stat.Count</span>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Không có dữ liệu</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Biểu đồ lượt hiến theo tháng</h5>
+                    <canvas id="monthlyChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Top người hiến máu</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Lượt hiến</th>
+                                <th>Tổng thể tích</th>
+                                <th>Lần gần nhất</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (topDonors != null && topDonors.Count > 0)
+                            {
+                                foreach (var donor in topDonors)
+                                {
+                                    <tr>
+                                        <td>@donor.UserName</td>
+                                        <td>@donor.UserEmail</td>
+                                        <td>@donor.TotalDonations</td>
+                                        <td>@donor.TotalVolume</td>
+                                        <td>@donor.LastDonation.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Top sự kiện hiến máu</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tên sự kiện</th>
+                                <th>Ngày</th>
+                                <th>Lượt hiến</th>
+                                <th>Tổng thể tích</th>
+                                <th>Hoàn thành</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (eventStats != null && eventStats.Count > 0)
+                            {
+                                foreach (var evt in eventStats)
+                                {
+                                    <tr>
+                                        <td>@evt.EventName</td>
+                                        <td>@evt.EventDate?.ToString("dd/MM/yyyy")</td>
+                                        <td>@evt.TotalDonations</td>
+                                        <td>@evt.TotalVolume</td>
+                                        <td>@evt.CompletedDonations</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Biểu đồ lượt hiến theo tháng
+        var ctx = document.getElementById('monthlyChart').getContext('2d');
+        var monthlyLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(monthlyStats?.Keys?.ToList() ?? new List<string>()));
+        var monthlyData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(monthlyStats?.Values?.ToList() ?? new List<int>()));
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Lượt hiến máu',
+                    data: monthlyData,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, stepSize: 1 }
+                }
+            }
+        });
+    </script>
+}
