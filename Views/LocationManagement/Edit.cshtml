@@ -68,8 +68,8 @@
                             <div class="mt-2">
                                 <input type="text" id="addressDetail" name="AddressDetail" class="form-control" placeholder="Số nhà, tên đường">
                             </div>
-                            <input type="hidden" asp-for="Address" id="fullAddress" />
-                            <span asp-validation-for="Address" class="text-danger"></span>
+                                                         <input type="hidden" asp-for="Address" id="fullAddress" />
+                             <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
 
                         <div class="row">
@@ -146,7 +146,7 @@
             const wardSelect = document.getElementById('ward');
             const addressDetailInput = document.getElementById('addressDetail');
             const fullAddressInput = document.getElementById('fullAddress');
-
+            
             function decodeHTMLEntities(text) {
                 if (!text) return '';
                 const textArea = document.createElement('textarea');
@@ -158,10 +158,14 @@
                 try {
                     const response = await fetch('https://provinces.open-api.vn/api/p/');
                     const provinces = await response.json();
+                    
                     provinces.forEach(province => {
                         const option = new Option(province.name, province.name);
                         provinceSelect.add(option);
                     });
+
+                    // Parse and set current address
+                    parseCurrentAddress();
                 } catch (error) {
                     console.error('Error loading provinces:', error);
                 }
@@ -171,14 +175,30 @@
                 try {
                     const response = await fetch(`https://provinces.open-api.vn/api/p/search/?q=${encodeURIComponent(provinceName)}`);
                     const provinces = await response.json();
+                    
                     if (provinces.length > 0) {
                         const province = provinces[0];
                         const districtsResponse = await fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`);
                         const provinceData = await districtsResponse.json();
+                        
                         provinceData.districts.forEach(district => {
                             const option = new Option(district.name, district.name);
                             districtSelect.add(option);
                         });
+
+                        // Try to set district if we have one
+                        const currentDistrict = getCurrentDistrict();
+                        if (currentDistrict) {
+                            const options = Array.from(districtSelect.options);
+                            const option = options.find(opt => 
+                                opt.text.trim().toLowerCase() === currentDistrict.trim().toLowerCase()
+                            );
+                            if (option) {
+                                option.selected = true;
+                                wardSelect.disabled = false;
+                                loadWards(option.text);
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading districts:', error);
@@ -189,14 +209,29 @@
                 try {
                     const response = await fetch(`https://provinces.open-api.vn/api/d/search/?q=${encodeURIComponent(districtName)}`);
                     const districts = await response.json();
+                    
                     if (districts.length > 0) {
                         const district = districts[0];
                         const wardsResponse = await fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`);
                         const districtData = await wardsResponse.json();
+                        
                         districtData.wards.forEach(ward => {
                             const option = new Option(ward.name, ward.name);
                             wardSelect.add(option);
                         });
+
+                        // Try to set ward if we have one
+                        const currentWard = getCurrentWard();
+                        if (currentWard) {
+                            const options = Array.from(wardSelect.options);
+                            const option = options.find(opt => 
+                                opt.text.trim().toLowerCase() === currentWard.trim().toLowerCase()
+                            );
+                            if (option) {
+                                option.selected = true;
+                                updateFullAddress();
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading wards:', error);
@@ -204,58 +239,108 @@
             }
 
             function updateFullAddress() {
-                const province = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
-                const district = districtSelect.options[districtSelect.selectedIndex]?.text || '';
-                const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
-                const addressDetail = addressDetailInput.value.trim();
-                const parts = [addressDetail, ward, district, province].filter(part => part);
-                const fullAddress = parts.join(', ');
-                if (fullAddressInput) {
-                    fullAddressInput.value = fullAddress;
+                try {
+                    const province = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
+                    const district = districtSelect.options[districtSelect.selectedIndex]?.text || '';
+                    const ward = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+                    const addressDetail = addressDetailInput.value.trim();
+
+                    const parts = [addressDetail, ward, district, province].filter(part => part);
+                    const fullAddress = parts.join(', ');
+
+                    if (fullAddressInput) {
+                        fullAddressInput.value = fullAddress;
+                    }
+                } catch (error) {
+                    console.error('Error updating address:', error);
                 }
             }
 
-            function parseAddress(address) {
-                if (!address) return;
+            function parseCurrentAddress() {
+                const currentAddress = decodeHTMLEntities('@Model.Address');
+                if (!currentAddress) return;
+
+                console.log('Parsing current address:', currentAddress);
                 
-                const parts = address.split(', ').map(part => part.trim());
+                // Parse address parts
+                const parts = currentAddress.split(', ').map(part => part.trim());
+                console.log('Address parts:', parts);
+
                 if (parts.length >= 3) {
-                    // Giả sử format: "Số nhà, Phường, Quận, Tỉnh"
-                    const addressDetail = parts[0];
-                    const ward = parts[1];
-                    const district = parts[2];
-                    const province = parts[3];
+                    let addressDetail, ward, district, province;
+                    
+                    if (parts.length === 4) {
+                        // Format: "Số nhà, Phường, Quận, Tỉnh"
+                        addressDetail = parts[0];
+                        ward = parts[1];
+                        district = parts[2];
+                        province = parts[3];
+                    } else if (parts.length === 3) {
+                        // Format: "Phường, Quận, Tỉnh"
+                        ward = parts[0];
+                        district = parts[1];
+                        province = parts[2];
+                    }
 
                     // Set address detail
-                    if (addressDetailInput) {
+                    if (addressDetail) {
                         addressDetailInput.value = addressDetail;
                     }
 
-                    // Load provinces and set selected
-                    loadProvinces().then(() => {
-                        if (province) {
-                            provinceSelect.value = province;
-                            loadDistricts(province).then(() => {
-                                if (district) {
-                                    districtSelect.value = district;
-                                    loadWards(district).then(() => {
-                                        if (ward) {
-                                            wardSelect.value = ward;
-                                        }
-                                        updateFullAddress();
-                                    });
-                                }
-                            });
+                    // Try to set province
+                    if (province) {
+                        const options = Array.from(provinceSelect.options);
+                        const option = options.find(opt => 
+                            opt.text.trim().toLowerCase() === province.trim().toLowerCase()
+                        );
+                        if (option) {
+                            option.selected = true;
+                            districtSelect.disabled = false;
+                            loadDistricts(option.text);
                         }
-                    });
+                    }
                 }
             }
+
+            function getCurrentDistrict() {
+                const currentAddress = decodeHTMLEntities('@Model.Address');
+                if (!currentAddress) return null;
+
+                const parts = currentAddress.split(', ').map(part => part.trim());
+                if (parts.length >= 3) {
+                    if (parts.length === 4) {
+                        return parts[2]; // district
+                    } else if (parts.length === 3) {
+                        return parts[1]; // district
+                    }
+                }
+                return null;
+            }
+
+            function getCurrentWard() {
+                const currentAddress = decodeHTMLEntities('@Model.Address');
+                if (!currentAddress) return null;
+
+                const parts = currentAddress.split(', ').map(part => part.trim());
+                if (parts.length >= 3) {
+                    if (parts.length === 4) {
+                        return parts[1]; // ward
+                    } else if (parts.length === 3) {
+                        return parts[0]; // ward
+                    }
+                }
+                return null;
+            }
+
+
 
             provinceSelect.addEventListener('change', async function() {
                 districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
                 wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+                
                 districtSelect.disabled = !this.value;
                 wardSelect.disabled = true;
+                
                 if (this.value) {
                     await loadDistricts(this.value);
                 }
@@ -265,6 +350,7 @@
             districtSelect.addEventListener('change', async function() {
                 wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
                 wardSelect.disabled = !this.value;
+                
                 if (this.value) {
                     await loadWards(this.value);
                 }
@@ -279,13 +365,8 @@
                 updateFullAddress();
             });
 
-            // Parse existing address when page loads
-            const currentAddress = '@Model.Address';
-            if (currentAddress) {
-                parseAddress(currentAddress);
-            } else {
-                loadProvinces();
-            }
+            // Initialize the form
+            loadProvinces();
         });
 
         function confirmReset() {
