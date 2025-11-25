@@ -22,10 +22,12 @@ namespace Blood_Donation_Website.Controllers
                 var total = await _userService.GetUserTotalDonationsAsync(user.UserId);
                 if (total > 0)
                 {
+                    user.TotalDonations = total;
+                    user.LastDonationDate = await _userService.GetUserLastDonationDateAsync(user.UserId);
                     donors.Add(user);
                 }
             }
             return View(donors);
         }
     }
-} 
+}
