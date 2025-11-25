@@ -1,0 +1,293 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationHistoryDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Quản lý lịch sử hiến máu";
+}
+<link rel="stylesheet" href="~/css/my-history-page.css" asp-append-version="true" />
+
+<div class="my-history-container">
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="history-main-card">
+                    <div class="history-card-header">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <h4 class="mb-0">
+                                <i class="fas fa-search me-2"></i>Quản lý lịch sử hiến máu
+                            </h4>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Statistics", "DonationHistory")" class="btn btn-info btn-sm">
+                                    <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                </a>
+                                <a href="@Url.Action("Reports", "DonationHistory")" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-file-alt me-1"></i>Báo cáo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Search Form -->
+                        <div class="search-container mb-4">
+                            <form asp-action="Index" method="get" class="search-form">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           name="searchTerm" 
+                                           class="form-control border-start-0" 
+                                           placeholder="Tìm kiếm theo email, tên người hiến, hoặc mã đăng ký..."
+                                           value="@ViewBag.SearchTerm">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                                    </button>
+                                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                                    {
+                                        <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                            <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                        </a>
+                                    }
+                                </div>
+                            </form>
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                            {
+                                <div class="search-info mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Tìm thấy <strong>@Model.Count()</strong> kết quả cho "<strong>@ViewBag.SearchTerm</strong>"
+                                    </small>
+                                </div>
+                            }
+                        </div>
+
+                        @if (!Model.Any())
+                        {
+                            <div class="empty-state fade-in">
+                                <i class="fas fa-search empty-state-icon"></i>
+                                @if (string.IsNullOrEmpty(ViewBag.SearchTerm))
+                                {
+                                    <h5 class="empty-state-title">Chưa có lịch sử hiến máu nào</h5>
+                                    <p class="empty-state-text">Sử dụng ô tìm kiếm ở trên để tìm kiếm lịch sử hiến máu theo email, tên, hoặc mã đăng ký</p>
+                                }
+                                else
+                                {
+                                    <h5 class="empty-state-title">Không tìm thấy kết quả</h5>
+                                    <p class="empty-state-text">Không có lịch sử hiến máu nào phù hợp với từ khóa "<strong>@ViewBag.SearchTerm</strong>"</p>
+                                    <a href="@Url.Action("Index")" class="btn btn-primary">
+                                        <i class="fas fa-arrow-left me-1"></i>Xem tất cả
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="history-table table table-bordered table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Người hiến</th>
+                                            <th>Email</th>
+                                            <th>Mã ĐK</th>
+                                            <th>Sự kiện</th>
+                                            <th>Ngày hiến</th>
+                                            <th>Nhóm máu</th>
+                                            <th>Thể tích (ml)</th>
+                                            <th>Trạng thái</th>
+                                            <th>Chứng nhận</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var (item, idx) in Model.Select((x, i) => (x, i + 1)))
+                                        {
+                                            <tr class="slide-in">
+                                                <td>@idx</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="user-avatar-sm me-2">
+                                                            @(item.UserName?.Substring(0, 1).ToUpper() ?? "U")
+                                                        </div>
+                                                        <span>@item.UserName</span>
+                                                    </div>
+                                                </td>
+                                                <td>@item.UserEmail</td>
+                                                <td>
+                                                    <code class="text-primary">@item.RegistrationCode</code>
+                                                </td>
+                                                <td>@item.EventName</td>
+                                                <td>
+                                                    <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                                    @item.DonationDate.ToString("dd/MM/yyyy")
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger">@item.BloodTypeName</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <strong>@item.Volume</strong>
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(item.Status);
+                                                    }
+                                                    <span class="status-badge @GetStatusBadgeClass(item.Status)">@statusDisplayName</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (item.CertificateIssued)
+                                                    {
+                                                        <i class="fas fa-certificate text-success" title="Đã cấp chứng nhận"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-certificate text-muted" title="Chưa cấp chứng nhận"></i>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <a href="@Url.Action("Details", "DonationHistory", new { id = item.DonationId })" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i>Chi tiết
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Summary -->
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <div class="summary-item">
+                                            <i class="fas fa-list text-primary"></i>
+                                            <h5>@Model.Count()</h5>
+                                            <small class="text-muted">Tổng số bản ghi</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="summary-item">
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            <h5>@Model.Count(d => d.Status == EnumMapper.DonationStatus.Completed)</h5>
+                                            <small class="text-muted">Hoàn thành</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="summary-item">
+                                            <i class="fas fa-tint text-danger"></i>
+                                            <h5>@Model.Sum(d => d.Volume) ml</h5>
+                                            <small class="text-muted">Tổng lượng máu</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="summary-item">
+                                            <i class="fas fa-users text-info"></i>
+                                            <h5>@Model.Select(d => d.UserId).Distinct().Count()</h5>
+                                            <small class="text-muted">Người hiến</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .search-container {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .search-form .input-group {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-form input {
+            border-left: none;
+            padding: 0.75rem;
+        }
+        
+        .search-form input:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+        
+        .search-info {
+            padding: 0.5rem 0;
+        }
+        
+        .user-avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .summary-item {
+            padding: 1rem;
+        }
+        
+        .summary-item i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-item h5 {
+            margin: 0.5rem 0 0.25rem 0;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #cbd5e0;
+            margin-bottom: 1rem;
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .history-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+    </style>
+}
+
+@functions {
+    private string GetStatusBadgeClass(EnumMapper.DonationStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.DonationStatus.Completed => "badge bg-success",
+            EnumMapper.DonationStatus.Cancelled => "badge bg-danger",
+            EnumMapper.DonationStatus.Started => "badge bg-info text-dark",
+            EnumMapper.DonationStatus.InProgress => "badge bg-warning text-dark",
+            _ => "badge bg-secondary"
+        };
+    }
+}

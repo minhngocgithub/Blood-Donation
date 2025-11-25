@@ -1,0 +1,221 @@
+@model Blood_Donation_Website.Models.DTOs.DonationRegistrationDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Theo dõi hiến máu";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/donation-progress-page.css" asp-append-version="true" />
+}
+
+<div class="donation-progress-page">
+    <div class="container">
+        <div class="donation-progress-header">
+            <h2>
+                <i class="fas fa-clock me-2"></i>Theo dõi hiến máu
+            </h2>
+            <div class="subtitle">Đang trong quá trình hiến máu</div>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Đăng ký</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Check-in</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Sàng lọc</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step active">
+                <div class="step-number">4</div>
+                <div class="step-label">Hiến máu</div>
+            </div>
+            <div class="progress-line active"></div>
+            <div class="progress-step">
+                <div class="step-number">5</div>
+                <div class="step-label">Hoàn tất</div>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="progress-timer">
+            <div class="timer-display" id="timer">00:00:00</div>
+            <div class="timer-label">Thời gian hiến máu</div>
+        </div>
+
+        <!-- Thông tin người hiến máu -->
+        <div class="user-info-card">
+            <div class="user-avatar">
+                @(Model.FullName?.Substring(0, 1).ToUpper() ?? "U")
+            </div>
+            <div class="user-info">
+                <h4>@Model.FullName</h4>
+                <p><i class="fas fa-id-card me-2"></i>@Model.RegistrationCode</p>
+                <p><i class="fas fa-envelope me-2"></i>@Model.UserEmail</p>
+                <p><i class="fas fa-phone me-2"></i>@Model.PhoneNumber</p>
+            </div>
+        </div>
+
+        <!-- Trạng thái hiến máu -->
+        <div class="donation-status-card">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <div class="status-text">Đang hiến máu</div>
+            </div>
+            <p class="text-center mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Quá trình hiến máu đang diễn ra. Vui lòng theo dõi và ghi chú nếu cần thiết.
+            </p>
+        </div>
+
+        <!-- Ghi chú -->
+        <div class="donation-notes">
+            <div class="notes-header">
+                <i class="fas fa-sticky-note me-2"></i>Ghi chú trong quá trình hiến máu
+            </div>
+            <textarea class="notes-textarea" id="donationNotes" placeholder="Ghi chú về quá trình hiến máu (nếu có)..."></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button type="button" class="btn btn-donation btn-complete" id="completeBtn">
+                <i class="fas fa-check me-2"></i>Hoàn tất hiến máu
+            </button>
+            <button type="button" class="btn btn-donation btn-stop" id="stopBtn">
+                <i class="fas fa-stop me-2"></i>Dừng hiến máu
+            </button>
+            <a asp-action="Index" class="btn btn-donation btn-back">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            var successMsg = '@TempData["SuccessMessage"]';
+            var errorMsg = '@TempData["ErrorMessage"]';
+            
+            if (successMsg) {
+                showSuccess('Thành công');
+            }
+            if (errorMsg) {
+                showError('Lỗi');
+            }
+
+            // Timer functionality
+            var startTime = new Date();
+            var timerInterval = setInterval(updateTimer, 1000);
+
+            function updateTimer() {
+                var now = new Date();
+                var diff = now - startTime;
+                
+                var hours = Math.floor(diff / (1000 * 60 * 60));
+                var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                $('#timer').text(
+                    (hours < 10 ? '0' : '') + hours + ':' +
+                    (minutes < 10 ? '0' : '') + minutes + ':' +
+                    (seconds < 10 ? '0' : '') + seconds
+                );
+            }
+
+            // Complete donation
+            $('#completeBtn').on('click', function() {
+                showConfirm(
+                    'Hoàn tất hiến máu',
+                    'Chuyển đến trang nhập thông tin lượng máu đã hiến?',
+                    'Tiếp tục',
+                    'Hủy bỏ',
+                    'success'
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to Complete page (GET)
+                        window.location.href = '@Url.Action("Complete", "DonationManagement", new { id = Model.RegistrationId })';
+                    }
+                });
+            });
+
+            // Stop donation
+            $('#stopBtn').on('click', function() {
+                var notes = $('#donationNotes').val();
+                
+                showConfirm(
+                    'Dừng hiến máu',
+                    'Bạn có chắc chắn muốn dừng quá trình hiến máu cho @Model.FullName?',
+                    'Dừng lại',
+                    'Hủy bỏ',
+                    'warning'
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit form to stop donation
+                        var form = $('<form>', {
+                            'method': 'POST',
+                            'action': '@Url.Action("Stop", "DonationManagement")'
+                        });
+                        
+                        form.append($('<input>', {
+                            'type': 'hidden',
+                            'name': 'id',
+                            'value': '@Model.RegistrationId'
+                        }));
+                        
+                        form.append($('<input>', {
+                            'type': 'hidden',
+                            'name': 'notes',
+                            'value': notes
+                        }));
+                        
+                        form.append($('<input>', {
+                            'type': 'hidden',
+                            'name': '__RequestVerificationToken',
+                            'value': $('input[name="__RequestVerificationToken"]').val()
+                        }));
+                        
+                        $('body').append(form);
+                        form.submit();
+                    }
+                });
+            });
+
+            // Cleanup on page unload
+            $(window).on('beforeunload', function() {
+                clearInterval(timerInterval);
+            });
+        });
+    </script>
+} 

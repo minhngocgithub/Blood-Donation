@@ -1,0 +1,310 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Quản lý sự kiện hiến máu";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/event-management-page.css" asp-append-version="true" />
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger fw-bold">
+                    <i class="fas fa-calendar-plus me-2"></i>Quản lý sự kiện hiến máu
+                </h2>
+                <a asp-action="Create" class="btn btn-danger">
+                    <i class="fas fa-plus me-2"></i>Tạo sự kiện mới
+                </a>
+            </div>
+
+            <!-- SweetAlert notifications will be handled by _SweetAlertNotifications partial -->
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có sự kiện nào</h5>
+                            <p class="text-muted">Bắt đầu tạo sự kiện hiến máu đầu tiên của bạn.</p>
+                            <a asp-action="Create" class="btn btn-danger">
+                                <i class="fas fa-plus me-2"></i>Tạo sự kiện
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Sorting Controls -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label class="form-label me-2 mb-0 fw-bold">
+                                        <i class="fas fa-sort me-1"></i>Sắp xếp theo:
+                                    </label>
+                                    <select id="sortBy" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="name-asc">Tên sự kiện (A-Z)</option>
+                                        <option value="name-desc">Tên sự kiện (Z-A)</option>
+                                        <option value="date-newest">Ngày diễn ra (Mới nhất)</option>
+                                        <option value="date-oldest">Ngày diễn ra (Cũ nhất)</option>
+                                        <option value="status-active">Trạng thái (Hoạt động)</option>
+                                        <option value="status-draft">Trạng thái (Nháp)</option>
+                                        <option value="capacity-high">Sức chứa (Cao nhất)</option>
+                                        <option value="capacity-low">Sức chứa (Thấp nhất)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex align-items-center justify-content-end">
+                                    <label class="form-label me-2 mb-0 fw-bold">
+                                        <i class="fas fa-filter me-1"></i>Lọc trạng thái:
+                                    </label>
+                                    <select id="statusFilter" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="all">Tất cả</option>
+                                        <option value="Active">Hoạt động</option>
+                                        <option value="Draft">Nháp</option>
+                                        <option value="Published">Đã xuất bản</option>
+                                        <option value="Completed">Đã hoàn thành</option>
+                                        <option value="Cancelled">Đã hủy</option>
+                                        <option value="Postponed">Tạm hoãn</option>
+                                        <option value="Full">Đã đầy</option>
+                                        <option value="Closed">Đã đóng</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th>Tên sự kiện</th>
+                                        <th>Địa điểm</th>
+                                        <th>Ngày diễn ra</th>
+                                        <th>Thời gian</th>
+                                        <th>Số lượng</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var eventItem in Model)
+                                    {
+                                        <tr class="event-row" 
+                                            data-name="@eventItem.EventName.ToLower()" 
+                                            data-status="@eventItem.Status"
+                                            data-date="@eventItem.EventDate.ToString("yyyy-MM-dd")"
+                                            data-capacity="@eventItem.MaxDonors"
+                                            data-location="@eventItem.LocationName?.ToLower()">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(eventItem.ImageUrl))
+                                                    {
+                                                        <img src="@eventItem.ImageUrl" alt="Event" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                            <i class="fas fa-calendar text-muted"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-0">@eventItem.EventName</h6>
+                                                        <small class="text-muted">@eventItem.EventDescription?.Substring(0, Math.Min(50, eventItem.EventDescription.Length))...</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-map-marker-alt text-info me-2"></i>
+                                                    <span class="text-muted">@eventItem.LocationName</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-primary fw-bold">@eventItem.EventDate.ToString("dd/MM/yyyy")</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @(eventItem.StartTime is TimeSpan st ? st.ToString(@"hh\:mm") : "--")
+                                                    -
+                                                    @(eventItem.EndTime is TimeSpan et ? et.ToString(@"hh\:mm") : "--")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress me-2" style="width: 60px; height: 8px;">
+                                                        @{
+                                                            var percentage = eventItem.MaxDonors > 0 ? (double)eventItem.CurrentDonors / eventItem.MaxDonors * 100 : 0;
+                                                            var progressClass = percentage >= 100 ? "bg-danger" : percentage >= 80 ? "bg-warning" : "bg-success";
+                                                        }
+                                                        <div class="progress-bar @progressClass" style="width: @(Math.Min(percentage, 100))%"></div>
+                                                    </div>
+                                                    <small class="text-muted">@eventItem.CurrentDonors/@eventItem.MaxDonors</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var statusClass = eventItem.Status switch
+                                                    {
+                                                        EnumMapper.EventStatus.Active => "bg-success",
+                                                        EnumMapper.EventStatus.Draft => "bg-secondary",
+                                                        EnumMapper.EventStatus.Published => "bg-primary",
+                                                        EnumMapper.EventStatus.Completed => "bg-info",
+                                                        EnumMapper.EventStatus.Cancelled => "bg-danger",
+                                                        EnumMapper.EventStatus.Postponed => "bg-warning",
+                                                        EnumMapper.EventStatus.Full => "bg-dark",
+                                                        EnumMapper.EventStatus.Closed => "bg-secondary",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                    
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.EventStatus>(eventItem.Status);
+                                                }
+                                                <span class="badge @statusClass">@statusDisplayName</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Edit" asp-route-id="@eventItem.EventId" class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Details" asp-route-id="@eventItem.EventId" class="btn btn-sm btn-outline-info" title="Chi tiết">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" 
+                                                            onclick="confirmDelete(@eventItem.EventId, '@Html.Raw(eventItem.EventName.Replace("'", "\\'"))')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert will handle all confirmations -->
+
+@section Scripts {
+    <!-- SweetAlert Helper -->
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    
+    <script>
+        function confirmDelete(eventId, eventName) {
+            showDeleteConfirm(`sự kiện "${eventName}"`, 'Hành động này không thể hoàn tác.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/events/delete/${eventId}`;
+                        
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+        }
+
+        // Show toast notification when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventCount = @Model.Count();
+            if (eventCount > 0) {
+                showToast('info', `Hiển thị ${eventCount} sự kiện hiến máu`, 3000);
+            }
+
+            // Sorting and Filtering functionality
+            const sortBySelect = document.getElementById('sortBy');
+            const statusFilterSelect = document.getElementById('statusFilter');
+            const eventRows = document.querySelectorAll('.event-row');
+            const tbody = document.querySelector('tbody');
+
+            function applySortAndFilter() {
+                const sortBy = sortBySelect.value;
+                const statusFilter = statusFilterSelect.value;
+                
+                // Convert NodeList to Array for sorting
+                let rows = Array.from(eventRows);
+                
+                // Filter by status
+                if (statusFilter !== 'all') {
+                    rows = rows.filter(row => row.dataset.status === statusFilter);
+                }
+                
+                // Sort rows
+                rows.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name-asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case 'name-desc':
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        case 'date-newest':
+                            return new Date(b.dataset.date) - new Date(a.dataset.date);
+                        case 'date-oldest':
+                            return new Date(a.dataset.date) - new Date(b.dataset.date);
+                        case 'status-active':
+                            return (b.dataset.status === 'Active') - (a.dataset.status === 'Active');
+                        case 'status-draft':
+                            return (a.dataset.status === 'Draft') - (b.dataset.status === 'Draft');
+                        case 'capacity-high':
+                            return parseInt(b.dataset.capacity) - parseInt(a.dataset.capacity);
+                        case 'capacity-low':
+                            return parseInt(a.dataset.capacity) - parseInt(b.dataset.capacity);
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Reorder rows in DOM
+                rows.forEach(row => tbody.appendChild(row));
+                
+                // Show/hide rows based on filter
+                eventRows.forEach(row => {
+                    if (statusFilter === 'all' || row.dataset.status === statusFilter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Update event count display
+                const visibleCount = rows.filter(row => row.style.display !== 'none').length;
+                if (visibleCount !== eventCount) {
+                    showToast('info', `Hiển thị ${visibleCount} sự kiện`, 2000);
+                }
+            }
+
+            // Event listeners
+            sortBySelect.addEventListener('change', applySortAndFilter);
+            statusFilterSelect.addEventListener('change', applySortAndFilter);
+        });
+    </script>
+} 

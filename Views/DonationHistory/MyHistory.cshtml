@@ -1,0 +1,113 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationHistoryDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Lịch sử hiến máu của tôi";
+}
+<link rel="stylesheet" href="~/css/my-history-page.css" asp-append-version="true" />
+
+<div class="my-history-container">
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="history-main-card">
+                    <div class="history-card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-history me-2"></i>Lịch sử hiến máu của tôi
+                            </h4>
+                            @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                            {
+                                <a href="@Url.Action("Statistics", "DonationHistory")" class="btn btn-info btn-sm">
+                                    <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state fade-in">
+                            <i class="fas fa-tint empty-state-icon blood-drop-effect"></i>
+                            <h5 class="empty-state-title">Bạn chưa có lịch sử hiến máu nào</h5>
+                            <p class="empty-state-text">Hãy tham gia các sự kiện hiến máu để lưu lại dấu ấn của bạn!</p>
+                            <a href="@Url.Action("Index", "Events")" class="empty-state-btn heartbeat-effect">
+                                <i class="fas fa-heart me-1"></i>Đăng ký hiến máu
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="history-table table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Sự kiện</th>
+                                        <th>Ngày hiến</th>
+                                        <th>Địa điểm</th>
+                                        <th>Nhóm máu</th>
+                                        <th>Thể tích (ml)</th>
+                                        <th>Trạng thái</th>
+                                        <th>Chứng nhận</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (item, idx) in Model.Select((x, i) => (x, i + 1)))
+                                    {
+                                        <tr class="slide-in">
+                                            <td>@idx</td>
+                                            <td>@item.EventName</td>
+                                            <td>@item.DonationDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.EventDate?.ToString("dd/MM/yyyy")</td>
+                                            <td>@item.BloodTypeName</td>
+                                            <td>@item.Volume</td>
+                                            <td>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(item.Status);
+                                                }
+                                                <span class="status-badge @GetStatusBadgeClass(item.Status)">@statusDisplayName</span>
+                                            </td>
+                                            <td>
+                                                @if (item.CertificateIssued)
+                                                {
+                                                    <span class="certificate-badge bg-success">Đã cấp</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="certificate-badge bg-secondary">Chưa cấp</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "DonationHistory", new { id = item.DonationId })" class="btn-details">
+                                                    <i class="fas fa-eye me-1"></i>Chi tiết
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(EnumMapper.DonationStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.DonationStatus.Completed => "bg-success text-white",
+            EnumMapper.DonationStatus.InProgress => "bg-primary text-white",
+            EnumMapper.DonationStatus.Started => "bg-info text-white",
+            EnumMapper.DonationStatus.Stopped => "bg-warning text-white",
+            EnumMapper.DonationStatus.Failed => "bg-danger text-white",
+            EnumMapper.DonationStatus.Cancelled => "bg-secondary text-white",
+            _ => "bg-secondary text-white"
+        };
+    }
+} 

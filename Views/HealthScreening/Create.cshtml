@@ -1,0 +1,513 @@
+@model Blood_Donation_Website.Models.DTOs.HealthScreeningDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Sàng lọc sức khỏe";
+    var registration = ViewBag.Registration as Blood_Donation_Website.Models.DTOs.DonationRegistrationDto;
+    var user = ViewBag.User as Blood_Donation_Website.Models.DTOs.UserDto;
+    var bloodTypes = ViewBag.BloodTypes as List<Blood_Donation_Website.Models.DTOs.BloodTypeDto>;
+}
+
+<div class="container py-5 health-screening-create-page">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fas fa-stethoscope"></i>Sàng lọc sức khỏe
+                </h2>
+                <div class="header-actions">
+                    <a asp-action="PendingScreenings" class="btn btn-pending">
+                        <i class="fas fa-clock"></i>Chờ sàng lọc
+                    </a>
+                    <a asp-action="Index" class="btn btn-list">
+                        <i class="fas fa-list"></i>Tất cả sàng lọc
+                    </a>
+                </div>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Thông tin người hiến máu -->
+            <div class="user-info-card">
+                <div class="user-info-header">
+                    <h5>
+                        <i class="fas fa-user"></i>Thông tin người hiến máu
+                    </h5>
+                </div>
+                <div class="user-info-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user text-white fa-2x"></i>
+                                </div>
+                                <div class="user-info">
+                                    <h5 class="mb-1">@user?.FullName</h5>
+                                    <p class="text-muted mb-0">@user?.Email</p>
+                                    <p class="text-muted mb-0">@user?.Phone</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row registration-info">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Mã đăng ký:</label>
+                                    <p class="text-primary">@registration?.RegistrationId</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Sự kiện:</label>
+                                    <p class="text-info">@registration?.EventName</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Ngày đăng ký:</label>
+                                    <p class="text-muted">@registration?.RegistrationDate.ToString("dd/MM/yyyy")</p>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Thời gian check-in:</label>
+                                    <p class="text-success">@(registration?.CheckInTime?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa check-in")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form sàng lọc sức khỏe -->
+            <div class="screening-form-card">
+                <div class="screening-form-header">
+                    <h5>
+                        <i class="fas fa-clipboard-list"></i>Kết quả sàng lọc sức khỏe
+                    </h5>
+                </div>
+                <div class="screening-form-body">
+                    <form asp-action="Create" method="post" id="screeningForm">
+                        <input type="hidden" asp-for="RegistrationId" value="@registration?.RegistrationId" />
+                        
+                        <div class="row">
+                            <!-- Cột 1: Các chỉ số cơ bản -->
+                            <div class="col-md-6">
+                                <h6 class="section-header">
+                                    <i class="fas fa-ruler"></i>Chỉ số cơ bản
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    <label asp-for="Weight" class="form-label fw-bold">
+                                        <i class="fas fa-weight me-1"></i>Cân nặng (kg)
+                                    </label>
+                                    <input asp-for="Weight" type="number" class="form-control" step="0.1" min="30" max="200" 
+                                           placeholder="Ví dụ: 65.5" id="weight" />
+                                    <div class="form-text">Cân nặng tối thiểu: 45kg</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Height" class="form-label fw-bold">
+                                        <i class="fas fa-ruler-vertical me-1"></i>Chiều cao (cm)
+                                    </label>
+                                    <input asp-for="Height" type="number" class="form-control" step="0.1" min="140" max="220" 
+                                           placeholder="Ví dụ: 170.0" id="height" />
+                                    <div class="form-text">Chiều cao tối thiểu: 150cm</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="BloodPressure" class="form-label fw-bold">
+                                        <i class="fas fa-heartbeat me-1"></i>Huyết áp (mmHg)
+                                    </label>
+                                    <input asp-for="BloodPressure" type="text" class="form-control" 
+                                           placeholder="Ví dụ: 120/80" id="bloodPressure" />
+                                    <div class="form-text">Định dạng: Tâm thu/Tâm trương (Ví dụ: 120/80)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="HeartRate" class="form-label fw-bold">
+                                        <i class="fas fa-heart me-1"></i>Nhịp tim (bpm)
+                                    </label>
+                                    <input asp-for="HeartRate" type="number" class="form-control" min="40" max="200" 
+                                           placeholder="Ví dụ: 75" id="heartRate" />
+                                    <div class="form-text">Nhịp tim bình thường: 60-100 bpm</div>
+                                </div>
+                            </div>
+
+                            <!-- Cột 2: Các chỉ số khác -->
+                            <div class="col-md-6">
+                                <h6 class="section-header">
+                                    <i class="fas fa-thermometer-half"></i>Chỉ số khác
+                                </h6>
+
+                                <div class="mb-3">
+                                    <label asp-for="Temperature" class="form-label fw-bold">
+                                        <i class="fas fa-thermometer-half me-1"></i>Nhiệt độ (°C)
+                                    </label>
+                                    <input asp-for="Temperature" type="number" class="form-control" step="0.1" min="35" max="42" 
+                                           placeholder="Ví dụ: 36.5" id="temperature" />
+                                    <div class="form-text">Nhiệt độ bình thường: 36.5-37.5°C</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Hemoglobin" class="form-label fw-bold">
+                                        <i class="fas fa-tint me-1"></i>Hemoglobin (g/dL)
+                                    </label>
+                                    <input asp-for="Hemoglobin" type="number" class="form-control" step="0.1" min="7" max="20" 
+                                           placeholder="Ví dụ: 14.5" id="hemoglobin" />
+                                    <div class="form-text">Nam: ≥13g/dL, Nữ: ≥12g/dL</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calculator me-1"></i>BMI (Tự động tính)
+                                    </label>
+                                    <input type="text" class="form-control" id="bmi" readonly />
+                                    <div class="form-text">BMI = Cân nặng (kg) / [Chiều cao (m)]²</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-info-circle me-1"></i>Đánh giá BMI
+                                    </label>
+                                    <input type="text" class="form-control" id="bmiStatus" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Kết quả đánh giá -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="section-header">
+                                    <i class="fas fa-clipboard-check"></i>Kết quả đánh giá
+                                </h6>
+                                
+                                <div class="eligibility-section">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="isEligible" asp-for="IsEligible" checked>
+                                                <label class="form-check-label fw-bold" for="isEligible">
+                                                    <i class="fas fa-check-circle me-1"></i>Đủ điều kiện hiến máu
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="eligibilityStatus" class="eligibility-status alert-success">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                <strong>Đủ điều kiện hiến máu</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 disqualify-reason-group" id="disqualifyReasonGroup" style="display: none;">
+                                    <label asp-for="DisqualifyReason" class="form-label fw-bold">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Lý do không đủ điều kiện
+                                    </label>
+                                    <select asp-for="DisqualifyReason" class="form-select" id="disqualifyReason">
+                                        <option value="">-- Chọn lý do --</option>
+                                        <option value="@EnumMapper.DisqualificationReason.Underweight">Thiếu cân (BMI < 18.5)</option>
+                                        <option value="@EnumMapper.DisqualificationReason.Overweight">Thừa cân (BMI > 30)</option>
+                                        <option value="@EnumMapper.DisqualificationReason.HighBloodPressure">Huyết áp cao</option>
+                                        <option value="@EnumMapper.DisqualificationReason.LowBloodPressure">Huyết áp thấp</option>
+                                        <option value="@EnumMapper.DisqualificationReason.HighHeartRate">Nhịp tim cao</option>
+                                        <option value="@EnumMapper.DisqualificationReason.LowHeartRate">Nhịp tim thấp</option>
+                                        <option value="@EnumMapper.DisqualificationReason.HighTemperature">Sốt</option>
+                                        <option value="@EnumMapper.DisqualificationReason.LowHemoglobin">Thiếu máu (Hb thấp)</option>
+                                        <option value="@EnumMapper.DisqualificationReason.LowWeight">Cân nặng không đủ (< 45kg)</option>
+                                        <option value="@EnumMapper.DisqualificationReason.LowHeight">Chiều cao không đủ (< 150cm)</option>
+                                        <option value="@EnumMapper.DisqualificationReason.Other">Lý do khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Nút thao tác -->
+                        <div class="action-buttons">
+                            <a asp-action="PendingScreenings" class="btn btn-back">
+                                <i class="fas fa-arrow-left"></i>Quay lại
+                            </a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-auto-evaluate" id="autoEvaluateBtn">
+                                    <i class="fas fa-magic"></i>Tự động đánh giá
+                                </button>
+                                <button type="submit" class="btn btn-save">
+                                    <i class="fas fa-save"></i>Lưu kết quả
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/health-screening-create-page.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // Các biến để lưu trữ giá trị
+            let weight = 0;
+            let height = 0;
+            let bmi = 0;
+            let bloodPressure = '';
+            let heartRate = 0;
+            let temperature = 0;
+            let hemoglobin = 0;
+
+            // Hàm tính BMI
+            function calculateBMI() {
+                if (weight > 0 && height > 0) {
+                    const heightInMeters = height / 100;
+                    bmi = weight / (heightInMeters * heightInMeters);
+                    $('#bmi').val(bmi.toFixed(1));
+                    
+                    // Đánh giá BMI
+                    let bmiStatus = '';
+                    let bmiClass = '';
+                    if (bmi < 18.5) {
+                        bmiStatus = 'Thiếu cân';
+                        bmiClass = 'text-warning';
+                    } else if (bmi < 25) {
+                        bmiStatus = 'Bình thường';
+                        bmiClass = 'text-success';
+                    } else if (bmi < 30) {
+                        bmiStatus = 'Thừa cân';
+                        bmiClass = 'text-warning';
+                    } else {
+                        bmiStatus = 'Béo phì';
+                        bmiClass = 'text-danger';
+                    }
+                    
+                    $('#bmiStatus').val(bmiStatus).removeClass('text-warning text-success text-danger').addClass(bmiClass);
+                }
+            }
+
+            // Hàm đánh giá huyết áp
+            function evaluateBloodPressure(bp) {
+                if (!bp) return { status: 'normal', message: 'Bình thường' };
+                
+                const parts = bp.split('/');
+                if (parts.length !== 2) return { status: 'invalid', message: 'Định dạng không hợp lệ' };
+                
+                const systolic = parseInt(parts[0]);
+                const diastolic = parseInt(parts[1]);
+                
+                if (systolic < 90 || diastolic < 60) {
+                    return { status: 'low', message: 'Huyết áp thấp' };
+                } else if (systolic > 140 || diastolic > 90) {
+                    return { status: 'high', message: 'Huyết áp cao' };
+                } else {
+                    return { status: 'normal', message: 'Bình thường' };
+                }
+            }
+
+            // Hàm đánh giá nhịp tim
+            function evaluateHeartRate(hr) {
+                if (!hr) return { status: 'normal', message: 'Bình thường' };
+                
+                if (hr < 60) {
+                    return { status: 'low', message: 'Nhịp tim chậm' };
+                } else if (hr > 100) {
+                    return { status: 'high', message: 'Nhịp tim nhanh' };
+                } else {
+                    return { status: 'normal', message: 'Bình thường' };
+                }
+            }
+
+            // Hàm đánh giá nhiệt độ
+            function evaluateTemperature(temp) {
+                if (!temp) return { status: 'normal', message: 'Bình thường' };
+                
+                if (temp < 36.5) {
+                    return { status: 'low', message: 'Nhiệt độ thấp' };
+                } else if (temp > 37.5) {
+                    return { status: 'high', message: 'Sốt' };
+                } else {
+                    return { status: 'normal', message: 'Bình thường' };
+                }
+            }
+
+            // Hàm đánh giá hemoglobin
+            function evaluateHemoglobin(hgb) {
+                if (!hgb) return { status: 'normal', message: 'Bình thường' };
+                
+                // Giả sử đây là nam (có thể cần thêm logic phân biệt nam/nữ)
+                if (hgb < 13) {
+                    return { status: 'low', message: 'Thiếu máu' };
+                } else {
+                    return { status: 'normal', message: 'Bình thường' };
+                }
+            }
+
+            // Hàm tự động đánh giá
+            function autoEvaluate() {
+                // Lấy giá trị từ form
+                weight = parseFloat($('#weight').val()) || 0;
+                height = parseFloat($('#height').val()) || 0;
+                bloodPressure = $('#bloodPressure').val() || '';
+                heartRate = parseInt($('#heartRate').val()) || 0;
+                temperature = parseFloat($('#temperature').val()) || 0;
+                hemoglobin = parseFloat($('#hemoglobin').val()) || 0;
+
+                // Tính BMI
+                calculateBMI();
+
+                // Đánh giá các chỉ số
+                const bpEval = evaluateBloodPressure(bloodPressure);
+                const hrEval = evaluateHeartRate(heartRate);
+                const tempEval = evaluateTemperature(temperature);
+                const hgbEval = evaluateHemoglobin(hemoglobin);
+
+                // Kiểm tra điều kiện
+                let isEligible = true;
+                let disqualifyReason = '';
+
+                // Kiểm tra cân nặng
+                if (weight < 45) {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.LowWeight';
+                }
+                // Kiểm tra chiều cao
+                else if (height < 150) {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.LowHeight';
+                }
+                // Kiểm tra BMI
+                else if (bmi < 18.5) {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.Underweight';
+                }
+                else if (bmi > 30) {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.Overweight';
+                }
+                // Kiểm tra huyết áp
+                else if (bpEval.status === 'high') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.HighBloodPressure';
+                }
+                else if (bpEval.status === 'low') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.LowBloodPressure';
+                }
+                // Kiểm tra nhịp tim
+                else if (hrEval.status === 'high') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.HighHeartRate';
+                }
+                else if (hrEval.status === 'low') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.LowHeartRate';
+                }
+                // Kiểm tra nhiệt độ
+                else if (tempEval.status === 'high') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.HighTemperature';
+                }
+                // Kiểm tra hemoglobin
+                else if (hgbEval.status === 'low') {
+                    isEligible = false;
+                    disqualifyReason = '@EnumMapper.DisqualificationReason.LowHemoglobin';
+                }
+
+                // Cập nhật UI
+                $('#isEligible').prop('checked', isEligible);
+                $('#disqualifyReason').val(disqualifyReason);
+                
+                if (isEligible) {
+                    $('#eligibilityStatus').removeClass('alert-danger').addClass('alert-success')
+                        .html('<i class="fas fa-check-circle me-2"></i><strong>Đủ điều kiện hiến máu</strong>');
+                    $('#disqualifyReasonGroup').hide();
+                } else {
+                    $('#eligibilityStatus').removeClass('alert-success').addClass('alert-danger')
+                        .html('<i class="fas fa-times-circle me-2"></i><strong>Không đủ điều kiện hiến máu</strong>');
+                    $('#disqualifyReasonGroup').show();
+                }
+
+                // Hiển thị thông báo
+                const message = isEligible ? 
+                    'Đánh giá hoàn tất: Người hiến máu đủ điều kiện!' :
+                    'Đánh giá hoàn tất: Người hiến máu không đủ điều kiện.';
+                
+                showToast(isEligible ? 'success' : 'warning', message, 3000);
+            }
+
+            // Event listeners
+            $('#weight, #height').on('input', function() {
+                calculateBMI();
+            });
+
+            $('#isEligible').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                if (isChecked) {
+                    $('#eligibilityStatus').removeClass('alert-danger').addClass('alert-success')
+                        .html('<i class="fas fa-check-circle me-2"></i><strong>Đủ điều kiện hiến máu</strong>');
+                    $('#disqualifyReasonGroup').hide();
+                } else {
+                    $('#eligibilityStatus').removeClass('alert-success').addClass('alert-danger')
+                        .html('<i class="fas fa-times-circle me-2"></i><strong>Không đủ điều kiện hiến máu</strong>');
+                    $('#disqualifyReasonGroup').show();
+                }
+            });
+
+            $('#autoEvaluateBtn').on('click', function() {
+                showConfirm(
+                    'Tự động đánh giá',
+                    'Bạn có muốn hệ thống tự động đánh giá dựa trên các chỉ số đã nhập?',
+                    'Đánh giá',
+                    'Hủy',
+                    'question'
+                ).then((result) => {
+                    if (result.isConfirmed) {
+                        autoEvaluate();
+                    }
+                });
+            });
+
+            // Validate form trước khi submit
+            $('#screeningForm').on('submit', function(e) {
+                const isEligible = $('#isEligible').is(':checked');
+                const disqualifyReason = $('#disqualifyReason').val();
+                
+                if (!isEligible && !disqualifyReason) {
+                    e.preventDefault();
+                    showError('Lỗi', 'Vui lòng chọn lý do không đủ điều kiện khi đánh dấu không đủ điều kiện.');
+                    return false;
+                }
+                
+                // Kiểm tra các trường bắt buộc
+                const weight = $('#weight').val();
+                const height = $('#height').val();
+                const bloodPressure = $('#bloodPressure').val();
+                const heartRate = $('#heartRate').val();
+                const temperature = $('#temperature').val();
+                const hemoglobin = $('#hemoglobin').val();
+                
+                if (!weight || !height || !bloodPressure || !heartRate || !temperature || !hemoglobin) {
+                    e.preventDefault();
+                    showError('Lỗi', 'Vui lòng nhập đầy đủ các chỉ số sức khỏe.');
+                    return false;
+                }
+                
+                return true;
+            });
+        });
+    </script>
+} 

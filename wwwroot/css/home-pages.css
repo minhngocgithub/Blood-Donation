@@ -1,0 +1,342 @@
+Home Pages Specific Styles
+/* ========================== */
+
+/* Main Content Layout */
+.main-content {
+    min-height: calc(100vh - 70px);
+    padding-top: 70px;
+}
+
+/* About Page Styles */
+.about-hero {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(255, 107, 107, 0.1));
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+}
+
+.about-stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+}
+
+.about-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.about-team-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.about-team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* FAQ Page Styles */
+.faq-accordion .accordion-button {
+    background: white;
+    border: none;
+    color: #333;
+    font-weight: 600;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+    background: #e74c3c;
+    color: white;
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+}
+
+.faq-accordion .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+}
+
+.faq-accordion .accordion-body {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0 0 10px 10px;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Guide Page Styles */
+.guide-step-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border-left: 4px solid #e74c3c;
+}
+
+.guide-step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.guide-step-number {
+    background: #e74c3c;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* Privacy & Terms Page Styles */
+.legal-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #e74c3c;
+}
+
+.legal-section h4 {
+    color: #e74c3c;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.legal-section ul {
+    padding-left: 1.5rem;
+}
+
+.legal-section li {
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.legal-contact-info {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Card Enhancements */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Alert Enhancements */
+.alert {
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+}
+
+.alert-info {
+    background: rgba(23, 162, 184, 0.1);
+    color: #0c5460;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    color: #856404;
+}
+
+/* Icon Enhancements */
+.text-primary {
+    color: #e74c3c !important;
+}
+
+.fas, .fa {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .fas,
+.card:hover .fa {
+    transform: scale(1.1);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .main-content {
+        padding-top: 55px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-content {
+        padding-top: 50px;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .about-hero {
+        padding: 2rem 1rem;
+    }
+    
+    .guide-step-card,
+    .about-team-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Page Specific Overrides */
+.about-page .display-4 {
+    color: #e74c3c !important;
+}
+
+.faq-page .accordion-item {
+    border: none;
+    margin-bottom: 1rem;
+}
+
+.guide-page .card {
+    border-left: 4px solid #e74c3c;
+}
+
+.privacy-page .legal-section,
+.terms-page .legal-section {
+    background: #f8f9fa;
+    border-left: 4px solid #e74c3c;
+}
+
+/* Button Styles for Home Pages */
+.btn-danger {
+    background: #e74c3c;
+    border-color: #e74c3c;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+}
+
+.btn-outline-danger {
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    background: transparent;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-danger:hover {
+    background: #e74c3c;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Call to Action Sections */
+.cta-section {
+    background: rgba(231, 76, 60, 0.1);
+    padding: 3rem;
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.cta-section h3 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+/* Statistics Display */
+.stats-display {
+    background: rgba(231, 76, 60, 0.05);
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.stats-display h4 {
+    color: #e74c3c;
+    margin-bottom: 1.5rem;
+}
+
+.stats-display .h3 {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.stats-display .text-muted {
+    font-size: 0.9rem;
+}
+
+/* Team Section */
+.team-section .card {
+    text-align: center;
+    padding: 2rem;
+}
+
+.team-section .rounded-circle {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+/* Values Section */
+.values-section .rounded-circle {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.values-section h5 {
+    margin-bottom: 0.5rem;
+}
+
+.values-section .text-muted {
+    font-size: 0.9rem;
+} 

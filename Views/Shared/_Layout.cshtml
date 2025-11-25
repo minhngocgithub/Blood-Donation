@@ -1,0 +1,537 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hệ thống Hiến Máu Nhân Đạo</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-pages.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/index-page.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/registration-page.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sweetalert-custom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/submenu.css" asp-append-version="true" />
+
+    <!-- Page-specific Styles -->
+    @await RenderSectionAsync("Styles", required: false)
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico">
+</head>
+<body>
+    <header class="navbar-section">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+            <div class="container">
+                <!-- Brand -->
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="me-2 img-fluid" style="width:auto;max-width:60px;">
+                    <span class="brand-text fw-bold text-danger">BloodLife</span>
+                </a>
+
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navigation -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                               asp-controller="Home" asp-action="Index">
+                                Trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "BloodDonationEvent" ? "active" : "")"
+                               asp-controller="Events" asp-action="Index">
+                                Sự kiện
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "News" ? "active" : "")"
+                               asp-controller="News" asp-action="Index">
+                                Tin tức
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "About" ? "active" : "")"
+                               asp-controller="Home" asp-action="About">
+                                Giới thiệu
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Guide" ? "active" : "")"
+                               asp-controller="Home" asp-action="Guide">
+                                Hướng dẫn
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "FAQ" ? "active" : "")"
+                               asp-controller="Home" asp-action="FAQ">
+                                FAQ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active" : "")"
+                               asp-controller="Contact" asp-action="Index">
+                                Liên hệ
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- User Authentication -->
+                    <div class="d-flex align-items-center">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-outline-danger dropdown-toggle d-flex align-items-center user-dropdown-btn"
+                                        type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span class="user-name-text">@(User.FindFirst("FullName")?.Value ?? User.Identity.Name)
+                                            <br />
+                                            <small class="text-muted">
+                                                @{
+                                                    var roles = User.Claims.Where(c => c.Type == System.Security.Claims.ClaimTypes.Role).Select(c => c.Value);
+                                                    var roleDisplayNames = roles.Select(r => r switch
+                                                    {
+                                                        "Admin" => "Quản trị viên",
+                                                        "Hospital" => "Bệnh viện",
+                                                        "Doctor" => "Bác sĩ",
+                                                        "Staff" => "Nhân viên",
+                                                        "User" => "Người dùng",
+                                                        _ => r
+                                                    });
+                                                }
+                                                @string.Join(", ", roleDisplayNames)
+                                            </small>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                            <i class="fas fa-user me-2 text-primary"></i>Thông tin cá nhân
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                            <i class="fas fa-key me-2 text-warning"></i>Đổi mật khẩu
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="MyRegistrations">
+                                            <i class="fas fa-calendar-check me-2 text-success"></i>Đăng ký của tôi
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="DonationHistory" asp-action="MyHistory">
+                                            <i class="fas fa-history me-2 text-info"></i>Lịch sử hiến máu
+                                        </a>
+                                    </li>
+                                    <!-- Quản lý hiến máu (Hospital, Doctor, Staff) -->
+                                    @if (User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-tint me-2 text-danger"></i>Quản lý hiến máu
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationManagement" asp-action="Index">
+                                                        <i class="fas fa-list me-2 text-primary"></i>Danh sách hiến máu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationHistory" asp-action="Index">
+                                                        <i class="fas fa-search me-2 text-info"></i>Tra cứu lịch sử hiến máu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Checkin">
+                                                        <i class="fas fa-user-check me-2 text-success"></i>Check-in người hiến máu
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Sàng lọc sức khỏe (Hospital, Doctor) -->
+                                    @if (User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Index">
+                                                        <i class="fas fa-stethoscope me-2 text-success"></i>Sàng lọc sức khỏe
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="PendingScreenings">
+                                                        <i class="fas fa-clock me-2 text-warning"></i>Chờ sàng lọc
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="UpdateBloodTypeForm" asp-route-userId="0">
+                                                        <i class="fas fa-tint me-2 text-info"></i>Cập nhật nhóm máu
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Quản lý hệ thống (Admin, Hospital) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-cogs me-2 text-primary"></i>Quản lý hệ thống
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="EventManagement" asp-action="Index">
+                                                        <i class="fas fa-calendar-plus me-2 text-primary"></i>Quản lý sự kiện
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="LocationManagement" asp-action="Index">
+                                                        <i class="fas fa-map-marker-alt me-2 text-info"></i>Quản lý địa điểm
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="News" asp-action="Index">
+                                                        <i class="fas fa-newspaper me-2 text-success"></i>Quản lý tin tức
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="ContactMessage" asp-action="Index">
+                                                        <i class="fas fa-envelope me-2 text-warning"></i>Tin nhắn liên hệ
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Báo cáo và thống kê (Admin, Hospital, Doctor) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-chart-bar me-2 text-primary"></i>Báo cáo & Thống kê
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationRegistration" asp-action="Statistics">
+                                                        <i class="fas fa-chart-bar me-2 text-primary"></i>Thống kê đăng ký
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="DonationHistory" asp-action="Reports">
+                                                        <i class="fas fa-chart-line me-2 text-success"></i>Báo cáo hiến máu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="HealthScreening" asp-action="Statistics">
+                                                        <i class="fas fa-heartbeat me-2 text-danger"></i>Thống kê sàng lọc
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Quản lý người dùng (Admin, Hospital, Doctor) -->
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-users me-2 text-primary"></i>Quản lý người dùng
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="User" asp-action="Index">
+                                                        <i class="fas fa-users me-2 text-primary"></i>Quản lý người dùng
+                                                    </a>
+                                                </li>
+                                                @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                                {
+                                                    <li>
+                                                        <a class="dropdown-item" asp-controller="DonationHistory" asp-action="Statistics">
+                                                            <i class="fas fa-chart-bar me-2 text-info"></i>Thống kê hiến máu
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    }
+
+                                    <!-- Quản trị hệ thống (Admin only) -->
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li class="dropend">
+                                            <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-cog me-2 text-warning"></i>Quản trị hệ thống
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-submenu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="NewsCategory" asp-action="Index">
+                                                        <i class="fas fa-tags me-2 text-warning"></i>Danh mục tin tức
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="Data" asp-action="DataExport">
+                                                        <i class="fas fa-download me-2 text-info"></i>Xuất dữ liệu
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">
+                                                        <i class="fas fa-cog me-2 text-warning"></i>Quản trị hệ thống
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <div class="dropdown-item-group">
+                                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>
+                                    <span>Đăng nhập</span>
+                                </a>
+                                <a class="btn btn-danger" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i>
+                                    <span>Đăng ký</span>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main" class="main-content">
+        <!-- Breadcrumb (optional) -->
+        @if (ViewData["ShowBreadcrumb"] as bool? == true)
+        {
+            <nav aria-label="breadcrumb" class="bg-light py-2">
+                <div class="container">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home"></i> Trang chủ
+                            </a>
+                        </li>
+                        @if (ViewData["BreadcrumbItems"] != null)
+                        {
+                            @Html.Raw(ViewData["BreadcrumbItems"])
+                        }
+                    </ol>
+                </div>
+            </nav>
+        }
+
+        <!-- Page Content -->
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-section bg-dark text-light mt-5">
+        <div class="container">
+            <div class="row py-5">
+                <!-- Brand Column -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="footer-brand mb-3">
+                        <img src="~/image/Logo.png" alt="Blood Donation Logo" height="40" class="mb-2">
+                        <h5 class="text-white fw-bold">BloodLife</h5>
+                    </div>
+                    <p class="text-muted mb-3">
+                        Kết nối những trái tim nhân ái, cứu sống những sinh mạng quý giá.
+                        Mỗi giọt máu hiến tặng là một cơ hội sống mới cho những người cần được giúp đỡ.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3 social-link" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-light me-3 social-link" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-light me-3 social-link" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-light social-link" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white mb-3 fw-bold">Liên kết nhanh</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-muted text-decoration-none">Trang chủ</a></li>
+                        <li><a asp-controller="Events" asp-action="Index" class="text-muted text-decoration-none">Sự kiện hiến máu</a></li>
+                        <li><a asp-controller="News" asp-action="Index" class="text-muted text-decoration-none">Tin tức</a></li>
+                        <li><a asp-controller="Home" asp-action="About" class="text-muted text-decoration-none">Giới thiệu</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index" class="text-muted text-decoration-none">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-white mb-3 fw-bold">Hỗ trợ</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a asp-controller="Home" asp-action="Guide" class="text-muted text-decoration-none">Hướng dẫn hiến máu</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none">Chính sách bảo mật</a></li>
+                        <li><a asp-controller="Home" asp-action="Terms" class="text-muted text-decoration-none">Điều khoản sử dụng</a></li>
+                        <li><a asp-controller="Home" asp-action="FAQ" class="text-muted text-decoration-none">Câu hỏi thường gặp</a></li>
+                        <li><a href="tel:1900-1234" class="text-muted text-decoration-none">Hotline: 1900-1234</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6 class="text-white mb-3 fw-bold">Thông tin liên hệ</h6>
+                    <div class="contact-info">
+                        <div class="contact-item mb-2">
+                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                            <span class="text-muted">26 Nguyễn Thái Học, Ba Đình, Hà Nội</span>
+                        </div>
+                        <div class="contact-item mb-2">
+                            <i class="fas fa-phone me-2 text-danger"></i>
+                            <a href="tel:1900-1234" class="text-muted text-decoration-none">1900-1234</a>
+                        </div>
+                        <div class="contact-item mb-2">
+                            <i class="fas fa-envelope me-2 text-danger"></i>
+                            <a href="mailto:lienhe@hienmau.gov.vn" class="text-muted text-decoration-none">lienhe@hienmau.gov.vn</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock me-2 text-danger"></i>
+                            <span class="text-muted">24/7 - Luôn sẵn sàng hỗ trợ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <hr class="border-secondary my-4">
+            <div class="row py-3 align-items-center">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">
+                        &copy; @DateTime.Now.Year BloodLife - Hệ thống Hiến Máu Nhân Đạo.
+                        Tất cả quyền được bảo lưu.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-0">
+                        Được phát triển với <i class="fas fa-heart text-danger"></i> tại Việt Nam
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button type="button" class="btn btn-danger btn-floating btn-lg" id="btn-back-to-top" title="Về đầu trang">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 JS --> 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
+    
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script src="~/js/logout.js" asp-append-version="true"></script>
+
+    <!-- Custom Scripts -->
+    <script>
+        // Back to top button with improved animations
+        let mybutton = document.getElementById("btn-back-to-top");
+        let isVisible = false;
+
+        window.onscroll = function () {
+            scrollFunction();
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                if (!isVisible) {
+                    mybutton.style.display = "flex";
+                    mybutton.classList.add("show");
+                    mybutton.classList.remove("hide");
+                    isVisible = true;
+                }
+            } else {
+                if (isVisible) {
+                    mybutton.classList.add("hide");
+                    mybutton.classList.remove("show");
+                    setTimeout(() => {
+                        if (!isVisible) return;
+                        mybutton.style.display = "none";
+                    }, 300);
+                    isVisible = false;
+                }
+            }
+        }
+        mybutton.addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Auto-hide alerts
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
+                const alerts = document.querySelectorAll('.alert-dismissible');
+                alerts.forEach(function (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    
+    <!-- SweetAlert Notifications -->
+    @await Html.PartialAsync("_SweetAlertNotifications")
+</body>
+</html>
+

@@ -1,0 +1,320 @@
+@model Blood_Donation_Website.Models.DTOs.HealthScreeningDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chi tiết sàng lọc sức khỏe";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/health-screening-details-page.css" asp-append-version="true" />
+}
+
+<div class="screening-details-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card details-main-card">
+                    <div class="card-header details-card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-stethoscope me-2"></i>Chi tiết sàng lọc sức khỏe
+                            </h4>
+                            <a href="@Url.Action("Index", "HealthScreening")" class="btn btn-back-header">
+                                <i class="fas fa-arrow-left"></i>Quay lại
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Thông tin chính -->
+                            <div class="col-lg-8">
+                                <!-- Thông tin người hiến máu -->
+                                <div class="card content-card">
+                                    <div class="card-header content-card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-user me-2"></i>Thông tin người hiến máu
+                                        </h5>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Họ tên</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-user"></i>
+                                                    <span>@Model.UserName</span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sự kiện</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <span>@Model.EventName</span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Ngày sàng lọc</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-calendar"></i>
+                                                    <span>@Model.ScreeningDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Người thực hiện</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-user-md"></i>
+                                                    <span>@(Model.ScreenedByUserName ?? "Chưa xác định")</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Chỉ số sức khỏe -->
+                                <div class="card content-card">
+                                    <div class="card-header content-card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-heartbeat me-2"></i>Chỉ số sức khỏe
+                                        </h5>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <div class="vital-signs-grid">
+                                            @if (Model.Weight.HasValue)
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-weight"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.Weight kg</div>
+                                                    <div class="vital-sign-label">Cân nặng</div>
+                                                </div>
+                                            }
+                                            @if (Model.Height.HasValue)
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-ruler-vertical"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.Height cm</div>
+                                                    <div class="vital-sign-label">Chiều cao</div>
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(Model.BloodPressure))
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-heart"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.BloodPressure</div>
+                                                    <div class="vital-sign-label">Huyết áp (mmHg)</div>
+                                                </div>
+                                            }
+                                            @if (Model.HeartRate.HasValue)
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-heartbeat"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.HeartRate</div>
+                                                    <div class="vital-sign-label">Nhịp tim (bpm)</div>
+                                                </div>
+                                            }
+                                            @if (Model.Temperature.HasValue)
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-thermometer-half"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.Temperature°C</div>
+                                                    <div class="vital-sign-label">Nhiệt độ</div>
+                                                </div>
+                                            }
+                                            @if (Model.Hemoglobin.HasValue)
+                                            {
+                                                <div class="vital-sign-card">
+                                                    <div class="vital-sign-icon">
+                                                        <i class="fas fa-tint"></i>
+                                                    </div>
+                                                    <div class="vital-sign-value">@Model.Hemoglobin g/dL</div>
+                                                    <div class="vital-sign-label">Hemoglobin</div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Kết quả sàng lọc -->
+                                <div class="card content-card">
+                                    <div class="card-header content-card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-clipboard-check me-2"></i>Kết quả sàng lọc
+                                        </h5>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Trạng thái</label>
+                                                <div>
+                                                    @if (Model.IsEligible)
+                                                    {
+                                                        <div class="success-alert">
+                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            <strong>Đạt tiêu chuẩn hiến máu</strong>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="danger-alert">
+                                                            <i class="fas fa-times-circle me-2"></i>
+                                                            <strong>Không đạt tiêu chuẩn hiến máu</strong>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            @if (Model.DisqualifyReason.HasValue && !Model.IsEligible)
+                                            {
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label">Lý do không đạt</label>
+                                                    <div class="warning-alert">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                                        <strong>Lý do:</strong> @EnumMapper.GetDisplayName(Model.DisqualifyReason.Value)
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Thông tin đăng ký -->
+                                <div class="card content-card">
+                                    <div class="card-header content-card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-calendar-check me-2"></i>Thông tin đăng ký
+                                        </h5>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Mã đăng ký</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-hashtag"></i>
+                                                    <span>#@Model.RegistrationId</span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Trạng thái đăng ký</label>
+                                                <div>
+                                                    @{
+                                                        var statusDisplayName = Model.RegistrationStatus != null 
+                                                            ? EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(
+                                                                (EnumMapper.RegistrationStatus)Enum.Parse(typeof(EnumMapper.RegistrationStatus), Model.RegistrationStatus))
+                                                            : "Chưa xác định";
+                                                    }
+                                                    <span class="badge status-badge bg-info">@statusDisplayName</span>
+                                                </div>
+                                            </div>
+                                            @if (Model.CheckInTime.HasValue)
+                                            {
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Thời gian check-in</label>
+                                                    <p class="value-display">
+                                                        <i class="fas fa-sign-in-alt"></i>
+                                                        <span>@Model.CheckInTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                    </p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sidebar -->
+                            <div class="col-lg-4">
+                                <!-- Thông tin tổng quan -->
+                                <div class="card sidebar-card">
+                                    <div class="card-header content-card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>Thông tin tổng quan
+                                        </h6>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <div class="user-info-item">
+                                            <div class="user-info-label">Mã sàng lọc</div>
+                                            <div class="user-info-value">#@Model.ScreeningId</div>
+                                        </div>
+                                        <div class="user-info-item">
+                                            <div class="user-info-label">Ngày thực hiện</div>
+                                            <div class="user-info-value">@Model.ScreeningDate.ToString("dd/MM/yyyy")</div>
+                                        </div>
+                                        <div class="user-info-item">
+                                            <div class="user-info-label">Giờ thực hiện</div>
+                                            <div class="user-info-value">@Model.ScreeningDate.ToString("HH:mm")</div>
+                                        </div>
+                                        <div class="user-info-item">
+                                            <div class="user-info-label">Kết quả</div>
+                                            <div class="user-info-value">
+                                                @if (Model.IsEligible)
+                                                {
+                                                    <span class="badge bg-success">Đạt</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Không đạt</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hành động -->
+                                <div class="card sidebar-card">
+                                    <div class="card-header content-card-header">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-cogs me-2"></i>Hành động
+                                        </h6>
+                                    </div>
+                                    <div class="card-body content-card-body">
+                                        <a href="@Url.Action("Edit", "HealthScreening", new { id = Model.ScreeningId })" class="action-button btn-edit">
+                                            <i class="fas fa-edit me-2"></i>
+                                            <span>Chỉnh sửa</span>
+                                        </a>
+                                        <a href="@Url.Action("Index", "HealthScreening")" class="action-button btn-back">
+                                            <i class="fas fa-arrow-left me-2"></i>
+                                            <span>Quay lại danh sách</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Thông tin bổ sung -->
+                                @if (!string.IsNullOrEmpty(Model.ScreenedByUserName))
+                                {
+                                    <div class="card sidebar-card">
+                                        <div class="card-header content-card-header">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-user-md me-2"></i>Người thực hiện
+                                            </h6>
+                                        </div>
+                                        <div class="card-body content-card-body">
+                                            <div class="user-info-item">
+                                                <div class="user-info-label">Bác sĩ/Nhân viên</div>
+                                                <div class="user-info-value">@Model.ScreenedByUserName</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // Add any additional JavaScript functionality here
+            console.log('Health Screening Details page loaded');
+        });
+    </script>
+} 

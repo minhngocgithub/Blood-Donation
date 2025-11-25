@@ -1,0 +1,136 @@
+@model Blood_Donation_Website.Models.DTOs.UserDto?
+@{
+    ViewData["Title"] = "Cập nhật nhóm máu";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/update-blood-type-form-page.css" asp-append-version="true" />
+}
+
+<div class="update-blood-type-page">
+    <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-container">
+                <div class="page-header">
+                    <h4>
+                        <i class="fas fa-tint"></i>
+                        Cập nhật nhóm máu
+                    </h4>
+                </div>
+                    @if (Model == null)
+                    {
+                        <div class="error-alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Lỗi:</strong> Không tìm thấy thông tin người dùng. Vui lòng quay lại và thử lại.
+                        </div>
+                        <div class="text-center">
+                            <a asp-action="Index" class="btn btn-back">
+                                <i class="fas fa-arrow-left"></i>
+                                Quay lại
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="user-info-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Thông tin người dùng</h6>
+                                    <p><strong>Họ tên:</strong> @Model.FullName</p>
+                                    <p><strong>Email:</strong> @Model.Email</p>
+                                    <p><strong>Nhóm máu hiện tại:</strong> 
+                                        <span class="blood-type-badge">@(Model.BloodTypeName ?? "Chưa cập nhật")</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Thông tin khác</h6>
+                                    <p><strong>Giới tính:</strong> @Model.Gender</p>
+                                    <p><strong>Số điện thoại:</strong> @(Model.Phone ?? "Chưa cập nhật")</p>
+                                    <p><strong>Ngày sinh:</strong> @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form asp-action="UpdateBloodType" asp-route-userId="@Model.UserId" method="post">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="form-group">
+                                <label for="bloodTypeId" class="form-label">
+                                    <i class="fas fa-tint"></i>
+                                    Chọn nhóm máu mới
+                                </label>
+                                <select name="bloodTypeId" id="bloodTypeId" class="form-select" required>
+                                    <option value="">-- Chọn nhóm máu --</option>
+                                    @if (ViewBag.BloodTypes != null)
+                                    {
+                                        foreach (var bloodType in ViewBag.BloodTypes)
+                                        {
+                                            var isSelected = Model.BloodTypeId == bloodType.BloodTypeId;
+                                            if (isSelected)
+                                            {
+                                                <option value="@bloodType.BloodTypeId" selected>
+                                                    @bloodType.BloodTypeName
+                                                </option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@bloodType.BloodTypeId">
+                                                    @bloodType.BloodTypeName
+                                                </option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Chọn nhóm máu chính xác để đảm bảo tính tương thích khi hiến máu
+                                </div>
+                            </div>
+
+                            <div class="warning-alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Lưu ý:</strong> Việc cập nhật nhóm máu sẽ ảnh hưởng đến các đăng ký hiến máu trong tương lai. 
+                                Hãy đảm bảo thông tin chính xác trước khi cập nhật.
+                            </div>
+
+                            <div class="button-group">
+                                <a href="/screening/update-blood-type" class="btn btn-back">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-update">
+                                    <i class="fas fa-save"></i>
+                                    Cập nhật nhóm máu
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Validation cho form
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const bloodTypeSelect = document.getElementById('bloodTypeId');
+            
+            form.addEventListener('submit', function(e) {
+                if (!bloodTypeSelect.value) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Vui lòng chọn nhóm máu',
+                        text: 'Bạn cần chọn một nhóm máu trước khi cập nhật.',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
+        });
+    </script>
+} 

@@ -1,0 +1,360 @@
+@model Blood_Donation_Website.Models.DTOs.DonationRegistrationDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chi tiết đăng ký";
+}
+
+@{
+    // Thêm anti-forgery token cho JavaScript
+    var token = Html.AntiForgeryToken();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/registration-details-page.css" asp-append-version="true" />
+}
+
+<div class="registration-details-container">
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card details-main-card">
+                <div class="card-header details-card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-check me-2"></i>Chi tiết đăng ký hiến máu
+                        </h4>
+                        <a href="@Url.Action("MyRegistrations", "DonationRegistration")" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Thông tin sự kiện -->
+                        <div class="col-lg-8 slide-in-left">
+                            <div class="card content-card">
+                                <div class="card-header content-card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Thông tin sự kiện
+                                    </h5>
+                                </div>
+                                <div class="card-body content-card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Tên sự kiện</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-calendar-alt text-primary"></i>
+                                                <span>@Model.EventName</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Địa điểm</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                <span>@Model.LocationName</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Ngày sự kiện</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-calendar text-info"></i>
+                                                <span>@(Model.EventDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Trạng thái</label>
+                                            <div>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(Model.Status);
+                                                }
+                                                <span class="badge status-badge @GetStatusBadgeClass(Model.Status)">
+                                                    @statusDisplayName
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin đăng ký -->
+                            <div class="card content-card">
+                                <div class="card-header content-card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-user-check me-2 text-success"></i>Thông tin đăng ký
+                                    </h5>
+                                </div>
+                                <div class="card-body content-card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Ngày đăng ký</label>
+                                            <p class="value-display">
+                                                <i class="fas fa-clock text-warning"></i>
+                                                <span>@Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Tình trạng sức khỏe</label>
+                                            <div>
+                                                @{
+                                                    var screening = ViewBag.HealthScreening as Blood_Donation_Website.Models.DTOs.HealthScreeningDto;
+                                                    bool? healthEligible = screening?.IsEligible;
+                                                }
+                                                @if (healthEligible == true)
+                                                {
+                                                    <span class="badge status-badge bg-success">
+                                                        <i class="fas fa-check"></i>
+                                                        <span>Đủ điều kiện</span>
+                                                    </span>
+                                                }
+                                                else if (healthEligible == false)
+                                                {
+                                                    <span class="badge status-badge bg-danger">
+                                                        <i class="fas fa-times"></i>
+                                                        <span>Không đủ điều kiện</span>
+                                                    </span>
+                                                }
+                                                else if (Model.IsEligible)
+                                                {
+                                                    <span class="badge status-badge bg-success">
+                                                        <i class="fas fa-check"></i>
+                                                        <span>Đủ điều kiện</span>
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge status-badge bg-secondary">
+                                                        <i class="fas fa-question"></i>
+                                                        <span>Chưa xác định</span>
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (Model.CheckInTime.HasValue)
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Thời gian check-in</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-sign-in-alt text-primary"></i>
+                                                    <span>@Model.CheckInTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </p>
+                                            </div>
+                                        }
+                                        @if (Model.CompletionTime.HasValue)
+                                        {
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Thời gian hoàn thành</label>
+                                                <p class="value-display">
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                    <span>@Model.CompletionTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </p>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.Notes))
+                                        {
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Ghi chú</label>
+                                                <div class="info-alert">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                    <span>@Model.Notes</span>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.CancellationReason))
+                                        {
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Lý do hủy</label>
+                                                <div class="warning-alert">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span><strong>Lý do:</strong> @Model.CancellationReason</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar -->
+                        <div class="col-lg-4 slide-in-right">
+                            <!-- Thông tin người đăng ký -->
+                            <div class="card sidebar-card">
+                                <div class="card-header content-card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-user me-2 text-info"></i>Thông tin cá nhân
+                                    </h6>
+                                </div>
+                                <div class="card-body content-card-body">
+                                    <div class="user-info-item">
+                                        <div class="user-info-label">Họ tên</div>
+                                        <div class="user-info-value">@Model.UserName</div>
+                                    </div>
+                                    <div class="user-info-item">
+                                        <div class="user-info-label">Email</div>
+                                        <div class="user-info-value">@Model.UserEmail</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hành động -->
+                            <div class="card sidebar-card">
+                                <div class="card-header content-card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-cogs me-2 text-secondary"></i>Hành động
+                                    </h6>
+                                </div>
+                                <div class="card-body content-card-body">
+                                    @{
+                                        var canCancelDetail = Model.Status == EnumMapper.RegistrationStatus.Registered ||
+                                                             Model.Status == EnumMapper.RegistrationStatus.Confirmed ||
+                                                             Model.Status == EnumMapper.RegistrationStatus.Deferred;
+                                    }
+                                    @if (canCancelDetail)
+                                    {
+                                        <button type="button" class="action-button btn-cancel-registration" 
+                                                onclick="showCancelConfirmation(@Model.RegistrationId, '@Html.Raw(Model.EventName!.Replace("'", "\\'"))')">
+                                            <i class="fas fa-times"></i>
+                                            <span>Hủy đăng ký</span>
+                                        </button>
+                                    }
+                                    
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Completed)
+                                    {
+                                        <div class="success-alert">
+                                            <i class="fas fa-trophy"></i>
+                                            <span><strong>Chúc mừng!</strong> Bạn đã hoàn thành hiến máu thành công.</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Cancelled)
+                                    {
+                                        <div class="warning-alert">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Đăng ký này đã bị @(Model.Status == EnumMapper.RegistrationStatus.Cancelled ? "hủy" : "từ chối").</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showCancelConfirmation(registrationId, eventName) {
+            Swal.fire({
+                title: 'Xác nhận hủy đăng ký',
+                html: `
+                    <p>Bạn có chắc chắn muốn hủy đăng ký cho sự kiện <strong>${eventName}</strong>?</p>
+                    <div class="form-group">
+                        <label for="cancelReason" class="form-label">Lý do hủy (tùy chọn)</label>
+                        <textarea id="cancelReason" class="form-control" rows="3" 
+                                  placeholder="Nhập lý do hủy đăng ký..."></textarea>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: '<i class="fas fa-times me-1"></i>Hủy đăng ký',
+                cancelButtonText: 'Đóng',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const reason = document.getElementById('cancelReason').value;
+                    return { reason: reason };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cancelRegistration(registrationId, result.value.reason);
+                }
+            });
+        }
+
+        function cancelRegistration(registrationId, reason) {
+            // Hiển thị loading
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Gửi request hủy đăng ký
+            const formData = new FormData();
+            formData.append('id', registrationId);
+            formData.append('reason', reason);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+            
+            fetch('@Url.Action("Cancel", "DonationRegistration")', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: 'Đã hủy đăng ký thành công',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Redirect về trang danh sách đăng ký
+                        window.location.href = '@Url.Action("MyRegistrations", "DonationRegistration")';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: data.message || 'Có lỗi xảy ra khi hủy đăng ký'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra khi hủy đăng ký. Vui lòng thử lại.'
+                });
+            });
+        }
+    </script>
+    <script src="~/js/registration.js" asp-append-version="true"></script>
+}
+
+@functions {
+    private string GetStatusBadgeClass(EnumMapper.RegistrationStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.RegistrationStatus.Registered => "bg-warning text-dark",
+            EnumMapper.RegistrationStatus.Confirmed => "bg-info text-white",
+            EnumMapper.RegistrationStatus.CheckedIn => "bg-primary text-white",
+            EnumMapper.RegistrationStatus.Screening => "bg-warning text-dark",
+            EnumMapper.RegistrationStatus.Eligible => "bg-success text-white",
+            EnumMapper.RegistrationStatus.Ineligible => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.Donating => "bg-info text-white",
+            EnumMapper.RegistrationStatus.Completed => "bg-success text-white",
+            EnumMapper.RegistrationStatus.Cancelled => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.NoShow => "bg-secondary text-white",
+            EnumMapper.RegistrationStatus.Failed => "bg-danger text-white",
+            EnumMapper.RegistrationStatus.Deferred => "bg-warning text-dark",
+            _ => "bg-light text-dark"
+        };
+    }
+} 

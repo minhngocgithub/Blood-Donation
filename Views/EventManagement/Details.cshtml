@@ -1,0 +1,494 @@
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventDto
+@using Blood_Donation_Website.Models.DTOs
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chi tiết sự kiện";
+    var statistics = ViewBag.Statistics as EventStatisticsDto;
+    
+
+    
+    string GetStatusClass(EnumMapper.EventStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.EventStatus.Active => "bg-success",
+            EnumMapper.EventStatus.Draft => "bg-secondary",
+            EnumMapper.EventStatus.Published => "bg-primary",
+            EnumMapper.EventStatus.Completed => "bg-info",
+            EnumMapper.EventStatus.Cancelled => "bg-danger",
+            EnumMapper.EventStatus.Postponed => "bg-warning",
+            EnumMapper.EventStatus.Full => "bg-dark",
+            EnumMapper.EventStatus.Closed => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+    
+
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/event-management-page.css" asp-append-version="true" />
+}
+
+<div class="container py-5">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger fw-bold">
+                    <i class="fas fa-calendar-alt me-2"></i>Chi tiết sự kiện hiến máu
+                </h2>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" 
+                            data-event-id="@Model.EventId" 
+                            data-event-name="@Model.EventName"
+                            onclick="confirmDelete(this)">
+                        <i class="fas fa-trash me-2"></i>Xóa
+                    </button>
+                </div>
+            </div>
+
+            <!-- SweetAlert notifications will be handled by _SweetAlertNotifications partial -->
+
+            <div class="row">
+                <!-- Event Details -->
+                <div class="col-md-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin sự kiện
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Tên sự kiện:</label>
+                                        <div class="text-primary fw-bold fs-5">@Model.EventName</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Ngày diễn ra:</label>
+                                        <div class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>@Model.EventDate.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Thời gian:</label>
+                                        <div class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            @(Model.StartTime is TimeSpan st ? st.ToString(@"hh\:mm") : "--")
+                                            -
+                                            @(Model.EndTime is TimeSpan et ? et.ToString(@"hh\:mm") : "--")
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Địa điểm:</label>
+                                        <div class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>@Model.LocationName
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Trạng thái:</label>
+                                        <div>
+                                            @{
+                                                var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.EventStatus>(Model.Status);
+                                            }
+                                            <span class="badge @GetStatusClass(Model.Status) fs-6">@statusDisplayName</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Số lượng đăng ký:</label>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress me-2" style="width: 100px; height: 10px;">
+                                                @{
+                                                    var percentage = Model.MaxDonors > 0 ? (double)Model.CurrentDonors / Model.MaxDonors * 100 : 0;
+                                                    var progressClass = percentage >= 100 ? "bg-danger" : percentage >= 80 ? "bg-warning" : "bg-success";
+                                                }
+                                                <div class="progress-bar @progressClass" style="width: @(Math.Min(percentage, 100))%"></div>
+                                            </div>
+                                            <span class="text-muted">@Model.CurrentDonors/@Model.MaxDonors</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Nhóm máu cần:</label>
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(Model.RequiredBloodTypes))
+                                            {
+                                                var bloodTypes = Model.RequiredBloodTypes.Split(',');
+                                                foreach (var bloodType in bloodTypes)
+                                                {
+                                                    <span class="badge bg-danger me-1">@bloodType.Trim()</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Tất cả nhóm máu</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Người tạo:</label>
+                                        <div class="text-muted">
+                                            <i class="fas fa-user me-1"></i>@Model.CreatorName
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mô tả sự kiện:</label>
+                                <div class="p-3 bg-light rounded">
+                                    @if (!string.IsNullOrEmpty(Model.EventDescription))
+                                    {
+                                        @Html.Raw(Model.EventDescription.Replace("\n", "<br>"))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không có mô tả</span>
+                                    }
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Hình ảnh sự kiện:</label>
+                                    <div>
+                                        <img src="@Model.ImageUrl" alt="Event Image" class="img-fluid rounded" style="max-height: 300px;">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics and Quick Actions -->
+                <div class="col-md-4">
+                    <!-- Statistics Card -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Thống kê
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (statistics != null)
+                            {
+                                <div class="row text-center">
+                                    <div class="col-6 mb-3">
+                                        <div class="bg-primary text-white rounded p-3">
+                                            <h4 class="mb-0">@statistics.CurrentDonors</h4>
+                                            <small>Đăng ký</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="bg-success text-white rounded p-3">
+                                            <h4 class="mb-0">@statistics.CompletedDonations</h4>
+                                            <small>Hoàn thành</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="bg-info text-white rounded p-3">
+                                            <h4 class="mb-0">@statistics.MaxDonors</h4>
+                                            <small>Tối đa</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="bg-warning text-white rounded p-3">
+                                            <h4 class="mb-0">@(statistics.MaxDonors - statistics.CurrentDonors)</h4>
+                                            <small>Còn lại</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-muted">Tỷ lệ hoàn thành:</span>
+                                        <span class="fw-bold">@(statistics.MaxDonors > 0 ? Math.Round((double)statistics.CompletedDonations / statistics.MaxDonors * 100, 1) : 0)%</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        @{
+                                            var completionRate = statistics.MaxDonors > 0 ? (double)statistics.CompletedDonations / statistics.MaxDonors * 100 : 0;
+                                        }
+                                        <div class="progress-bar bg-success" style="width: @(Math.Min(completionRate, 100))%"></div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-3">
+                                    <i class="fas fa-chart-line fa-2x text-muted mb-2"></i>
+                                    <p class="text-muted">Chưa có thống kê</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-cogs me-2"></i>Thao tác nhanh
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                @if (Model.Status == EnumMapper.EventStatus.Active)
+                                {
+                                                                    <button type="button" class="btn btn-outline-success" 
+                                        data-event-id="@Model.EventId" 
+                                        data-event-name="@Model.EventName"
+                                        onclick="updateEventStatus('Completed', this)">
+                                    <i class="fas fa-check-circle me-2"></i>Hoàn thành sự kiện
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" 
+                                        data-event-id="@Model.EventId" 
+                                        data-event-name="@Model.EventName"
+                                        onclick="updateEventStatus('Postponed', this)">
+                                    <i class="fas fa-pause me-2"></i>Tạm hoãn sự kiện
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" 
+                                        data-event-id="@Model.EventId" 
+                                        data-event-name="@Model.EventName"
+                                        onclick="updateEventStatus('Cancelled', this)">
+                                    <i class="fas fa-times-circle me-2"></i>Hủy sự kiện
+                                </button>
+                                }
+                                else if (Model.Status == EnumMapper.EventStatus.Postponed)
+                                {
+                                    <button type="button" class="btn btn-outline-success" 
+                                            data-event-id="@Model.EventId" 
+                                            data-event-name="@Model.EventName"
+                                            onclick="updateEventStatus('Active', this)">
+                                        <i class="fas fa-play me-2"></i>Kích hoạt lại
+                                    </button>
+                                }
+                                
+                                <button type="button" class="btn btn-outline-info" 
+                                        data-event-id="@Model.EventId" 
+                                        data-event-name="@Model.EventName"
+                                        onclick="sendReminders(this)">
+                                    <i class="fas fa-bell me-2"></i>Gửi nhắc nhở
+                                </button>
+                                
+                                <button type="button" class="btn btn-outline-primary" 
+                                        data-event-id="@Model.EventId" 
+                                        data-event-name="@Model.EventName"
+                                        onclick="exportEventData(this)">
+                                    <i class="fas fa-download me-2"></i>Xuất dữ liệu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Event Info -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Thông tin bổ sung
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Ngày tạo:</label>
+                                <div class="text-muted">
+                                    <i class="fas fa-calendar-plus me-1"></i>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Cập nhật lần cuối:</label>
+                                <div class="text-muted">
+                                    <i class="fas fa-edit me-1"></i>@Model.UpdatedDate.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <label class="form-label fw-bold">Mã sự kiện:</label>
+                                <div class="text-muted">
+                                    <i class="fas fa-hashtag me-1"></i>#@Model.EventId
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.LocationAddress))
+                            {
+                                <div class="mb-2">
+                                    <label class="form-label fw-bold">Địa chỉ chi tiết:</label>
+                                    <div class="text-muted">
+                                        <i class="fas fa-map me-1"></i>@Model.LocationAddress
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert will handle all confirmations -->
+
+@section Scripts {
+    <!-- SweetAlert Helper -->
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <!-- Event Management -->
+    <script src="~/js/event-management.js" asp-append-version="true"></script>
+    
+    <script>
+        function confirmDelete(button) {
+            const eventId = button.getAttribute('data-event-id');
+            const eventName = button.getAttribute('data-event-name');
+            
+            showDeleteConfirm(`sự kiện "${eventName}"`, 'Hành động này không thể hoàn tác.')
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/events/delete/${eventId}`;
+                        
+                        const token = document.createElement('input');
+                        token.type = 'hidden';
+                        token.name = '__RequestVerificationToken';
+                        token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                        
+                        form.appendChild(token);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+        }
+
+        function updateEventStatus(status, button) {
+            const eventId = button.getAttribute('data-event-id');
+            const eventName = button.getAttribute('data-event-name');
+            
+            const statusText = {
+                'Active': 'kích hoạt',
+                'Completed': 'hoàn thành',
+                'Postponed': 'tạm hoãn',
+                'Cancelled': 'hủy bỏ'
+            };
+            
+            showConfirm(
+                'Cập nhật trạng thái sự kiện',
+                `Bạn có chắc chắn muốn ${statusText[status]} sự kiện "${eventName}"?`,
+                'Có, cập nhật',
+                'Hủy bỏ',
+                'question'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading('Đang cập nhật...', 'Cập nhật trạng thái sự kiện');
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/events/status/${eventId}`;
+                    
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'status';
+                    statusInput.value = status;
+                    
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    
+                    form.appendChild(statusInput);
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function sendReminders(button) {
+            const eventId = button.getAttribute('data-event-id');
+            const eventName = button.getAttribute('data-event-name');
+            
+            showConfirm(
+                'Gửi nhắc nhở',
+                'Bạn có chắc chắn muốn gửi nhắc nhở cho tất cả người đăng ký?',
+                'Có, gửi nhắc nhở',
+                'Hủy bỏ',
+                'question'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading('Đang gửi...', 'Gửi nhắc nhở cho người đăng ký');
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/events/reminders/${eventId}`;
+                    
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function exportEventData(button) {
+            const eventId = button.getAttribute('data-event-id');
+            const eventName = button.getAttribute('data-event-name');
+            
+            showConfirm(
+                'Xuất dữ liệu sự kiện',
+                'Bạn có muốn xuất dữ liệu chi tiết của sự kiện này?',
+                'Có, xuất dữ liệu',
+                'Hủy bỏ',
+                'question'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading('Đang xuất...', 'Xuất dữ liệu sự kiện');
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `/admin/events/export/${eventId}`;
+                    
+                    const formatInput = document.createElement('input');
+                    formatInput.type = 'hidden';
+                    formatInput.name = 'format';
+                    formatInput.value = 'json';
+                    
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    
+                    form.appendChild(formatInput);
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Show event info when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const eventName = '@Model.EventName';
+            const eventDate = '@Model.EventDate.ToString("dd/MM/yyyy")';
+            
+            showToast('info', `Xem chi tiết sự kiện: "${eventName}" - ${eventDate}`, 3000);
+        });
+    </script>
+} 

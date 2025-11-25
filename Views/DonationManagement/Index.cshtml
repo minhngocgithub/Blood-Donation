@@ -1,0 +1,397 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationRegistrationDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Quản lý hiến máu";
+}
+
+<style>
+.donation-management-page {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.donation-management-page .container {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.donation-header {
+    background: #dc3545;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+}
+
+.donation-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.donation-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #dc3545;
+}
+
+.stat-card.eligible {
+    border-color: #28a745;
+    background: white;
+}
+
+.stat-card.donating {
+    border-color: #007bff;
+    background: white;
+}
+
+.stat-card.completed {
+    border-color: #28a745;
+    background: white;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #dc3545;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.donation-table {
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #dee2e6;
+}
+
+.donation-table .table {
+    margin: 0;
+}
+
+.donation-table .table thead th {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.donation-table .table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.donation-table .table tbody tr:hover {
+    background: #f8f9fa;
+    transform: scale(1.005);
+}
+
+.donation-table .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-eligible {
+    background: #28a745;
+    color: white;
+}
+
+.status-donating {
+    background: #007bff;
+    color: white;
+}
+
+.status-completed {
+    background: #28a745;
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-donation {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-donation:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-start {
+    background: #28a745;
+    color: white;
+}
+
+.btn-progress {
+    background: #007bff;
+    color: white;
+}
+
+.btn-complete {
+    background: #28a745;
+    color: white;
+}
+
+.btn-details {
+    background: #6c757d;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #dc3545;
+}
+
+@@media (max-width: 768px) {
+    .donation-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-donation {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="donation-management-page">
+    <div class="container">
+        <div class="donation-header">
+            <h2>
+                <i class="fas fa-tint me-2"></i>Quản lý hiến máu
+            </h2>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Thống kê -->
+        <div class="donation-stats">
+            <div class="stat-card eligible">
+                <div class="stat-number">@Model.Count(r => r.Status == EnumMapper.RegistrationStatus.Eligible)</div>
+                <div class="stat-label">Đủ điều kiện</div>
+            </div>
+            <div class="stat-card donating">
+                <div class="stat-number">@Model.Count(r => r.Status == EnumMapper.RegistrationStatus.Donating)</div>
+                <div class="stat-label">Đang hiến máu</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-number">@Model.Count(r => r.Status == EnumMapper.RegistrationStatus.Completed)</div>
+                <div class="stat-label">Hoàn thành</div>
+            </div>
+        </div>
+
+        <!-- Bảng danh sách -->
+        <div class="donation-table">
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <i class="fas fa-tint"></i>
+                    <h5>Chưa có đăng ký nào</h5>
+                    <p>Không có đăng ký nào đủ điều kiện hiến máu.</p>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Người hiến máu</th>
+                            <th>Sự kiện</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Trạng thái</th>
+                            <th>Sức khỏe</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var reg in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3">
+                                            @(reg.FullName?.Substring(0, 1).ToUpper() ?? "U")
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">@reg.FullName</h6>
+                                            <small class="text-muted">@reg.RegistrationCode</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>@reg.EventName</strong>
+                                        <br>
+                                        <small class="text-muted">@reg.EventDate?.ToString("dd/MM/yyyy")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@reg.RegistrationDate.ToString("dd/MM/yyyy")</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(reg.Status);
+                                        var statusClass = reg.Status switch
+                                        {
+                                            EnumMapper.RegistrationStatus.Eligible => "status-eligible",
+                                            EnumMapper.RegistrationStatus.Donating => "status-donating",
+                                            EnumMapper.RegistrationStatus.Completed => "status-completed",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="status-badge @statusClass">@statusDisplayName</span>
+                                </td>
+                                <td>
+                                    @if (reg.IsEligible)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Đủ điều kiện
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-times me-1"></i>Chưa đủ điều kiện
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        @if (reg.Status == EnumMapper.RegistrationStatus.Eligible)
+                                        {
+                                            <a asp-action="Start" asp-route-id="@reg.RegistrationId" class="btn btn-donation btn-start">
+                                                <i class="fas fa-play me-1"></i>Bắt đầu
+                                            </a>
+                                        }
+                                        else if (reg.Status == EnumMapper.RegistrationStatus.Donating)
+                                        {
+                                            <a asp-action="InProgress" asp-route-id="@reg.RegistrationId" class="btn btn-donation btn-progress">
+                                                <i class="fas fa-clock me-1"></i>Theo dõi
+                                            </a>
+                                            <a asp-action="Complete" asp-route-id="@reg.RegistrationId" class="btn btn-donation btn-complete">
+                                                <i class="fas fa-check me-1"></i>Hoàn tất
+                                            </a>
+                                        }
+                                        else if (reg.Status == EnumMapper.RegistrationStatus.Completed)
+                                        {
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle me-1"></i>Đã hoàn thành
+                                            </span>
+                                        }
+                                        
+                                        <a asp-action="Details" asp-route-id="@reg.RegistrationId" class="btn btn-donation btn-details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            var successMsg = '@TempData["SuccessMessage"]';
+            var errorMsg = '@TempData["ErrorMessage"]';
+            
+            if (successMsg) {
+                showSuccess('Thành công');
+            }
+            if (errorMsg) {
+                showError('Lỗi');
+            }
+        });
+    </script>
+} 
