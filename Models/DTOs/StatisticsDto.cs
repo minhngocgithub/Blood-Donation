@@ -50,6 +50,7 @@ namespace Blood_Donation_Website.Models.DTOs
     {
         public string BloodType { get; set; } = string.Empty;
         public int Count { get; set; }
+        public int TotalVolume { get; set; }
     }
 
     public class TopDonorDto
@@ -69,4 +70,4 @@ namespace Blood_Donation_Website.Models.DTOs
         public int TotalVolume { get; set; }
         public int CompletedDonations { get; set; }
     }
-} 
+}
