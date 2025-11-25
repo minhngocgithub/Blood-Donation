@@ -1,0 +1,371 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationRegistrationDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Đăng ký của tôi";
+}
+
+@{
+    // Thêm anti-forgery token cho JavaScript
+    var token = Html.AntiForgeryToken();
+}
+@{
+    var selectedStatus = Context.Request.Query["status"].ToString();
+    if (string.IsNullOrEmpty(selectedStatus)) { selectedStatus = "active"; }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/my-registrations-page.css" asp-append-version="true" />
+}
+
+<div class="my-registrations-container">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card registrations-main-card">
+                    <div class="card-header registrations-card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-calendar-check me-2"></i>Đăng ký hiến máu của tôi
+                            </h4>
+                            <a href="@Url.Action("MyStatistics", "DonationRegistration")" class="btn btn-light btn-sm ms-3">
+                                <i class="fas fa-chart-bar me-1"></i>Thống kê
+                            </a>
+                        </div>
+                        <form method="get" class="mb-0">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto">
+                                    <select name="status" class="form-select form-select-sm status-filter-select" onchange="this.form.submit()">
+                                        @if (selectedStatus == "active") {
+                                            <option value="active" selected>Đang đăng ký</option>
+                                        } else {
+                                            <option value="active">Đang đăng ký</option>
+                                        }
+                                        @if (selectedStatus == "completed") {
+                                            <option value="completed" selected>Hoàn thành</option>
+                                        } else {
+                                            <option value="completed">Hoàn thành</option>
+                                        }
+                                        @if (selectedStatus == "deferred") {
+                                            <option value="deferred" selected>Tạm hoãn</option>
+                                        } else {
+                                            <option value="deferred">Tạm hoãn</option>
+                                        }
+                                        @if (selectedStatus == "cancelled") {
+                                            <option value="cancelled" selected>Đã hủy</option>
+                                        } else {
+                                            <option value="cancelled">Đã hủy</option>
+                                        }
+                                        @if (selectedStatus == "all") {
+                                            <option value="all" selected>Tất cả</option>
+                                        } else {
+                                            <option value="all">Tất cả</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="empty-state fade-in">
+                            <i class="fas fa-calendar-times empty-state-icon fa-3x"></i>
+                            <h5 class="empty-state-title">Bạn chưa có đăng ký hiến máu nào</h5>
+                            <p class="empty-state-text">Hãy tham gia các sự kiện hiến máu để đăng ký!</p>
+                            <a href="@Url.Action("Index", "Events")" class="empty-state-btn">
+                                <i class="fas fa-plus me-1"></i>Xem sự kiện hiến máu
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            @foreach (var registration in Model)
+                            {
+                                <div class="col-lg-6 col-xl-4 mb-4 slide-in">
+                                    <div class="card registration-item-card h-100">
+                                        <div class="card-header registration-card-header">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="card-title registration-card-title">@registration.EventName</h6>
+                                                    <div class="location-info">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                        <span>@registration.LocationName</span>
+                                                    </div>
+                                                </div>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(registration.Status);
+                                                }
+                                                <span class="badge status-badge @GetStatusBadgeClass(registration.Status.ToString())">
+                                                    @statusDisplayName
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body registration-card-body">
+                                            <div class="info-grid">
+                                                <div class="info-item">
+                                                    <div class="info-label">Ngày đăng ký</div>
+                                                    <div class="info-value">@registration.RegistrationDate.ToString("dd/MM/yyyy")</div>
+                                                </div>
+                                                <div class="info-item">
+                                                    <div class="info-label">Ngày sự kiện</div>
+                                                    <div class="info-value">@(registration.EventDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+                                                </div>
+                                            </div>
+                                            
+                                            @if (!string.IsNullOrEmpty(registration.Notes))
+                                            {
+                                                <div class="notes-section">
+                                                    <div class="info-label">Ghi chú</div>
+                                                    <p class="notes-text">@registration.Notes</p>
+                                                </div>
+                                            }
+
+                                            @if (registration.CheckInTime.HasValue)
+                                            {
+                                                <div class="time-info">
+                                                    <i class="fas fa-clock"></i>
+                                                    <span class="time-text">Check-in: @registration.CheckInTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </div>
+                                            }
+
+                                            @if (registration.CompletionTime.HasValue)
+                                            {
+                                                <div class="time-info">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span class="time-text">Hoàn thành: @registration.CompletionTime.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                </div>
+                                            }
+
+                                            @if (!string.IsNullOrEmpty(registration.CancellationReason))
+                                            {
+                                                <div class="cancellation-alert">
+                                                    <small>
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        <strong>Lý do hủy:</strong> @registration.CancellationReason
+                                                    </small>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="card-footer registration-card-footer">
+                                            <a href="@Url.Action("Details", "DonationRegistration", new { id = registration.RegistrationId })" 
+                                               class="action-btn btn-details">
+                                                <i class="fas fa-eye"></i>
+                                                <span>Chi tiết</span>
+                                            </a>
+                                            
+                                            @{
+                                                var canCancel = registration.Status == EnumMapper.RegistrationStatus.Registered ||
+                                                               registration.Status == EnumMapper.RegistrationStatus.Confirmed ||
+                                                               registration.Status == EnumMapper.RegistrationStatus.Deferred;
+                                            }
+                                            @if (canCancel)
+                                            {
+                                                <button type="button" class="action-btn btn-cancel" 
+                                                        onclick="showCancelConfirmation(@registration.RegistrationId, '@Html.Raw(registration.EventName!.Replace("'", "\\'"))')">
+                                                    <i class="fas fa-times"></i>
+                                                    <span>Hủy đăng ký</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add loading overlay functionality
+        function showLoadingOverlay() {
+            const overlay = document.createElement('div');
+            overlay.className = 'loading-overlay';
+            overlay.innerHTML = '<div class="loading-spinner"></div>';
+            document.body.appendChild(overlay);
+        }
+
+        function hideLoadingOverlay() {
+            const overlay = document.querySelector('.loading-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Enhanced cancel confirmation with better styling
+        function showCancelConfirmation(registrationId, eventName) {
+            Swal.fire({
+                title: '<i class="fas fa-exclamation-triangle text-warning me-2"></i>Xác nhận hủy đăng ký',
+                html: `
+                    <div class="text-start">
+                        <p class="mb-3">Bạn có chắc chắn muốn hủy đăng ký cho sự kiện:</p>
+                        <div class="alert alert-info">
+                            <strong><i class="fas fa-calendar me-1"></i>${eventName}</strong>
+                        </div>
+                        <div class="form-group">
+                            <label for="cancelReason" class="form-label fw-bold">
+                                <i class="fas fa-comment me-1"></i>Lý do hủy (tùy chọn)
+                            </label>
+                            <textarea id="cancelReason" class="form-control" rows="3" 
+                                      placeholder="Nhập lý do hủy đăng ký..."></textarea>
+                        </div>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-times me-1"></i>Hủy đăng ký',
+                cancelButtonText: '<i class="fas fa-times me-1"></i>Đóng',
+                focusConfirm: false,
+                customClass: {
+                    popup: 'swal-custom-popup',
+                    title: 'swal-custom-title',
+                    htmlContainer: 'swal-custom-html'
+                },
+                preConfirm: () => {
+                    const reason = document.getElementById('cancelReason').value;
+                    return { reason: reason };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cancelRegistration(registrationId, result.value.reason);
+                }
+            });
+        }
+
+        function cancelRegistration(registrationId, reason) {
+            // Show loading overlay
+            showLoadingOverlay();
+
+            // Gửi request hủy đăng ký
+            const formData = new FormData();
+            formData.append('id', registrationId);
+            formData.append('reason', reason);
+            formData.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+            
+            fetch('@Url.Action("Cancel", "DonationRegistration")', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => {
+                hideLoadingOverlay();
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '<i class="fas fa-check-circle text-success me-2"></i>Thành công!',
+                        text: 'Đã hủy đăng ký thành công',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal-custom-popup'
+                        }
+                    }).then(() => {
+                        // Reload trang để cập nhật danh sách
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '<i class="fas fa-times-circle text-danger me-2"></i>Lỗi!',
+                        text: data.message || 'Có lỗi xảy ra khi hủy đăng ký',
+                        customClass: {
+                            popup: 'swal-custom-popup'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                hideLoadingOverlay();
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '<i class="fas fa-times-circle text-danger me-2"></i>Lỗi!',
+                    text: 'Có lỗi xảy ra khi hủy đăng ký. Vui lòng thử lại.',
+                    customClass: {
+                        popup: 'swal-custom-popup'
+                    }
+                });
+            });
+        }
+
+        // Add smooth animations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add staggered animation to registration cards
+            const cards = document.querySelectorAll('.slide-in');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Add hover effects to status badges
+            const badges = document.querySelectorAll('.status-badge');
+            badges.forEach(badge => {
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                });
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add click effects to action buttons
+            const actionBtns = document.querySelectorAll('.action-btn');
+            actionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+
+        // Add filter change animation
+        document.querySelector('.status-filter-select').addEventListener('change', function() {
+            const container = document.querySelector('.my-registrations-container');
+            container.style.opacity = '0.7';
+            container.style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'scale(1)';
+            }, 300);
+        });
+    </script>
+    <script src="~/js/registration.js" asp-append-version="true"></script>
+}
+
+@functions {
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Registered" => "bg-warning text-dark",
+            "Confirmed" => "bg-info text-white",
+            "CheckedIn" => "bg-primary text-white",
+            "Screening" => "bg-warning text-dark",
+            "Eligible" => "bg-success text-white",
+            "Ineligible" => "bg-danger text-white",
+            "Donating" => "bg-info text-white",
+            "Completed" => "bg-success text-white",
+            "Cancelled" => "bg-danger text-white",
+            "NoShow" => "bg-secondary text-white",
+            "Failed" => "bg-danger text-white",
+            _ => "bg-light text-dark"
+        };
+    }
+}

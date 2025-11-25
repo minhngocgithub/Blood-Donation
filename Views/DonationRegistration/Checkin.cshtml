@@ -1,0 +1,471 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.DonationRegistrationDto>
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Check-in người hiến máu";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/checkin-page.css" asp-append-version="true" />
+}
+
+<div class="checkin-page">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="page-title">
+                <i class="fas fa-user-check"></i>Check-in người hiến máu
+            </h2>
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Info"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>@TempData["Info"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            <div class="search-form">
+                <form asp-action="Checkin" method="post" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="RegistrationCode" class="form-label">Mã đăng ký</label>
+                            <input type="text" class="form-control" id="RegistrationCode" name="RegistrationCode" placeholder="Nhập mã đăng ký hoặc số điện thoại" autocomplete="off">
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-search">
+                                <i class="fas fa-search me-2"></i>Tìm
+                            </button>
+                            <button type="submit" class="btn btn-show-all" name="showAll" value="true" id="showAllBtn">
+                                <i class="fas fa-list me-2"></i>Hiển thị tất cả
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                @if (Model != null && Model.Any())
+                {
+                    <!-- Sorting Controls -->
+                    <div class="controls-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label class="control-label">
+                                        <i class="fas fa-sort"></i>Sắp xếp theo:
+                                    </label>
+                                    <select id="sortBy" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="name-asc">Họ tên (A-Z)</option>
+                                        <option value="name-desc">Họ tên (Z-A)</option>
+                                        <option value="code-asc">Mã đăng ký (A-Z)</option>
+                                        <option value="code-desc">Mã đăng ký (Z-A)</option>
+                                        <option value="date-newest">Ngày đăng ký (Mới nhất)</option>
+                                        <option value="date-oldest">Ngày đăng ký (Cũ nhất)</option>
+                                        <option value="status-checked">Trạng thái (Đã đến)</option>
+                                        <option value="status-registered">Trạng thái (Đã đăng ký)</option>
+                                        <option value="event-asc">Sự kiện (A-Z)</option>
+                                        <option value="event-desc">Sự kiện (Z-A)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex align-items-center justify-content-end">
+                                    <label class="control-label">
+                                        <i class="fas fa-filter"></i>Lọc trạng thái:
+                                    </label>
+                                    <select id="statusFilter" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="all">Tất cả</option>
+                                        <option value="Registered">Đã đăng ký</option>
+                                        <option value="Confirmed">Đã xác nhận</option>
+                                        <option value="CheckedIn">Đã đến</option>
+                                        <option value="Screening">Đang sàng lọc</option>
+                                        <option value="Eligible">Đủ điều kiện</option>
+                                        <option value="Ineligible">Không đủ điều kiện</option>
+                                        <option value="Donating">Đang hiến máu</option>
+                                        <option value="Completed">Hoàn tất</option>
+                                        <option value="Cancelled">Đã hủy</option>
+                                        <option value="NoShow">Không đến</option>
+                                        <option value="Failed">Thất bại</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Mã đăng ký</th>
+                                        <th>Họ tên</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Sự kiện</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Trạng thái</th>
+                                        <th>Sức khỏe</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var reg in Model)
+                                    {
+                                        <tr class="registration-row" 
+                                            data-name="@(reg.FullName?.ToLower() ?? "")" 
+                                            data-code="@(reg.RegistrationCode?.ToLower() ?? "")"
+                                            data-status="@reg.Status"
+                                            data-date="@reg.RegistrationDate.ToString("yyyy-MM-dd")"
+                                            data-event="@(reg.EventName?.ToLower() ?? "")"
+                                            data-phone="@(reg.PhoneNumber ?? "")">
+                                            <td class="registration-code">@reg.RegistrationCode</td>
+                                            <td class="full-name">@reg.FullName</td>
+                                            <td class="phone-number">@reg.PhoneNumber</td>
+                                            <td class="event-name">@reg.EventName</td>
+                                            <td class="registration-date">@reg.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @{
+                                                    var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.RegistrationStatus>(reg.Status);
+                                                    
+                                                    var badgeClass = reg.Status switch
+                                                    {
+                                                        EnumMapper.RegistrationStatus.CheckedIn => "bg-success",
+                                                        EnumMapper.RegistrationStatus.Registered => "bg-primary",
+                                                        EnumMapper.RegistrationStatus.Confirmed => "bg-info",
+                                                        EnumMapper.RegistrationStatus.Cancelled => "bg-danger",
+                                                        EnumMapper.RegistrationStatus.Completed => "bg-success",
+                                                        EnumMapper.RegistrationStatus.NoShow => "bg-secondary",
+                                                        EnumMapper.RegistrationStatus.Failed => "bg-danger",
+                                                        EnumMapper.RegistrationStatus.Screening => "bg-warning",
+                                                        EnumMapper.RegistrationStatus.Eligible => "bg-success",
+                                                        EnumMapper.RegistrationStatus.Ineligible => "bg-danger",
+                                                        EnumMapper.RegistrationStatus.Donating => "bg-info",
+                                                        EnumMapper.RegistrationStatus.Deferred => "bg-warning",
+                                                        _ => "bg-secondary"
+                                                    };
+                                                }
+                                                <span class="status-badge @badgeClass">@statusDisplayName</span>
+                                            </td>
+                                            <td class="health-status">
+                                                @if (reg.IsEligible)
+                                                {
+                                                    <span class="health-badge bg-success">
+                                                        <i class="fas fa-check me-1"></i>Đủ điều kiện
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="health-badge bg-warning">
+                                                        <i class="fas fa-times me-1"></i>Chưa đủ điều kiện
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    @{
+                                                        // Theo quy trình: Check-in được thực hiện TRƯỚC khi sàng lọc sức khỏe
+                                                        // Nên không cần kiểm tra IsEligible
+                                                        var canCheckin = (reg.Status == EnumMapper.RegistrationStatus.Registered || reg.Status == EnumMapper.RegistrationStatus.Confirmed);
+                                                        var isCheckedIn = reg.Status == EnumMapper.RegistrationStatus.CheckedIn;
+                                                        
+                                                        // Kiểm tra thời gian check-in
+                                                        var currentDateTime = DateTime.Now;
+                                                        var eventDate = reg.EventDate?.Date ?? DateTime.MinValue;
+                                                        var eventStartTime = reg.EventStartTime ?? TimeSpan.Zero;
+                                                        var eventEndTime = reg.EventEndTime ?? TimeSpan.Zero;
+                                                        
+                                                        var isCorrectDate = currentDateTime.Date == eventDate;
+                                                        var eventStartDateTime = eventDate.Add(eventStartTime);
+                                                        var checkinStartTime = eventStartDateTime.AddMinutes(-30); // Cho phép check-in sớm 30 phút
+                                                        var eventEndDateTime = eventDate.Add(eventEndTime);
+                                                        
+                                                        var isWithinCheckinTime = currentDateTime >= checkinStartTime && currentDateTime <= eventEndDateTime;
+                                                        var canCheckinNow = canCheckin && isCorrectDate && isWithinCheckinTime;
+                                                        
+                                                        var timeMessage = "";
+                                                        if (canCheckin && !isCorrectDate)
+                                                        {
+                                                            timeMessage = $"Chỉ có thể check-in vào ngày {eventDate:dd/MM/yyyy}";
+                                                        }
+                                                        else if (canCheckin && currentDateTime < checkinStartTime)
+                                                        {
+                                                            var timeUntilStart = checkinStartTime - currentDateTime;
+                                                            var hours = (int)timeUntilStart.TotalHours;
+                                                            var minutes = timeUntilStart.Minutes;
+                                                            timeMessage = hours > 0 ? $"Check-in mở lúc {checkinStartTime:HH:mm} (còn {hours}h {minutes}m)" : $"Check-in mở lúc {checkinStartTime:HH:mm} (còn {minutes}m)";
+                                                        }
+                                                        else if (canCheckin && currentDateTime > eventEndDateTime)
+                                                        {
+                                                            if (eventEndTime != TimeSpan.Zero)
+                                                            {
+                                                                timeMessage = $"Đã quá giờ check-in (kết thúc lúc {eventEndTime:hh\\:mm})";
+                                                            }
+                                                            else
+                                                            {
+                                                                timeMessage = "Đã quá giờ check-in";
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                    @if (isCheckedIn)
+                                                    {
+                                                        <form asp-action="CancelCheckin" method="post" style="display:inline;" class="cancel-checkin-form">
+                                                            <input type="hidden" name="id" value="@reg.RegistrationId" />
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="button" class="btn btn-cancel-checkin">Hủy</button>
+                                                        </form>
+                                                    }
+                                                    else if (canCheckinNow)
+                                                    {
+                                                        <form asp-action="ConfirmCheckin" method="post" style="display:inline;">
+                                                            <input type="hidden" name="id" value="@reg.RegistrationId" />
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-checkin">Check-in</button>
+                                                        </form>
+                                                    }
+                                                    else if (canCheckin && !string.IsNullOrEmpty(timeMessage))
+                                                    {
+                                                        <div class="time-restriction">
+                                                            <button type="button" class="btn btn-secondary" disabled title="@timeMessage">
+                                                                <i class="fas fa-clock me-1"></i>Check-in
+                                                            </button>
+                                                            <small class="text-muted d-block mt-1">@timeMessage</small>
+                                                        </div>
+                                                    }
+                                                    else if (reg.Status == EnumMapper.RegistrationStatus.CheckedIn)
+                                                    {
+                                                        <span class="status-message success">
+                                                            <i class="fas fa-check me-1"></i>
+                                                            Đã check-in, chờ sàng lọc sức khỏe
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="status-message muted">Không thể check-in</span>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            var successMsg = '@TempData["Success"]';
+            var errorMsg = '@TempData["Error"]';
+            var infoMsg = '@TempData["Info"]';
+            
+            if (successMsg) {
+                showSuccess('Thành công');
+            }
+            if (errorMsg) {
+                showError('Lỗi');
+            }
+            if (infoMsg) {
+                showInfo('Thông báo');
+            }
+
+            // SweetAlert xác nhận hủy check-in
+            $(document).on('click', '.btn-cancel-checkin', function (e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Xác nhận hủy check-in',
+                    text: 'Bạn có chắc chắn muốn hủy check-in này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Hủy check-in',
+                    cancelButtonText: 'Đóng'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // Sorting and Filtering functionality
+            const sortBySelect = document.getElementById('sortBy');
+            const statusFilterSelect = document.getElementById('statusFilter');
+            const registrationRows = document.querySelectorAll('.registration-row');
+            const tbody = document.querySelector('tbody');
+
+            function applySortAndFilter() {
+                const sortBy = sortBySelect.value;
+                const statusFilter = statusFilterSelect.value;
+                
+                // Convert NodeList to Array for sorting
+                let rows = Array.from(registrationRows);
+                
+                // Filter by status
+                if (statusFilter !== 'all') {
+                    rows = rows.filter(row => row.dataset.status === statusFilter);
+                }
+                
+                // Sort rows
+                rows.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name-asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case 'name-desc':
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        case 'code-asc':
+                            return a.dataset.code.localeCompare(b.dataset.code);
+                        case 'code-desc':
+                            return b.dataset.code.localeCompare(a.dataset.code);
+                        case 'date-newest':
+                            return new Date(b.dataset.date) - new Date(a.dataset.date);
+                        case 'date-oldest':
+                            return new Date(a.dataset.date) - new Date(b.dataset.date);
+                        case 'status-checked':
+                            return (b.dataset.status === 'CheckedIn') - (a.dataset.status === 'CheckedIn');
+                        case 'status-registered':
+                            return (a.dataset.status === 'Registered') - (b.dataset.status === 'Registered');
+                        case 'event-asc':
+                            return (a.dataset.event || '').localeCompare(b.dataset.event || '');
+                        case 'event-desc':
+                            return (b.dataset.event || '').localeCompare(a.dataset.event || '');
+                        default:
+                            return 0;
+                    }
+                });
+                
+                // Reorder rows in DOM
+                rows.forEach(row => tbody.appendChild(row));
+                
+                // Show/hide rows based on filter
+                registrationRows.forEach(row => {
+                    if (statusFilter === 'all' || row.dataset.status === statusFilter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Update registration count display
+                const visibleCount = rows.filter(row => row.style.display !== 'none').length;
+                const totalCount = registrationRows.length;
+                if (visibleCount !== totalCount) {
+                    showToast('info', `Hiển thị ${visibleCount}/${totalCount} đăng ký`, 2000);
+                }
+            }
+
+            // Event listeners
+            if (sortBySelect && statusFilterSelect) {
+                sortBySelect.addEventListener('change', applySortAndFilter);
+                statusFilterSelect.addEventListener('change', applySortAndFilter);
+            }
+
+            // Show progress when clicking "Hiển thị tất cả"
+            $('#showAllBtn').on('click', function(e) {
+                e.preventDefault();
+                
+                // Get current registration count to determine loading time
+                const currentRows = $('.registration-row').length;
+                let loadingTime = 1000; // Default 1 second for few records
+                let statusMessages = [
+                    'Đang khởi tạo...',
+                    'Đang kết nối cơ sở dữ liệu...',
+                    'Đang truy vấn dữ liệu...',
+                    'Đang xử lý kết quả...',
+                    'Hoàn tất!'
+                ];
+                
+                if (currentRows > 10) {
+                    loadingTime = 2000; // 2 seconds for many records
+                    statusMessages = [
+                        'Đang khởi tạo...',
+                        'Đang kết nối cơ sở dữ liệu...',
+                        'Đang truy vấn dữ liệu lớn...',
+                        'Đang xử lý kết quả...',
+                        'Đang tối ưu hiển thị...',
+                        'Hoàn tất!'
+                    ];
+                } else if (currentRows > 5) {
+                    loadingTime = 1500; // 1.5 seconds for medium records
+                    statusMessages = [
+                        'Đang khởi tạo...',
+                        'Đang kết nối cơ sở dữ liệu...',
+                        'Đang truy vấn dữ liệu...',
+                        'Đang xử lý kết quả...',
+                        'Hoàn tất!'
+                    ];
+                }
+                
+                // Show progress bar
+                showProgress('Đang tải dữ liệu', 'Vui lòng chờ trong giây lát...');
+                
+                // Simulate loading with progress updates
+                let progress = 0;
+                let statusIndex = 0;
+                const progressInterval = setInterval(() => {
+                    progress += Math.random() * 15 + 5; // Random progress increment
+                    
+                    // Update status message based on progress
+                    if (progress > 20 && statusIndex < statusMessages.length - 1) {
+                        statusIndex = Math.floor(progress / (100 / (statusMessages.length - 1)));
+                        if (statusIndex >= statusMessages.length) statusIndex = statusMessages.length - 1;
+                    }
+                    
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(progressInterval);
+                        
+                        // Show completion status
+                        updateProgress(100, statusMessages[statusMessages.length - 1]);
+                        
+                        // Submit form after progress completes
+                        setTimeout(() => {
+                            hideLoading();
+                            // Tạo form mới với showAll=true
+                            const form = $('<form>', {
+                                'method': 'POST',
+                                'action': window.location.href
+                            });
+                            
+                            // Thêm anti-forgery token
+                            const token = $('input[name="__RequestVerificationToken"]').val();
+                            form.append($('<input>', {
+                                'type': 'hidden',
+                                'name': '__RequestVerificationToken',
+                                'value': token
+                            }));
+                            
+                            // Thêm showAll parameter
+                            form.append($('<input>', {
+                                'type': 'hidden',
+                                'name': 'showAll',
+                                'value': 'true'
+                            }));
+                            
+                            // Submit form
+                            $('body').append(form);
+                            form.submit();
+                        }, 500);
+                    } else {
+                        updateProgress(Math.round(progress), statusMessages[statusIndex]);
+                    }
+                }, loadingTime / 20); // Update progress 20 times during loading
+            });
+        });
+    </script>
+}

@@ -1,0 +1,121 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.UserDto>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+    var roles = ViewBag.Roles as IEnumerable<Blood_Donation_Website.Models.Entities.Role>;
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Danh sách người dùng</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle" id="users-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Vai trò</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var user in Model)
+                    {
+                        <tr data-user-id="@user.UserId">
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>@user.Phone</td>
+                            <td class="user-role">@(user.RoleName?.ToString() ?? "-")</td>
+                            <td>@user.CreatedDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary edit-user-role-btn" data-user-id="@user.UserId" data-user-name="@user.FullName" data-role-id="@user.RoleId">
+                                    <i class="fas fa-edit me-1"></i>Sửa quyền
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="6" class="text-center">Không có người dùng nào.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal chọn vai trò -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editRoleModalLabel">Sửa quyền người dùng</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editRoleForm">
+          <input type="hidden" id="editUserId" />
+          <div class="mb-3">
+            <label for="editRoleSelect" class="form-label">Chọn vai trò mới</label>
+            <select class="form-select" id="editRoleSelect" required>
+              <option value="">-- Chọn vai trò --</option>
+              @if (roles != null)
+              {
+                  foreach (var role in roles)
+                  {
+                      <option value="@role.RoleId">@role.RoleName</option>
+                  }
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary" id="saveRoleBtn">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        var editModal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+        var selectedUserId = null;
+        $(document).on('click', '.edit-user-role-btn', function() {
+            selectedUserId = $(this).data('user-id');
+            var currentRoleId = $(this).data('role-id');
+            $('#editUserId').val(selectedUserId);
+            $('#editRoleSelect').val(currentRoleId);
+            editModal.show();
+        });
+        $('#saveRoleBtn').on('click', function() {
+            var userId = $('#editUserId').val();
+            var roleId = $('#editRoleSelect').val();
+            if (!roleId) {
+                showWarning('Vui lòng chọn vai trò!');
+                return;
+            }
+            $.ajax({
+                url: '/Admin/UpdateUserRole',
+                type: 'POST',
+                data: { userId: userId, roleId: roleId },
+                success: function(res) {
+                    if (res.success) {
+                        showSuccess('Thành công', res.message);
+                        // Cập nhật vai trò trên bảng
+                        var row = $('#users-table').find('tr[data-user-id="' + userId + '"]');
+                        var roleName = $('#editRoleSelect option:selected').text();
+                        row.find('.user-role').text(roleName);
+                        editModal.hide();
+                    } else {
+                        showError('Lỗi', res.message);
+                    }
+                },
+                error: function() {
+                    showError('Lỗi', 'Không thể cập nhật vai trò.');
+                }
+            });
+        });
+    </script>
+}

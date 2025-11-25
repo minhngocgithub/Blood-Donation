@@ -1,0 +1,287 @@
+/* Update Blood Type Form Page Styles */
+.update-blood-type-page {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.update-blood-type-page .container {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.page-header {
+    background: #dc3545;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.page-header i {
+    margin-right: 0.5rem;
+}
+
+.form-container {
+    background: white;
+    border-radius: 5px;
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.error-alert {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-alert i {
+    margin-right: 0.5rem;
+}
+
+.user-info-section {
+    background: #f8f9fa;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.user-info-section h6 {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.user-info-section p {
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+.user-info-section strong {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.blood-type-badge {
+    background: #dc3545;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    margin-right: 0.5rem;
+}
+
+.form-select {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+    background: white;
+}
+
+.form-select:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    outline: none;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-text i {
+    margin-right: 0.5rem;
+    color: #dc3545;
+}
+
+.warning-alert {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.warning-alert i {
+    margin-right: 0.5rem;
+    color: #dc3545;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-back {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.btn-back i {
+    margin-right: 0.5rem;
+}
+
+.btn-update {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-update:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-update i {
+    margin-right: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dee2e6;
+}
+
+.empty-state h4 {
+    color: #dc3545;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .update-blood-type-page {
+        padding: 1rem 0;
+    }
+    
+    .update-blood-type-page .container {
+        padding: 1rem;
+    }
+    
+    .form-container {
+        padding: 1.5rem;
+    }
+    
+    .page-header {
+        padding: 1rem;
+    }
+    
+    .page-header h4 {
+        font-size: 1.3rem;
+    }
+    
+    .user-info-section {
+        padding: 1rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-back,
+    .btn-update {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header h4 {
+        font-size: 1.2rem;
+    }
+    
+    .user-info-section .row {
+        margin: 0;
+    }
+    
+    .user-info-section .col-md-6 {
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .user-info-section .col-md-6:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .warning-alert,
+    .error-alert {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+} 

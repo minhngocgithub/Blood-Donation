@@ -1,0 +1,236 @@
+@model Blood_Donation_Website.Models.DTOs.DonationRegistrationDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Hoàn tất hiến máu";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/donation-complete-page.css" asp-append-version="true" />
+}
+
+<div class="donation-complete-page">
+    <div class="container">
+        <div class="donation-complete-header">
+            <h2>
+                <i class="fas fa-check-circle me-2"></i>Hoàn tất hiến máu
+            </h2>
+            <div class="subtitle">Nhập thông tin lượng máu đã hiến</div>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Đăng ký</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Check-in</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Sàng lọc</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed">
+                <div class="step-number">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="step-label">Hiến máu</div>
+            </div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step active">
+                <div class="step-number">5</div>
+                <div class="step-label">Hoàn tất</div>
+            </div>
+        </div>
+
+        <!-- Thông tin người hiến máu -->
+        <div class="user-info-card">
+            <div class="user-avatar">
+                @(Model.FullName?.Substring(0, 1).ToUpper() ?? "U")
+            </div>
+            <div class="user-info">
+                <h4>@Model.FullName</h4>
+                <p><i class="fas fa-id-card me-2"></i>@Model.RegistrationCode</p>
+                <p><i class="fas fa-envelope me-2"></i>@Model.UserEmail</p>
+                <p><i class="fas fa-phone me-2"></i>@Model.PhoneNumber</p>
+                @if (!string.IsNullOrEmpty(Model.BloodTypeName))
+                {
+                    <p><i class="fas fa-tint me-2 text-danger"></i>Nhóm máu: <strong>@Model.BloodTypeName</strong></p>
+                }
+            </div>
+        </div>
+
+        <!-- Form nhập lượng máu -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="fas fa-flask me-2 text-danger"></i>Thông tin hiến máu
+                </h5>
+
+                <form asp-action="CompleteDonation" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.RegistrationId" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-tint text-danger me-2"></i>Lượng máu hiến (ml) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" 
+                                   class="form-control form-control-lg" 
+                                   name="volume" 
+                                   id="volume"
+                                   min="200" 
+                                   max="500" 
+                                   step="50"
+                                   value="350"
+                                   required />
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Lượng máu tiêu chuẩn: 200ml - 500ml (khuyến nghị: 350ml)
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-calendar me-2"></i>Thời gian hoàn tất
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   value="@DateTime.Now.ToString("dd/MM/yyyy HH:mm")"
+                                   readonly />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-sticky-note me-2"></i>Ghi chú (tùy chọn)
+                        </label>
+                        <textarea class="form-control" 
+                                  name="notes" 
+                                  rows="3"
+                                  placeholder="Nhập ghi chú về quá trình hiến máu (nếu có)..."></textarea>
+                    </div>
+
+                    <!-- Quick Volume Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">
+                            <i class="fas fa-hand-pointer me-2"></i>Chọn nhanh lượng máu:
+                        </label>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary volume-btn" data-volume="250">250ml</button>
+                            <button type="button" class="btn btn-outline-primary volume-btn" data-volume="300">300ml</button>
+                            <button type="button" class="btn btn-outline-primary volume-btn active" data-volume="350">350ml</button>
+                            <button type="button" class="btn btn-outline-primary volume-btn" data-volume="400">400ml</button>
+                            <button type="button" class="btn btn-outline-primary volume-btn" data-volume="450">450ml</button>
+                        </div>
+                    </div>
+
+                    <!-- Donation Summary -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>Tóm tắt hiến máu
+                        </h6>
+                        <hr />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Sự kiện:</strong> @Model.EventName</p>
+                                <p class="mb-1"><strong>Địa điểm:</strong> @Model.LocationName</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Ngày sự kiện:</strong> @Model.EventDate?.ToString("dd/MM/yyyy")</p>
+                                <p class="mb-0"><strong>Người hiến:</strong> @Model.FullName</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Hủy
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check me-2"></i>Hoàn tất hiến máu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            // Quick volume selection
+            $('.volume-btn').click(function() {
+                $('.volume-btn').removeClass('active');
+                $(this).addClass('active');
+                var volume = $(this).data('volume');
+                $('#volume').val(volume);
+            });
+
+            // Form validation
+            $('form').submit(function(e) {
+                var volume = parseInt($('#volume').val());
+                
+                if (volume < 200 || volume > 500) {
+                    e.preventDefault();
+                    showError(
+                        'Lỗi',
+                        'Lượng máu hiến phải từ 200ml đến 500ml.',
+                        'OK'
+                    );
+                    return false;
+                }
+
+                // Confirm before submit
+                e.preventDefault();
+                var form = this;
+                
+                Swal.fire({
+                    title: '<i class="fas fa-question-circle text-warning"></i> Xác nhận hoàn tất',
+                    html: `
+                        <div class="text-start">
+                            <p>Bạn có chắc chắn muốn hoàn tất hiến máu với thông tin sau:</p>
+                            <div class="alert alert-info">
+                                <p class="mb-2"><strong><i class="fas fa-user me-2"></i>Người hiến:</strong> @Model.FullName</p>
+                                <p class="mb-2"><strong><i class="fas fa-tint me-2 text-danger"></i>Lượng máu:</strong> ${volume} ml</p>
+                                <p class="mb-0"><strong><i class="fas fa-calendar me-2"></i>Thời gian:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-check me-1"></i>Xác nhận',
+                    cancelButtonText: '<i class="fas fa-times me-1"></i>Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+} 
