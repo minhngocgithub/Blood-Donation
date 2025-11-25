@@ -1,7 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-
 namespace Blood_Donation_Website.Services.Utilities
 {
     public class PasswordHelper

@@ -1,6 +1,6 @@
 # Blood Donation – Hệ Thống Quản Lý Hiến Máu Nhân Đạo
 
-## Giới thiệu về hệ thống
+## Giới thiệu
 
 Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đạo, hỗ trợ người hiến máu, bác sĩ, nhân viên y tế, bệnh viện và quản trị viên trong việc tổ chức, theo dõi, và báo cáo các hoạt động hiến máu. Hệ thống cung cấp quy trình khép kín từ đăng ký, sàng lọc sức khỏe, thực hiện hiến máu, lưu trữ lịch sử, đến thống kê và thông báo.
 
