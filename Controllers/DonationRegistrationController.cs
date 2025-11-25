@@ -159,8 +159,12 @@ namespace Blood_Donation_Website.Controllers
 
                 if (string.IsNullOrEmpty(status) || status == "active")
                 {
-                    var activeStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.CheckedIn, RegistrationStatus.Screening, RegistrationStatus.Eligible, RegistrationStatus.Ineligible, RegistrationStatus.Donating };
+                    var activeStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed, RegistrationStatus.CheckedIn, RegistrationStatus.Screening, RegistrationStatus.Eligible, RegistrationStatus.Ineligible, RegistrationStatus.Donating };
                     filtered = allRegs.Where(r => activeStatuses.Contains(r.Status)).ToList();
+                }
+                else if (status == "confirmed")
+                {
+                    filtered = allRegs.Where(r => r.Status == RegistrationStatus.Confirmed).ToList();
                 }
                 else if (status == "completed")
                 {

@@ -40,6 +40,11 @@
                                         } else {
                                             <option value="active">Đang đăng ký</option>
                                         }
+                                        @if (selectedStatus == "confirmed") {
+                                            <option value="confirmed" selected>Đã xác nhận</option>
+                                        } else {
+                                            <option value="confirmed">Đã xác nhận</option>
+                                        }
                                         @if (selectedStatus == "completed") {
                                             <option value="completed" selected>Hoàn thành</option>
                                         } else {
