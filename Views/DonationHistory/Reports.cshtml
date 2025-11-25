@@ -100,6 +100,58 @@
         </div>
     </div>
     <div class="row g-4 mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Phân bổ lượng máu đã hiến theo nhóm máu</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="bloodTypeVolumeChart" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nhóm máu</th>
+                                        <th>Số lượt hiến</th>
+                                        <th>Tổng thể tích (ml)</th>
+                                        <th>Tỷ lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (bloodTypeStats != null && bloodTypeStats.Count > 0)
+                                    {
+                                        var totalVol = bloodTypeStats.Sum(s => s.TotalVolume);
+                                        foreach (var stat in bloodTypeStats)
+                                        {
+                                            var percentage = totalVol > 0 ? (stat.TotalVolume * 100.0 / totalVol) : 0;
+                                            <tr>
+                                                <td><strong>@stat.BloodType</strong></td>
+                                                <td>@stat.Count</td>
+                                                <td>@stat.TotalVolume ml</td>
+                                                <td>@percentage.ToString("F1")%</td>
+                                            </tr>
+                                        }
+                                        <tr class="table-active">
+                                            <td><strong>Tổng cộng</strong></td>
+                                            <td><strong>@bloodTypeStats.Sum(s => s.Count)</strong></td>
+                                            <td><strong>@totalVol ml</strong></td>
+                                            <td><strong>100%</strong></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="4">Không có dữ liệu</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -203,6 +255,63 @@
                 },
                 scales: {
                     y: { beginAtZero: true, stepSize: 1 }
+                }
+            }
+        });
+
+        // Biểu đồ phân bổ lượng máu theo nhóm máu
+        var bloodTypeCtx = document.getElementById('bloodTypeVolumeChart').getContext('2d');
+        var bloodTypeLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bloodTypeStats?.Select(s => s.BloodType).ToList() ?? new List<string>()));
+        var bloodTypeVolumes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bloodTypeStats?.Select(s => s.TotalVolume).ToList() ?? new List<int>()));
+        
+        // Màu sắc cho các nhóm máu
+        var bloodTypeColors = [
+            '#dc3545', // Đỏ
+            '#fd7e14', // Cam
+            '#ffc107', // Vàng
+            '#28a745', // Xanh lá
+            '#20c997', // Xanh mint
+            '#17a2b8', // Xanh dương
+            '#6610f2', // Tím
+            '#e83e8c'  // Hồng
+        ];
+
+        new Chart(bloodTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: bloodTypeLabels,
+                datasets: [{
+                    label: 'Lượng máu (ml)',
+                    data: bloodTypeVolumes,
+                    backgroundColor: bloodTypeColors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed || 0;
+                                var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                var percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return label + ': ' + value + ' ml (' + percentage + '%)';
+                            }
+                        }
+                    }
                 }
             }
         });

@@ -108,7 +108,11 @@ namespace Blood_Donation_Website.Controllers
             var bloodTypeStats = allDonations
                 .Where(d => !string.IsNullOrEmpty(d.BloodTypeName))
                 .GroupBy(d => d.BloodTypeName)
-                .Select(g => new BloodTypeStatDto { BloodType = g.Key!, Count = g.Count() })
+                .Select(g => new BloodTypeStatDto { 
+                    BloodType = g.Key!, 
+                    Count = g.Count(),
+                    TotalVolume = g.Sum(d => d.Volume)
+                })
                 .OrderByDescending(x => x.Count)
                 .ToList();
             
@@ -197,7 +201,11 @@ namespace Blood_Donation_Website.Controllers
             var bloodTypeStats = allDonations
                 .Where(d => !string.IsNullOrEmpty(d.BloodTypeName))
                 .GroupBy(d => d.BloodTypeName)
-                .Select(g => new BloodTypeStatDto { BloodType = g.Key!, Count = g.Count() })
+                .Select(g => new BloodTypeStatDto { 
+                    BloodType = g.Key!, 
+                    Count = g.Count(),
+                    TotalVolume = g.Sum(d => d.Volume)
+                })
                 .OrderByDescending(x => x.Count)
                 .ToList();
             var monthlyStats = new Dictionary<string, int>();
