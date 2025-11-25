@@ -15,7 +15,7 @@ namespace Blood_Donation_Website.Data.Configurations
             builder.Property(d => d.RegistrationId);
             builder.Property(d => d.DonationDate).IsRequired();
             builder.Property(d => d.BloodTypeId).IsRequired();
-            builder.Property(d => d.Volume).HasDefaultValue(350);
+            builder.Property(d => d.Volume).IsRequired();
             builder.Property(d => d.Status).HasDefaultValue(EnumMapper.DonationStatus.Completed);
             builder.Property(d => d.Notes).HasMaxLength(500);
             builder.Property(d => d.NextEligibleDate);

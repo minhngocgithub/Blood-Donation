@@ -98,6 +98,15 @@
             </p>
         </div>
 
+        <!-- Thể tích máu -->
+        <div class="donation-notes">
+            <div class="notes-header">
+                <i class="fas fa-tint me-2"></i>Thể tích máu hiến (ml)
+            </div>
+            <input type="number" class="form-control" id="bloodVolume" value="350" min="200" max="500" required />
+            <small class="text-muted">Nhập thể tích máu từ 200ml đến 500ml</small>
+        </div>
+
         <!-- Ghi chú -->
         <div class="donation-notes">
             <div class="notes-header">
@@ -157,6 +166,13 @@
             // Complete donation
             $('#completeBtn').on('click', function() {
                 var notes = $('#donationNotes').val();
+                var bloodVolume = $('#bloodVolume').val();
+                
+                // Validate blood volume
+                if (!bloodVolume || bloodVolume < 200 || bloodVolume > 500) {
+                    showError('Vui lòng nhập thể tích máu hợp lệ (200-500 ml)');
+                    return;
+                }
                 
                 showConfirm(
                     'Hoàn tất hiến máu',
@@ -182,6 +198,12 @@
                             'type': 'hidden',
                             'name': 'notes',
                             'value': notes
+                        }));
+                        
+                        form.append($('<input>', {
+                            'type': 'hidden',
+                            'name': 'volume',
+                            'value': bloodVolume
                         }));
                         
                         form.append($('<input>', {
@@ -244,4 +266,4 @@
             });
         });
     </script>
-} 
+}

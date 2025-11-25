@@ -24,7 +24,8 @@ namespace Blood_Donation_Website.Models.Entities
         [Required]
         public int BloodTypeId { get; set; }
 
-        public int Volume { get; set; } = 350;
+        [Required]
+        public int Volume { get; set; }
 
         public DonationStatus? Status { get; set; }
 
