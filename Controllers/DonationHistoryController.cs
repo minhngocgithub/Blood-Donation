@@ -38,9 +38,12 @@ namespace Blood_Donation_Website.Controllers
                 return RedirectToAction("Login", "Account");
 
             var donation = await _donationHistoryService.GetDonationByIdAsync(id);
-            if (donation == null || donation.UserId != userId)
+            
+            // Check access: Allow if owner OR if user has staff roles
+            bool isStaff = User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor");
+            if (donation == null || (!isStaff && donation.UserId != userId))
             {
-                TempData["Error"] = "Không tìm thấy lịch sử hiến máu này.";
+                TempData["Error"] = "Không tìm thấy lịch sử hiến máu này hoặc bạn không có quyền truy cập.";
                 return RedirectToAction(nameof(MyHistory));
             }
 
@@ -54,8 +57,8 @@ namespace Blood_Donation_Website.Controllers
             });
             donation.NextEligibleDate = newNextEligibleDate;
 
-            // Lấy ngày đủ điều kiện hiến máu tiếp theo (90 ngày sau lần hiến gần nhất)
-            var nextEligibleDate = await _donationHistoryService.GetUserNextEligibleDateAsync(userId);
+            // Lấy ngày đủ điều kiện hiến máu tiếp theo của NGƯỜI HIẾN MÁU (donation.UserId)
+            var nextEligibleDate = await _donationHistoryService.GetUserNextEligibleDateAsync(donation.UserId);
             int? daysLeft = null;
             string eligibleMessage = string.Empty;
             if (nextEligibleDate.HasValue)
@@ -63,18 +66,32 @@ namespace Blood_Donation_Website.Controllers
                 var now = DateTime.Now.Date;
                 if (now >= nextEligibleDate.Value.Date)
                 {
-                    eligibleMessage = "Bạn đã có thể hiến máu.";
+                    eligibleMessage = "Người hiến máu đã có thể hiến máu lại.";
                 }
                 else
                 {
                     daysLeft = (nextEligibleDate.Value.Date - now).Days;
-                    eligibleMessage = $"Bạn cần chờ {daysLeft} ngày nữa để hiến máu.";
+                    eligibleMessage = $"Người hiến máu cần chờ {daysLeft} ngày nữa để hiến máu.";
                 }
             }
             else
             {
-                eligibleMessage = "Bạn đã có thể hiến máu.";
+                eligibleMessage = "Người hiến máu đã có thể hiến máu.";
             }
+            
+            // Customize message for self-viewing
+            if (donation.UserId == userId)
+            {
+                if (nextEligibleDate.HasValue && DateTime.Now.Date < nextEligibleDate.Value.Date)
+                {
+                    eligibleMessage = $"Bạn cần chờ {daysLeft} ngày nữa để hiến máu.";
+                }
+                else
+                {
+                    eligibleMessage = "Bạn đã có thể hiến máu.";
+                }
+            }
+
             ViewBag.NextEligibleDate = nextEligibleDate;
             ViewBag.DaysLeft = daysLeft;
             ViewBag.EligibleMessage = eligibleMessage;
@@ -265,4 +282,4 @@ namespace Blood_Donation_Website.Controllers
             return 0;
         }
     }
-} 
+}
