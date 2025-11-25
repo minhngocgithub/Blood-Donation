@@ -387,7 +387,7 @@ namespace Blood_Donation_Website.Controllers
                 {
                     TotalRegistrations = await _registrationService.GetRegistrationCountAsync(),
                     CompletedRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Completed),
-                    PendingRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Registered),
+                    ApprovedRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Confirmed),
                     CancelledRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Cancelled),
                     CheckedInRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.CheckedIn)
                 };
