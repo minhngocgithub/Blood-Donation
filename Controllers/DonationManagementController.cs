@@ -219,7 +219,7 @@ namespace Blood_Donation_Website.Controllers
         // POST: DonationManagement/Complete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Complete(int id, string notes = "")
+        public async Task<IActionResult> Complete(int id, string notes = "", int volume = 350)
         {
             try
             {
@@ -239,6 +239,13 @@ namespace Blood_Donation_Website.Controllers
                 {
                     TempData["ErrorMessage"] = "Đăng ký này không đang trong quá trình hiến máu.";
                     return RedirectToAction(nameof(Index));
+                }
+
+                // Validate volume
+                if (volume < 200 || volume > 500)
+                {
+                    TempData["ErrorMessage"] = "Thể tích máu không hợp lệ. Vui lòng nhập giá trị từ 200ml đến 500ml.";
+                    return RedirectToAction(nameof(InProgress), new { id });
                 }
 
                 using var transaction = await _context.Database.BeginTransactionAsync();
@@ -261,6 +268,7 @@ namespace Blood_Donation_Website.Controllers
                         Status = EnumMapper.DonationStatus.Completed,
                         Notes = registration.Notes,
                         BloodTypeId = registration.User.BloodTypeId ?? 1, // Default to BloodTypeId = 1 if null
+                        Volume = volume
                     };
 
                     _context.DonationHistories.Add(donationHistory);
