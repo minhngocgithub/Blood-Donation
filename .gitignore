@@ -528,6 +528,3 @@ DatabaseExport/
 *.export.csv
 
 .config/
-
-note.txt
-INSTRUCTION.md

@@ -1,6 +1,6 @@
 # Blood Donation – Hệ Thống Quản Lý Hiến Máu Nhân Đạo
 
-## Giới thiệu
+## Giới thiệu về hệ thống
 
 Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đạo, hỗ trợ người hiến máu, bác sĩ, nhân viên y tế, bệnh viện và quản trị viên trong việc tổ chức, theo dõi, và báo cáo các hoạt động hiến máu. Hệ thống cung cấp quy trình khép kín từ đăng ký, sàng lọc sức khỏe, thực hiện hiến máu, lưu trữ lịch sử, đến thống kê và thông báo.
 
@@ -9,34 +9,42 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 ## Tính năng chính
 
 ### 1. Quản lý người dùng
+
 - Đăng ký, đăng nhập, đăng xuất
 - Cập nhật thông tin cá nhân, đổi mật khẩu
 - Xem lịch sử hiến máu, nhận thông báo
 
 ### 2. Quản lý sự kiện hiến máu
+
 - Tạo, cập nhật, xoá sự kiện
 - Quản lý số lượng người đăng ký, trạng thái sự kiện
 
 ### 3. Đăng ký hiến máu
+
 - Đăng ký/hủy đăng ký tham gia sự kiện
 - Kiểm tra điều kiện tham gia, check-in tại sự kiện
 
 ### 4. Sàng lọc sức khỏe
+
 - Nhập kết quả kiểm tra sức khỏe, đánh giá điều kiện hiến máu
 - Lưu lý do loại (nếu không đủ điều kiện)
 
 ### 5. Lưu trữ lịch sử hiến máu
+
 - Ghi nhận lịch sử hiến máu (thể tích, loại máu, thời gian)
 - Tính ngày đủ điều kiện lần hiến tiếp theo
 
 ### 6. Quản lý tin tức & thông báo
+
 - Đăng, cập nhật bài viết/tin tức
 - Quản lý trạng thái xuất bản, gửi thông báo
 
 ### 7. Cấu hình hệ thống
+
 - Quản lý, cập nhật các giá trị cấu hình hệ thống
 
 ### 8. Báo cáo & thống kê
+
 - Thống kê số lượng người hiến máu, đăng ký từng sự kiện
 - Phân tích nhóm máu, xuất báo cáo
 
@@ -45,6 +53,7 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 ## Quy trình hoạt động
 
 ### Người dùng (Người hiến máu)
+
 1. **Đăng ký tài khoản:** Điền thông tin cá nhân, xác thực email, nhận mã định danh.
 2. **Đăng nhập:** Xác thực thông tin, truy cập trang cá nhân.
 3. **Cập nhật thông tin:** Sửa đổi thông tin cá nhân, đổi mật khẩu.
@@ -58,22 +67,26 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 11. **Xem lịch sử & thông báo:** Theo dõi lịch sử hiến máu, nhận thông báo cá nhân.
 
 ### Quản trị viên (Admin)
+
 - Đăng nhập hệ thống quản trị, phân quyền
 - Quản lý người dùng, bệnh viện, sự kiện, tin tức/thông báo
 - Kiểm duyệt đăng ký, kết quả sàng lọc
 - Thống kê, xuất báo cáo, cấu hình hệ thống
 
 ### Bệnh viện (Đơn vị tổ chức)
+
 - Tạo/sửa sự kiện, phân công nhân sự
 - Theo dõi tiến độ, nhận thông báo, xem báo cáo
 - Cập nhật thông tin cơ sở
 
 ### Bác sĩ
+
 - Đăng nhập, xem danh sách người đến sự kiện
 - Khám, tư vấn, xét nghiệm, đánh giá điều kiện hiến máu
 - Hoàn tất sàng lọc, cập nhật trạng thái
 
 ### Nhân viên y tế
+
 - Đăng nhập, check-in người hiến
 - Thực hiện hiến máu, nhập dữ liệu, quan sát sau hiến
 - Kết thúc phiên hiến máu, cập nhật trạng thái
@@ -98,6 +111,7 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 - **ContactMessages:** Liên hệ, phản hồi
 
 ### Quan hệ giữa các bảng
+
 - Users liên kết Roles, BloodTypes
 - BloodDonationEvents liên kết Locations, Users (người tạo)
 - DonationRegistrations liên kết Users, BloodDonationEvents
@@ -115,24 +129,29 @@ Blood Donation là hệ thống quản lý và đăng ký hiến máu nhân đ�
 Dự án được phát triển theo mô hình kiến trúc MVC (Model-View-Controller) với nhiều lớp rõ ràng:
 
 ### Lớp trình bày (Presentation Layer)
+
 - **Controllers**: Xử lý yêu cầu HTTP, điều phối luồng dữ liệu, gọi services
 - **Views**: Hiển thị giao diện người dùng bằng Razor Pages
 
 ### Lớp dịch vụ (Service Layer)
+
 - **Interfaces**: Định nghĩa hợp đồng cho các dịch vụ
 - **Implementations**: Triển khai logic nghiệp vụ của ứng dụng
 
 ### Lớp truy cập dữ liệu (Data Access Layer)
+
 - **ApplicationDbContext**: Quản lý kết nối database, định nghĩa DbSets
 - **Configurations**: Cấu hình Entity Framework cho các entities
 - **Seeders**: Khởi tạo dữ liệu mẫu
 
 ### Lớp mô hình (Model Layer)
+
 - **Entities**: Định nghĩa cấu trúc dữ liệu và quan hệ
 - **DTOs**: Đối tượng chuyển dữ liệu giữa các lớp
 - **ViewModels**: Mô hình dữ liệu dành riêng cho views
 
 ### Tiện ích (Utilities)
+
 - **Extensions**: Các phương thức mở rộng
 - **Filters**: Bộ lọc cho các controller
 
@@ -143,11 +162,13 @@ Chi tiết kiến trúc dự án có thể xem tại [PROJECT_ARCHITECTURE.md](d
 ## Hướng dẫn cài đặt & khởi động
 
 1. **Yêu cầu hệ thống:**
+
    - .NET Core SDK
    - SQL Server hoặc hệ quản trị CSDL tương thích
    - Node.js (nếu sử dụng frontend riêng)
 
 2. **Cài đặt:**
+
    - Clone source code về máy
    - Cấu hình chuỗi kết nối CSDL trong `appsettings.json`
    - Chạy lệnh migrate để tạo database (nếu có hỗ trợ)
@@ -176,11 +197,12 @@ Chi tiết kiến trúc dự án có thể xem tại [PROJECT_ARCHITECTURE.md](d
 
 ---
 
-**Tài liệu tham khảo:**  
-- [DATABASE.md](docs/DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu  
-- [DESCRIPTION.md](docs/DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống  
-- [PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md) – Kiến trúc dự án & vai trò các thành phần  
-- [APPLICATION_WORKFLOW.md](docs/APPLICATION_WORKFLOW.md) – Luồng hoạt động chi tiết của ứng dụng  
+**Tài liệu tham khảo:**
+
+- [DATABASE.md](docs/DATABASE.md) – Sơ đồ & mô tả cơ sở dữ liệu
+- [DESCRIPTION.md](docs/DESCRIPTION.md) – Quy trình & nghiệp vụ hệ thống
+- [PROJECT_ARCHITECTURE.md](docs/PROJECT_ARCHITECTURE.md) – Kiến trúc dự án & vai trò các thành phần
+- [APPLICATION_WORKFLOW.md](docs/APPLICATION_WORKFLOW.md) – Luồng hoạt động chi tiết của ứng dụng
 - [docs/](docs/) – Hướng dẫn chi tiết về các thành phần hệ thống
 
 ---
