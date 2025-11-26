@@ -15,13 +15,9 @@ namespace Blood_Donation_Website.Controllers
     [AuthenticatedUser]
     public class DonationHistoryController : Controller
     {
-        // Dependencies
-        private readonly IDonationHistoryService _donationHistoryService; // Service lịch sử hiến máu
-        private readonly IProfileService _profileService; // Service profile (để lấy nhóm máu)
+        private readonly IDonationHistoryService _donationHistoryService;
+        private readonly IProfileService _profileService;
 
-        /// <summary>
-        /// Constructor - Inject các service cần thiết
-        /// </summary>
         public DonationHistoryController(IDonationHistoryService donationHistoryService, IProfileService profileService)
         {
             _donationHistoryService = donationHistoryService;
@@ -429,6 +425,176 @@ namespace Blood_Donation_Website.Controllers
             ViewBag.EventStats = eventStats;
             ViewBag.AllDonations = allDonations;
             return View();
+        }
+
+        // GET: /DonationHistory/SearchUser
+        [AuthenticatedUser]
+        public async Task<IActionResult> SearchUser(string searchTerm)
+        {
+            // Chỉ cho phép Admin, Hospital, Doctor, Staff truy cập
+            if (!User.IsInRole("Admin") && !User.IsInRole("Hospital") && !User.IsInRole("Doctor") && !User.IsInRole("Staff"))
+            {
+                return Json(new { success = false, message = "Bạn không có quyền thực hiện thao tác này." });
+            }
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return Json(new { success = false, message = "Vui lòng nhập email hoặc số điện thoại." });
+            }
+
+            try
+            {
+                // Tìm kiếm người dùng qua UserService
+                var userService = HttpContext.RequestServices.GetService<IUserService>();
+                if (userService == null)
+                {
+                    return Json(new { success = false, message = "Lỗi hệ thống." });
+                }
+
+                var allUsers = await userService.GetAllUsersAsync();
+                var user = allUsers.FirstOrDefault(u => 
+                    u.Email.Equals(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                    u.Phone == searchTerm);
+
+                if (user != null)
+                {
+                    return Json(new { success = true, userId = user.UserId, userName = user.FullName, userEmail = user.Email });
+                }
+
+                return Json(new { success = false, message = "Không tìm thấy người dùng với thông tin này." });
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra khi tìm kiếm." });
+            }
+        }
+
+        // GET: /DonationHistory/UserHistory
+        [AuthenticatedUser]
+        public async Task<IActionResult> UserHistory(int userId)
+        {
+            // Chỉ cho phép Admin, Hospital, Doctor, Staff truy cập
+            if (!User.IsInRole("Admin") && !User.IsInRole("Hospital") && !User.IsInRole("Doctor") && !User.IsInRole("Staff"))
+            {
+                TempData["Error"] = "Bạn không có quyền truy cập trang này.";
+                return RedirectToAction("MyHistory");
+            }
+
+            if (userId == 0)
+            {
+                TempData["Error"] = "Không tìm thấy người dùng.";
+                return RedirectToAction("MyHistory");
+            }
+
+            try
+            {
+                var donations = await _donationHistoryService.GetDonationsByUserAsync(userId);
+                
+                // Lấy thông tin người dùng
+                var userService = HttpContext.RequestServices.GetService<IUserService>();
+                if (userService != null)
+                {
+                    var user = await userService.GetUserByIdAsync(userId);
+                    if (user != null)
+                    {
+                        ViewBag.SearchedUser = user;
+                        ViewBag.SearchedUserName = user.FullName;
+                        ViewBag.SearchedUserEmail = user.Email;
+                    }
+                }
+                
+                return View("MyHistory", donations);
+            }
+            catch
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi tải lịch sử hiến máu.";
+                return RedirectToAction("MyHistory");
+            }
+        }
+
+        // GET: /DonationHistory/SearchUser
+        [AuthenticatedUser]
+        public async Task<IActionResult> SearchUser(string searchTerm)
+        {
+            // Chỉ cho phép Admin, Hospital, Doctor, Staff truy cập
+            if (!User.IsInRole("Admin") && !User.IsInRole("Hospital") && !User.IsInRole("Doctor") && !User.IsInRole("Staff"))
+            {
+                return Json(new { success = false, message = "Bạn không có quyền thực hiện thao tác này." });
+            }
+
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return Json(new { success = false, message = "Vui lòng nhập email hoặc số điện thoại." });
+            }
+
+            try
+            {
+                // Tìm kiếm người dùng qua UserService
+                var userService = HttpContext.RequestServices.GetService<IUserService>();
+                if (userService == null)
+                {
+                    return Json(new { success = false, message = "Lỗi hệ thống." });
+                }
+
+                var allUsers = await userService.GetAllUsersAsync();
+                var user = allUsers.FirstOrDefault(u => 
+                    u.Email.Equals(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                    u.Phone == searchTerm);
+
+                if (user != null)
+                {
+                    return Json(new { success = true, userId = user.UserId, userName = user.FullName, userEmail = user.Email });
+                }
+
+                return Json(new { success = false, message = "Không tìm thấy người dùng với thông tin này." });
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra khi tìm kiếm." });
+            }
+        }
+
+        // GET: /DonationHistory/UserHistory
+        [AuthenticatedUser]
+        public async Task<IActionResult> UserHistory(int userId)
+        {
+            // Chỉ cho phép Admin, Hospital, Doctor, Staff truy cập
+            if (!User.IsInRole("Admin") && !User.IsInRole("Hospital") && !User.IsInRole("Doctor") && !User.IsInRole("Staff"))
+            {
+                TempData["Error"] = "Bạn không có quyền truy cập trang này.";
+                return RedirectToAction("MyHistory");
+            }
+
+            if (userId == 0)
+            {
+                TempData["Error"] = "Không tìm thấy người dùng.";
+                return RedirectToAction("MyHistory");
+            }
+
+            try
+            {
+                var donations = await _donationHistoryService.GetDonationsByUserAsync(userId);
+                
+                // Lấy thông tin người dùng
+                var userService = HttpContext.RequestServices.GetService<IUserService>();
+                if (userService != null)
+                {
+                    var user = await userService.GetUserByIdAsync(userId);
+                    if (user != null)
+                    {
+                        ViewBag.SearchedUser = user;
+                        ViewBag.SearchedUserName = user.FullName;
+                        ViewBag.SearchedUserEmail = user.Email;
+                    }
+                }
+                
+                return View("MyHistory", donations);
+            }
+            catch
+            {
+                TempData["Error"] = "Có lỗi xảy ra khi tải lịch sử hiến máu.";
+                return RedirectToAction("MyHistory");
+            }
         }
 
         /// <summary>

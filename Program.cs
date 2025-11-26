@@ -1,4 +1,5 @@
-﻿using Blood_Donation_Website.Data;
+﻿// Import các namespace cần thiết cho ứng dụng
+using Blood_Donation_Website.Data;
 using Blood_Donation_Website.Data.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
