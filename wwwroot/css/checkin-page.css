@@ -1,0 +1,420 @@
+/* Checkin Page Styles */
+.checkin-page {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.checkin-page .container {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.checkin-header {
+    background: #dc3545;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.checkin-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.checkin-header .subtitle {
+    margin-top: 0.5rem;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.page-title {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.page-title i {
+    margin-right: 0.5rem;
+}
+
+.search-form {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.form-label {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    outline: none;
+}
+
+.btn-search {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-search:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-show-all {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-show-all:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls-section {
+    background: white;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.control-label {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.control-label i {
+    margin-right: 0.5rem;
+}
+
+.form-select {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 0.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    outline: none;
+}
+
+.table-container {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table tbody td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.registration-code {
+    font-weight: 600;
+    color: #dc3545;
+    font-family: 'Courier New', monospace;
+}
+
+.full-name {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.phone-number {
+    color: #6c757d;
+    font-family: 'Courier New', monospace;
+}
+
+.event-name {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.registration-date {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.badge-success {
+    background: #28a745;
+    color: white;
+}
+
+.badge-primary {
+    background: #007bff;
+    color: white;
+}
+
+.badge-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.badge-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.badge-warning {
+    background: #ffc107;
+    color: white;
+}
+
+.badge-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.health-status {
+    text-align: center;
+}
+
+.health-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-checkin {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-checkin:hover {
+    background: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel-checkin {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-checkin:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-message {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-message.success {
+    color: #28a745;
+}
+
+.status-message.muted {
+    color: #6c757d;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dee2e6;
+}
+
+.empty-state h4 {
+    color: #dc3545;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .checkin-page {
+        padding: 1rem 0;
+    }
+    
+    .checkin-page .container {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .search-form {
+        padding: 1rem;
+    }
+    
+    .controls-section {
+        padding: 0.75rem;
+    }
+    
+    .table-container {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .table thead th {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .btn-checkin,
+    .btn-cancel-checkin {
+        width: 100%;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.3rem;
+    }
+    
+    .search-form .row {
+        margin: 0;
+    }
+    
+    .search-form .col-md-6 {
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .search-form .col-md-6:last-child {
+        margin-bottom: 0;
+    }
+    
+    .controls-section .row {
+        margin: 0;
+    }
+    
+    .controls-section .col-md-6 {
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .controls-section .col-md-6:last-child {
+        margin-bottom: 0;
+    }
+    
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    .status-badge,
+    .health-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+} 

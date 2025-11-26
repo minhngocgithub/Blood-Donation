@@ -1,0 +1,186 @@
+@model Blood_Donation_Website.Models.DTOs.BloodDonationEventCreateDto
+@if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-danger d-none" id="server-error-alert">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div class="server-error-message">@error.ErrorMessage</div>
+        }
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger d-none" id="tempdata-error-alert">@TempData["ErrorMessage"]</div>
+}
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Tạo sự kiện mới";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/event-create-page.css" asp-append-version="true" />
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="event-create-card">
+                <div class="event-create-header">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h4 class="mb-0">Tạo sự kiện hiến máu mới</h4>
+                </div>
+                <div class="event-create-body">
+                    <form asp-action="Create" method="post">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventName" class="form-label">Tên sự kiện <span class="text-danger">*</span></label>
+                                <input asp-for="EventName" class="form-control" placeholder="Nhập tên sự kiện">
+                                <span asp-validation-for="EventName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EventDate" class="form-label">Ngày diễn ra <span class="text-danger">*</span></label>
+                                <input asp-for="EventDate" type="date" class="form-control">
+                                <span asp-validation-for="EventDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartTime" class="form-label">Thời gian bắt đầu <span class="text-danger">*</span></label>
+                                <input asp-for="StartTime" type="time" class="form-control">
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndTime" class="form-label">Thời gian kết thúc <span class="text-danger">*</span></label>
+                                <input asp-for="EndTime" type="time" class="form-control">
+                                <span asp-validation-for="EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="LocationId" class="form-label">Địa điểm <span class="text-danger">*</span></label>
+                                <select asp-for="LocationId" class="form-select">
+                                    <option value="">Chọn địa điểm</option>
+                                    @if (ViewBag.Locations != null)
+                                    {
+                                        @foreach (var location in ViewBag.Locations)
+                                        {
+                                            <option value="@location.LocationId">@location.LocationName</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="LocationId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="MaxDonors" class="form-label">Số lượng tối đa <span class="text-danger">*</span></label>
+                                <input asp-for="MaxDonors" type="number" class="form-control" placeholder="100">
+                                <span asp-validation-for="MaxDonors" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EventDescription" class="form-label">Mô tả sự kiện</label>
+                            <textarea asp-for="EventDescription" class="form-control" rows="4" placeholder="Mô tả chi tiết về sự kiện hiến máu"></textarea>
+                            <span asp-validation-for="EventDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="RequiredBloodTypes" class="form-label">Nhóm máu cần thiết</label>
+                                <select id="RequiredBloodTypesSelect" class="form-select" multiple style="width:100%">
+                                    @if (ViewBag.BloodTypes != null)
+                                    {
+                                        foreach (var bloodType in ViewBag.BloodTypes)
+                                        {
+                                            <option value="@bloodType.BloodTypeName">@bloodType.BloodTypeName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="hidden" asp-for="RequiredBloodTypes" id="RequiredBloodTypes" />
+                                <span asp-validation-for="RequiredBloodTypes" class="text-danger"></span>
+                                <small class="text-muted">Chọn nhiều nhóm máu nếu cần</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label">Trạng thái</label>
+                                <select asp-for="Status" class="form-select">
+                                    @foreach (var status in EnumMapper.GetSelectList<EnumMapper.EventStatus>())
+                                    {
+                                        <option value="@status.Value">@status.Text</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-2"></i>Tạo sự kiện
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#RequiredBloodTypesSelect').select2({
+                placeholder: 'Chọn nhóm máu cần thiết',
+                width: '100%',
+                allowClear: true,
+                closeOnSelect: false,
+                language: {
+                    noResults: function() {
+                        return "Không tìm thấy nhóm máu phù hợp";
+                    }
+                }
+            });
+
+            // Set initial value for hidden input
+            updateRequiredBloodTypes();
+
+            // SweetAlert for server-side errors
+            var errorMessages = [];
+            $("#server-error-alert .server-error-message").each(function() {
+                var msg = $(this).text().trim();
+                if (msg) errorMessages.push(msg);
+            });
+            var tempError = $("#tempdata-error-alert").text().trim();
+            if (tempError) errorMessages.push(tempError);
+            if (errorMessages.length > 0) {
+                showError("Lỗi tạo sự kiện", errorMessages.join("\n"));
+            }
+        });
+
+        // Update hidden input when selection changes
+        $('#RequiredBloodTypesSelect').on('change', function() {
+            updateRequiredBloodTypes();
+        });
+
+        function updateRequiredBloodTypes() {
+            var select = document.getElementById('RequiredBloodTypesSelect');
+            var selected = Array.from(select.selectedOptions).map(opt => opt.value);
+            document.getElementById('RequiredBloodTypes').value = selected.join(',');
+        }
+
+        // When submit form, ensure the hidden input is updated
+        document.querySelector('form').addEventListener('submit', function(e) {
+            updateRequiredBloodTypes();
+        });
+    </script>
+} 

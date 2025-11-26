@@ -1,0 +1,45 @@
+@using System.Text.Json
+
+@{
+    // Check for both Success and SuccessMessage
+    var successMessage = TempData["Success"] ?? TempData["SuccessMessage"];
+    var errorMessage = TempData["Error"] ?? TempData["ErrorMessage"];
+    var warningMessage = TempData["Warning"] ?? TempData["WarningMessage"];
+    var infoMessage = TempData["Info"] ?? TempData["InfoMessage"];
+}
+
+@if (successMessage != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showSuccess('Thành công!', '@Html.Raw(successMessage)');
+        });
+    </script>
+}
+
+@if (errorMessage != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showError('Lỗi!', '@Html.Raw(errorMessage)');
+        });
+    </script>
+}
+
+@if (warningMessage != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showWarning('Cảnh báo!', '@Html.Raw(warningMessage)');
+        });
+    </script>
+}
+
+@if (infoMessage != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showInfo('Thông tin!', '@Html.Raw(infoMessage)');
+        });
+    </script>
+}

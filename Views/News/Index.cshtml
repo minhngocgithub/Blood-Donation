@@ -1,0 +1,356 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.NewsDto>
+@{
+    ViewData["Title"] = "Quản lý tin tức";
+}
+
+<style>
+.news-management-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.news-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.news-header h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.news-table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.news-table .table {
+    margin: 0;
+}
+
+.news-table .table thead th {
+    background: #667eea;
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.news-table .table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.news-table .table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.badge-published {
+    background: #28a745;
+}
+
+.badge-draft {
+    background: #6c757d;
+}
+
+.news-image-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.news-title {
+    font-weight: 600;
+    color: #333;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-buttons .btn {
+    margin: 0 0.2rem;
+}
+</style>
+
+<div class="news-management-page">
+    <div class="container">
+        <div class="news-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>
+                    <i class="fas fa-newspaper me-2"></i>Quản lý tin tức
+                </h2>
+                <a asp-action="Create" class="btn btn-light btn-lg">
+                    <i class="fas fa-plus me-2"></i>Tạo tin tức mới
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-number">@ViewBag.TotalNews</div>
+                <div class="stat-label">Tổng số tin tức</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@ViewBag.PublishedNews</div>
+                <div class="stat-label">Đã xuất bản</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">@ViewBag.UnpublishedNews</div>
+                <div class="stat-label">Nháp</div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <form method="get" asp-action="Index">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" name="searchTerm" 
+                                   placeholder="Tìm kiếm theo tiêu đề, nội dung..." 
+                                   value="@ViewBag.SearchTerm" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" name="categoryId">
+                            <option value="">Tất cả danh mục</option>
+                            @if (ViewBag.Categories != null)
+                            {
+                                var categories = ViewBag.Categories as IEnumerable<Blood_Donation_Website.Models.DTOs.NewsCategoryDto>;
+                                if (categories != null)
+                                {
+                                    foreach (var cat in categories)
+                                    {
+                                        <option value="@cat.CategoryId" selected="@(ViewBag.CategoryId == cat.CategoryId)">
+                                            @cat.CategoryName
+                                        </option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="isPublished">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="true" selected="@(ViewBag.IsPublished == true)">Đã xuất bản</option>
+                            <option value="false" selected="@(ViewBag.IsPublished == false)">Nháp</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" name="sortBy">
+                            <option value="date" selected="@(ViewBag.SortBy == "date")">Mới nhất</option>
+                            <option value="title" selected="@(ViewBag.SortBy == "title")">Tiêu đề</option>
+                            <option value="views" selected="@(ViewBag.SortBy == "views")">Lượt xem</option>
+                            <option value="published" selected="@(ViewBag.SortBy == "published")">Ngày xuất bản</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- News Table -->
+        <div class="news-table">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Chưa có tin tức nào</h5>
+                    <a asp-action="Create" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>Tạo tin tức đầu tiên
+                    </a>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Hình ảnh</th>
+                            <th>Tiêu đề</th>
+                            <th>Danh mục</th>
+                            <th>Tác giả</th>
+                            <th>Lượt xem</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th style="width: 200px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var news in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(news.ImageUrl))
+                                    {
+                                        <img src="@news.ImageUrl" alt="@news.Title" class="news-image-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <div class="news-image-thumb bg-secondary d-flex align-items-center justify-content-center">
+                                            <i class="fas fa-image text-white"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="news-title" title="@news.Title">@news.Title</div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(news.CategoryName))
+                                    {
+                                        <span class="badge bg-info">@news.CategoryName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa phân loại</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(news.AuthorName))
+                                    {
+                                        @news.AuthorName
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không rõ</span>
+                                    }
+                                </td>
+                                <td>
+                                    <i class="fas fa-eye me-1"></i>@news.ViewCount
+                                </td>
+                                <td>
+                                    @if (news.IsPublished)
+                                    {
+                                        <span class="badge badge-published">
+                                            <i class="fas fa-check me-1"></i>Đã xuất bản
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-draft">
+                                            <i class="fas fa-file me-1"></i>Nháp
+                                        </span>
+                                    }
+                                </td>
+                                <td>@news.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a asp-action="Details" asp-route-id="@news.NewsId" 
+                                           class="btn btn-sm btn-info" title="Xem chi tiết">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@news.NewsId" 
+                                           class="btn btn-sm btn-primary" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                onclick="deleteNews(@news.NewsId)" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        function deleteNews(newsId) {
+            showDeleteConfirm(
+                'Bạn có chắc chắn muốn xóa tin tức này?',
+                'Hành động này không thể hoàn tác!',
+                function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '@Url.Action("Delete", "News")' + '/' + newsId;
+                    
+                    var token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = '@Html.AntiForgeryToken()'.match(/value="([^"]+)"/)[1];
+                    form.appendChild(token);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            );
+        }
+
+        $(document).ready(function() {
+            var successMsg = '@TempData["SuccessMessage"]';
+            var errorMsg = '@TempData["ErrorMessage"]';
+            
+            if (successMsg) {
+                showSuccess(successMsg);
+            }
+            if (errorMsg) {
+                showError(errorMsg);
+            }
+        });
+    </script>
+}

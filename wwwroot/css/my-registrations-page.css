@@ -1,0 +1,450 @@
+/* My Registrations Page Styles */
+.my-registrations-container {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+/* Card Header Styling */
+.registrations-card-header {
+    background: white !important;
+    border: none;
+    border-radius: 0 !important;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.registrations-card-header h4 {
+    font-weight: 600;
+    color: #dc3545;
+}
+
+.registrations-card-header .btn-light {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.registrations-card-header .btn-light:hover {
+    background: #c82333;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Filter Dropdown Styling */
+.status-filter-select {
+    background: white;
+    border: 1px solid #dc3545;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    color: #dc3545;
+}
+
+.status-filter-select:focus {
+    background: white;
+    border-color: #c82333;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Main Card Styling */
+.registrations-main-card {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: white;
+}
+
+/* Registration Item Cards */
+.registration-item-card {
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background: white;
+    overflow: hidden;
+}
+
+.registration-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-color: #dc3545;
+}
+
+/* Card Header */
+.registration-card-header {
+    background: #f8f9fa;
+    border: none;
+    padding: 1.25rem;
+    position: relative;
+}
+
+.registration-card-title {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.location-info {
+    color: #6c757d;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Status Badge Styling */
+.status-badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Card Body */
+.registration-card-body {
+    padding: 1.25rem;
+    background: white;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    text-align: center;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.info-label {
+    color: #6c757d;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Notes Section */
+.notes-section {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.notes-text {
+    color: #856404;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Time Information */
+.time-info {
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 5px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-info i {
+    color: #1976d2;
+    width: 16px;
+}
+
+.time-text {
+    color: #1565c0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Cancellation Alert */
+.cancellation-alert {
+    background: #fff3e0;
+    border: 1px solid #ffcc02;
+    border-radius: 5px;
+    padding: 0.75rem;
+    margin-bottom: 0;
+}
+
+.cancellation-alert small {
+    color: #e65100;
+    font-weight: 500;
+}
+
+/* Card Footer */
+.registration-card-footer {
+    background: #f8f9fa;
+    border: none;
+    padding: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Action Buttons */
+.action-btn {
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 120px;
+    justify-content: center;
+}
+
+.btn-details {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-details:hover {
+    background: #c82333;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #f8f9fa;
+    border-radius: 5px;
+    margin: 2rem 0;
+    border: 1px solid #dee2e6;
+}
+
+.empty-state-icon {
+    color: #dc3545;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.empty-state-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 2rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.empty-state-btn:hover {
+    background: #c82333;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .registrations-card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .registrations-card-header .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .status-filter-select {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .registration-card-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .empty-state {
+        padding: 3rem 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .my-registrations-container {
+        padding: 1rem 0;
+    }
+    
+    .registrations-card-header {
+        padding: 1rem;
+    }
+    
+    .registration-card-header,
+    .registration-card-body,
+    .registration-card-footer {
+        padding: 1rem;
+    }
+    
+    .registration-card-title {
+        font-size: 1rem;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Loading States */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #dc3545;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hover Effects */
+.registration-item-card:hover .registration-card-title {
+    color: #c82333;
+}
+
+/* Focus States */
+.status-filter-select:focus,
+.action-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Print Styles */
+@media print {
+    .registrations-card-header,
+    .registration-card-footer,
+    .action-btn {
+        display: none !important;
+    }
+    
+    .registration-item-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+} 

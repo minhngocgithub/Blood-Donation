@@ -1,0 +1,365 @@
+/* Donation Details Page Styles */
+.donation-details-page {
+    background: white;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.donation-details-page .container {
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.donation-details-header {
+    background: #dc3545;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.donation-details-header h2 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.donation-details-header .subtitle {
+    margin-top: 0.5rem;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.user-info-card {
+    background: white;
+    border-radius: 5px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #dc3545;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+}
+
+.user-info h4 {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.user-info p {
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.details-section {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #17a2b8;
+}
+
+.section-header {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid #17a2b8;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #0c5460;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.detail-item .value {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.status-eligible {
+    background: #28a745;
+    color: white;
+}
+
+.status-donating {
+    background: #007bff;
+    color: white;
+}
+
+.status-completed {
+    background: #28a745;
+    color: white;
+}
+
+.status-cancelled {
+    background: #dc3545;
+    color: white;
+}
+
+.health-screening-card {
+    background: white;
+    border-radius: 5px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ffc107;
+}
+
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.health-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ffc107;
+    text-align: center;
+}
+
+.health-item label {
+    font-weight: 600;
+    color: #856404;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.health-item .value {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.health-item .unit {
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
+.progress-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    margin: 0 1rem;
+}
+
+.progress-step .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.progress-step.active .step-number {
+    background: #007bff;
+    color: white;
+}
+
+.progress-step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.progress-step .step-label {
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.progress-step.active .step-label {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.progress-step.completed .step-label {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 0.5rem;
+}
+
+.progress-line.completed {
+    background: #28a745;
+}
+
+.progress-line.active {
+    background: #007bff;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-donation {
+    padding: 1rem 2rem;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.btn-donation:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    color: white;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .details-grid, .health-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-donation {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .progress-indicator {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .progress-step {
+        margin: 0;
+    }
+    
+    .progress-line {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .donation-details-page {
+        padding: 1rem 0;
+    }
+    
+    .donation-details-page .container {
+        padding: 1rem;
+    }
+    
+    .donation-details-header {
+        padding: 1rem;
+    }
+    
+    .donation-details-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .user-info-card {
+        padding: 1.5rem;
+    }
+    
+    .details-section,
+    .health-screening-card {
+        padding: 1rem;
+    }
+    
+    .btn-donation {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+} 
