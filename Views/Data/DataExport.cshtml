@@ -109,6 +109,105 @@
                         </div>
                     </div>
 
+                    <!-- Export Filtered Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-gradient-primary">
+                            <h5 class="mb-0 text-white">
+                                <i class="fas fa-filter mr-2"></i>
+                                Xuất dữ liệu theo bộ lọc
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Xuất dữ liệu với các tiêu chí lọc chi tiết (ngày tháng, nhóm máu, địa điểm, trạng thái...)</p>
+                            <form asp-action="ExportFilteredData" method="post">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="dataType">Loại dữ liệu:</label>
+                                            <select name="dataType" id="dataType" class="form-control" required>
+                                                <option value="donations">Lịch sử hiến máu</option>
+                                                <option value="registrations">Đăng ký hiến máu</option>
+                                                <option value="events">Sự kiện hiến máu</option>
+                                                <option value="users">Người dùng</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="format">Định dạng:</label>
+                                            <select name="format" id="format" class="form-control">
+                                                <option value="json">JSON</option>
+                                                <option value="csv">CSV</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fromDate">Từ ngày:</label>
+                                            <input type="date" name="fromDate" id="fromDate" class="form-control" />
+                                            <small class="form-text text-muted">Lọc từ ngày này trở đi</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="toDate">Đến ngày:</label>
+                                            <input type="date" name="toDate" id="toDate" class="form-control" />
+                                            <small class="form-text text-muted">Lọc đến ngày này</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="bloodTypeId">Nhóm máu:</label>
+                                            <select name="bloodTypeId" id="bloodTypeId" class="form-control">
+                                                <option value="">Tất cả</option>
+                                                <option value="1">A</option>
+                                                <option value="2">B</option>
+                                                <option value="3">AB</option>
+                                                <option value="4">O</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="locationId">Địa điểm:</label>
+                                            <input type="number" name="locationId" id="locationId" class="form-control" placeholder="ID địa điểm" />
+                                            <small class="form-text text-muted">Nhập ID địa điểm (tùy chọn)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Trạng thái:</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="">Tất cả</option>
+                                                <option value="Pending">Chờ xử lý</option>
+                                                <option value="Confirmed">Đã xác nhận</option>
+                                                <option value="Completed">Hoàn thành</option>
+                                                <option value="Cancelled">Đã hủy</option>
+                                                <option value="Active">Đang hoạt động</option>
+                                                <option value="Finished">Đã kết thúc</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-filter mr-2"></i>
+                                            Xuất dữ liệu theo bộ lọc
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <!-- Export Single Table Section -->
                     <div class="card mb-4">
                         <div class="card-header">

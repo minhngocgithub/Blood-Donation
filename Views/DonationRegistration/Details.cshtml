@@ -203,13 +203,20 @@
                                     </h6>
                                 </div>
                                 <div class="card-body content-card-body">
-                                    @if (Model.Status == EnumMapper.RegistrationStatus.Registered)
+                                    @if (Model.Status == EnumMapper.RegistrationStatus.Registered || Model.Status == EnumMapper.RegistrationStatus.Confirmed)
                                     {
                                         <button type="button" class="action-button btn-cancel-registration" 
                                                 onclick="showCancelConfirmation(@Model.RegistrationId, '@Html.Raw(Model.EventName!.Replace("'", "\\'"))')">
                                             <i class="fas fa-times"></i>
                                             <span>Hủy đăng ký</span>
                                         </button>
+                                    }
+                                    else if (Model.Status == EnumMapper.RegistrationStatus.CheckedIn || Model.Status == EnumMapper.RegistrationStatus.Screening || Model.Status == EnumMapper.RegistrationStatus.Donating)
+                                    {
+                                        <div class="info-alert">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Bạn đã check-in hoặc đang trong quá trình hiến máu, không thể hủy đăng ký.</span>
+                                        </div>
                                     }
                                     
                                     @if (Model.Status == EnumMapper.RegistrationStatus.Completed)

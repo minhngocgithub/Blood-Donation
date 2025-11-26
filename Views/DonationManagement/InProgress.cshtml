@@ -101,10 +101,52 @@
         <!-- Thể tích máu -->
         <div class="donation-notes">
             <div class="notes-header">
-                <i class="fas fa-tint me-2"></i>Thể tích máu hiến (ml)
+                <i class="fas fa-tint me-2"></i>Thể tích máu hiến
             </div>
-            <input type="number" class="form-control" id="bloodVolume" value="350" min="200" max="500" required />
-            <small class="text-muted">Nhập thể tích máu từ 200ml đến 500ml</small>
+            <div class="blood-volume-container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-danger text-white">
+                                <i class="fas fa-tint"></i>
+                            </span>
+                            <input type="number" class="form-control form-control-lg" id="bloodVolume" 
+                                   value="350" min="200" max="500" step="50" required 
+                                   style="font-size: 1.5rem; font-weight: bold; text-align: center;" />
+                            <span class="input-group-text bg-danger text-white" style="font-size: 1.2rem; font-weight: bold;">ml</span>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Giá trị chuẩn: 200ml - 500ml (khuyến nghị: 250ml, 350ml, 450ml)
+                            </small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="quick-select-volume">
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-danger btn-sm volume-btn" data-volume="250">
+                                    <i class="fas fa-tint me-1"></i>250 ml
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm volume-btn" data-volume="350">
+                                    <i class="fas fa-tint me-1"></i>350 ml
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm volume-btn" data-volume="450">
+                                    <i class="fas fa-tint me-1"></i>450 ml
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="volume-indicator mt-3">
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar bg-danger" id="volumeProgress" role="progressbar" 
+                             style="width: 50%;" aria-valuenow="350" aria-valuemin="200" aria-valuemax="500">
+                            <span id="volumeProgressText" style="font-size: 1rem; font-weight: bold;">350ml / 500ml</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Ghi chú -->
@@ -217,6 +259,33 @@
                     }
                 });
             });
+
+            // Quick volume selection buttons
+            $('.volume-btn').on('click', function() {
+                var volume = $(this).data('volume');
+                $('#bloodVolume').val(volume).trigger('input');
+                $('.volume-btn').removeClass('active');
+                $(this).addClass('active');
+            });
+
+            // Update progress bar when volume changes
+            $('#bloodVolume').on('input', function() {
+                var volume = parseInt($(this).val()) || 200;
+                if (volume < 200) volume = 200;
+                if (volume > 500) volume = 500;
+                
+                var percentage = ((volume - 200) / 300) * 100;
+                $('#volumeProgress').css('width', percentage + '%');
+                $('#volumeProgress').attr('aria-valuenow', volume);
+                $('#volumeProgressText').text(volume + 'ml / 500ml');
+                
+                // Highlight active button if volume matches
+                $('.volume-btn').removeClass('active');
+                $('.volume-btn[data-volume="' + volume + '"]').addClass('active');
+            });
+
+            // Initialize progress bar
+            $('#bloodVolume').trigger('input');
 
             // Stop donation
             $('#stopBtn').on('click', function() {

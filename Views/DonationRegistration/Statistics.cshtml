@@ -5,9 +5,9 @@
 <div class="container py-5">
     <h2 class="text-center mb-4">Thống kê đăng ký hiến máu</h2>
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="row g-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card border-primary shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-primary">Tổng số đăng ký</h5>
@@ -15,35 +15,48 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card border-success shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-success">Đã hoàn thành</h5>
                             <p class="display-5 fw-bold">@Model.CompletedRegistrations</p>
+                            <small class="text-muted">@Model.CompletionRate%</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card border-warning shadow-sm">
                         <div class="card-body text-center">
-                            <h5 class="card-title text-warning">Đã xác nhận đăng ký</h5>
+                            <h5 class="card-title text-warning">Đã xác nhận</h5>
                             <p class="display-5 fw-bold">@Model.ApprovedRegistrations</p>
+                            <small class="text-muted">@Model.ApprovedRate%</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="card border-danger shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-danger">Đã hủy</h5>
                             <p class="display-5 fw-bold">@Model.CancelledRegistrations</p>
+                            <small class="text-muted">@Model.CancelledRate%</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mx-auto">
+                <div class="col-md-4">
                     <div class="card border-info shadow-sm">
                         <div class="card-body text-center">
                             <h5 class="card-title text-info">Đã check-in</h5>
                             <p class="display-5 fw-bold">@Model.CheckedInRegistrations</p>
+                            <small class="text-muted">@Model.CheckedInRate%</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-secondary shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-secondary">Tạm hoãn</h5>
+                            <p class="display-5 fw-bold">@Model.DeferredRegistrations</p>
+                            <small class="text-muted">@Model.DeferredRate%</small>
                         </div>
                     </div>
                 </div>
