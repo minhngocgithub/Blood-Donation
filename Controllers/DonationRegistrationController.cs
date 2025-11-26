@@ -188,7 +188,6 @@ namespace Blood_Donation_Website.Controllers
                 var allRegs = await _registrationService.GetRegistrationsByUserAsync(userId);
                 IEnumerable<DonationRegistrationDto> filtered = allRegs;
 
-                // Lọc theo trạng thái
                 if (status == "active")
                 {
                     var activeStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed, RegistrationStatus.CheckedIn, RegistrationStatus.Screening, RegistrationStatus.Eligible, RegistrationStatus.Ineligible, RegistrationStatus.Donating };
