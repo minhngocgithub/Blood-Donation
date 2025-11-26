@@ -1,0 +1,461 @@
+@{
+    ViewData["Title"] = "Data Export Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-download mr-2"></i>
+                        Data Export Management
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    <!-- Export All Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-database mr-2"></i>
+                                Export All Database Data
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Export all database tables to a compressed file.</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form asp-action="ExportAll" method="post" class="d-inline">
+                                        <input type="hidden" name="format" value="json" />
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-file-code mr-2"></i>
+                                            Export as JSON
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-6">
+                                    <form asp-action="ExportAll" method="post" class="d-inline">
+                                        <input type="hidden" name="format" value="csv" />
+                                        <button type="submit" class="btn btn-success btn-block">
+                                            <i class="fas fa-file-csv mr-2"></i>
+                                            Export as CSV
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Event Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                Export Event Data
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Export comprehensive data for a specific blood donation event including registrations, donations, and health screenings.</p>
+                            <form asp-action="ExportEventData" method="post">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="eventId">Event ID:</label>
+                                            <input type="number" name="eventId" id="eventId" class="form-control" placeholder="Enter event ID" required />
+                                            <small class="form-text text-muted">Enter the ID of the event you want to export.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="eventFormat">Format:</label>
+                                            <select name="format" id="eventFormat" class="form-control">
+                                                <option value="json">JSON</option>
+                                                <option value="csv">CSV</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-calendar-download mr-2"></i>
+                                            Export Event Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Export Filtered Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-gradient-primary">
+                            <h5 class="mb-0 text-white">
+                                <i class="fas fa-filter mr-2"></i>
+                                Xuất dữ liệu theo bộ lọc
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Xuất dữ liệu với các tiêu chí lọc chi tiết (ngày tháng, nhóm máu, địa điểm, trạng thái...)</p>
+                            <form asp-action="ExportFilteredData" method="post">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="dataType">Loại dữ liệu:</label>
+                                            <select name="dataType" id="dataType" class="form-control" required>
+                                                <option value="donations">Lịch sử hiến máu</option>
+                                                <option value="registrations">Đăng ký hiến máu</option>
+                                                <option value="events">Sự kiện hiến máu</option>
+                                                <option value="users">Người dùng</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="format">Định dạng:</label>
+                                            <select name="format" id="format" class="form-control">
+                                                <option value="json">JSON</option>
+                                                <option value="csv">CSV</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fromDate">Từ ngày:</label>
+                                            <input type="date" name="fromDate" id="fromDate" class="form-control" />
+                                            <small class="form-text text-muted">Lọc từ ngày này trở đi</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="toDate">Đến ngày:</label>
+                                            <input type="date" name="toDate" id="toDate" class="form-control" />
+                                            <small class="form-text text-muted">Lọc đến ngày này</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="bloodTypeId">Nhóm máu:</label>
+                                            <select name="bloodTypeId" id="bloodTypeId" class="form-control">
+                                                <option value="">Tất cả</option>
+                                                <option value="1">A</option>
+                                                <option value="2">B</option>
+                                                <option value="3">AB</option>
+                                                <option value="4">O</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="locationId">Địa điểm:</label>
+                                            <input type="number" name="locationId" id="locationId" class="form-control" placeholder="ID địa điểm" />
+                                            <small class="form-text text-muted">Nhập ID địa điểm (tùy chọn)</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Trạng thái:</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="">Tất cả</option>
+                                                <option value="Pending">Chờ xử lý</option>
+                                                <option value="Confirmed">Đã xác nhận</option>
+                                                <option value="Completed">Hoàn thành</option>
+                                                <option value="Cancelled">Đã hủy</option>
+                                                <option value="Active">Đang hoạt động</option>
+                                                <option value="Finished">Đã kết thúc</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            <i class="fas fa-filter mr-2"></i>
+                                            Xuất dữ liệu theo bộ lọc
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Export Single Table Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-table mr-2"></i>
+                                Export Single Table
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Export data from a specific table.</p>
+                            <form asp-action="ExportTable" method="post">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="tableName">Table Name:</label>
+                                            <select name="tableName" id="tableName" class="form-control" required>
+                                                <option value="">Select a table...</option>
+                                                <option value="Users">Users</option>
+                                                <option value="Roles">Roles</option>
+                                                <option value="BloodTypes">Blood Types</option>
+                                                <option value="Locations">Locations</option>
+                                                <option value="BloodDonationEvents">Blood Donation Events</option>
+                                                <option value="DonationRegistrations">Donation Registrations</option>
+                                                <option value="DonationHistory">Donation History</option>
+                                                <option value="HealthScreenings">Health Screenings</option>
+                                                <option value="News">News</option>
+                                                <option value="NewsCategories">News Categories</option>
+                                                <option value="ContactMessages">Contact Messages</option>
+                                                <option value="Notifications">Notifications</option>
+                                                <option value="Settings">Settings</option>
+                                                <option value="BloodCompatibilities">Blood Compatibilities</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-info btn-block">
+                                            <i class="fas fa-download mr-2"></i>
+                                            Export Table
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Import All Data Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-upload mr-2"></i>
+                                Import All Database Data
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Import all database tables from a ZIP file containing JSON data.</p>
+                            <form asp-action="ImportAll" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="importFile">Select ZIP file:</label>
+                                            <input type="file" name="file" id="importFile" class="form-control-file" accept=".zip" required />
+                                            <small class="form-text text-muted">Upload a ZIP file containing JSON export files.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            <i class="fas fa-upload mr-2"></i>
+                                            Import All Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Import Single Table Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-import mr-2"></i>
+                                Import Single Table
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Import data to a specific table from a JSON file.</p>
+                            <form asp-action="ImportTable" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="importTableName">Table Name:</label>
+                                            <select name="tableName" id="importTableName" class="form-control" required>
+                                                <option value="">Select a table...</option>
+                                                <option value="Users">Users</option>
+                                                <option value="Roles">Roles</option>
+                                                <option value="BloodTypes">Blood Types</option>
+                                                <option value="Locations">Locations</option>
+                                                <option value="BloodDonationEvents">Blood Donation Events</option>
+                                                <option value="DonationRegistrations">Donation Registrations</option>
+                                                <option value="DonationHistory">Donation History</option>
+                                                <option value="HealthScreenings">Health Screenings</option>
+                                                <option value="News">News</option>
+                                                <option value="ContactMessages">Contact Messages</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="importTableFile">Select JSON file:</label>
+                                            <input type="file" name="file" id="importTableFile" class="form-control-file" accept=".json" required />
+                                            <small class="form-text text-muted">Upload a JSON file exported from the same table.</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>&nbsp;</label>
+                                        <button type="submit" class="btn btn-success btn-block">
+                                            <i class="fas fa-file-import mr-2"></i>
+                                            Import Table
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Testing Tools Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tools mr-2"></i>
+                                Testing Tools
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Run tests to verify DataExporter functionality.</p>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <form asp-action="RunTests" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-warning btn-block">
+                                            <i class="fas fa-play mr-2"></i>
+                                            Run All Tests
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestSimple" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-info btn-block">
+                                            <i class="fas fa-vial mr-2"></i>
+                                            Test Simple
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestExport" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-download mr-2"></i>
+                                            Test Export
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-md-3">
+                                    <form asp-action="TestExtensions" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-cogs mr-2"></i>
+                                            Test Extensions
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form asp-action="TestTables" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-secondary btn-block">
+                                            <i class="fas fa-table mr-2"></i>
+                                            Test Tables
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Status Section -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Export Status
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="exportStatus">
+                                <p class="text-muted">Loading export status...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            loadExportStatus();
+            
+            // Auto refresh status every 30 seconds
+            setInterval(loadExportStatus, 30000);
+        });
+
+        function loadExportStatus() {
+            $.get('@Url.Action("GetExportStatus")', function(data) {
+                var html = '';
+                if (data.hasExports) {
+                    html = '<div class="table-responsive"><table class="table table-striped">';
+                    html += '<thead><tr><th>Export Name</th><th>Created Date</th><th>Files</th><th>Size</th></tr></thead><tbody>';
+                    
+                    data.exports.forEach(function(exportItem) {
+                        var size = formatBytes(exportItem.size);
+                        var date = new Date(exportItem.createdDate).toLocaleString();
+                        html += '<tr>';
+                        html += '<td>' + exportItem.name + '</td>';
+                        html += '<td>' + date + '</td>';
+                        html += '<td>' + exportItem.fileCount + '</td>';
+                        html += '<td>' + size + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody></table></div>';
+                } else {
+                    html = '<p class="text-muted">No exports found.</p>';
+                }
+                
+                $('#exportStatus').html(html);
+            }).fail(function() {
+                $('#exportStatus').html('<p class="text-danger">Failed to load export status.</p>');
+            });
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    </script>
+}

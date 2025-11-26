@@ -1,0 +1,246 @@
+@model Blood_Donation_Website.Models.DTOs.NewsDto
+@{
+    ViewData["Title"] = Model.Title;
+    var isAdmin = User.IsInRole("Admin") || User.IsInRole("Hospital");
+}
+
+<style>
+.news-details-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.news-details-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.news-header-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.news-content-section {
+    padding: 2rem;
+}
+
+.news-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+}
+
+.meta-item i {
+    color: #667eea;
+}
+
+.news-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.news-summary {
+    font-size: 1.1rem;
+    color: #6c757d;
+    font-style: italic;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-left: 4px solid #667eea;
+}
+
+.news-content {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+.action-bar {
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge-category {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+</style>
+
+<div class="news-details-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="news-details-card">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="news-header-image" />
+                    }
+
+                    <div class="news-meta">
+                        @if (!string.IsNullOrEmpty(Model.CategoryName))
+                        {
+                            <div class="meta-item">
+                                <i class="fas fa-folder"></i>
+                                <span class="badge badge-category">@Model.CategoryName</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.AuthorName))
+                        {
+                            <div class="meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>Tác giả: <strong>@Model.AuthorName</strong></span>
+                            </div>
+                        }
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        @if (Model.PublishedDate.HasValue)
+                        {
+                            <div class="meta-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Xuất bản: @Model.PublishedDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        }
+                        <div class="meta-item">
+                            <i class="fas fa-eye"></i>
+                            <span>@Model.ViewCount lượt xem</span>
+                        </div>
+                        <div class="meta-item">
+                            @if (Model.IsPublished)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Đã xuất bản
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-file me-1"></i>Nháp
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="news-content-section">
+                        <h1 class="news-title">@Model.Title</h1>
+
+                        @if (!string.IsNullOrEmpty(Model.Summary))
+                        {
+                            <div class="news-summary">
+                                @Model.Summary
+                            </div>
+                        }
+
+                        <div class="news-content">
+                            @Html.Raw(Model.Content)
+                        </div>
+                    </div>
+
+                    @if (isAdmin)
+                    {
+                        <div class="action-bar">
+                            <a asp-action="Edit" asp-route-id="@Model.NewsId" class="btn btn-primary">
+                                <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                            </a>
+                            
+                            @if (Model.IsPublished)
+                            {
+                                <form asp-action="Unpublish" asp-route-id="@Model.NewsId" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="fas fa-eye-slash me-2"></i>Gỡ xuất bản
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Publish" asp-route-id="@Model.NewsId" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check me-2"></i>Xuất bản
+                                    </button>
+                                </form>
+                            }
+
+                            <button type="button" class="btn btn-danger" onclick="deleteNews(@Model.NewsId)">
+                                <i class="fas fa-trash me-2"></i>Xóa
+                            </button>
+                            
+                            <a asp-action="Index" class="btn btn-secondary ms-auto">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="action-bar">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        function deleteNews(newsId) {
+            showDeleteConfirm(
+                'Bạn có chắc chắn muốn xóa tin tức này?',
+                'Hành động này không thể hoàn tác!',
+                function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '@Url.Action("Delete", "News")' + '/' + newsId;
+                    
+                    var token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = '@Html.AntiForgeryToken()'.match(/value="([^"]+)"/)[1];
+                    form.appendChild(token);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            );
+        }
+
+        $(document).ready(function() {
+            var successMsg = '@TempData["SuccessMessage"]';
+            var errorMsg = '@TempData["ErrorMessage"]';
+            
+            if (successMsg) {
+                showSuccess(successMsg);
+            }
+            if (errorMsg) {
+                showError(errorMsg);
+            }
+        });
+    </script>
+}

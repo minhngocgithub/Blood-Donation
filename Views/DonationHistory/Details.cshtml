@@ -1,0 +1,126 @@
+@model Blood_Donation_Website.Models.DTOs.DonationHistoryDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Chi tiết hiến máu";
+}
+<link rel="stylesheet" href="~/css/my-history-details-page.css" asp-append-version="true" />
+<div class="my-history-details-container">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="details-main-card">
+                    <div class="details-card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tint me-2 blood-drop-effect"></i>Chi tiết hiến máu
+                        </h4>
+                        <a href="@Url.Action("MyHistory", "DonationHistory")" class="btn btn-light btn-sm heartbeat-effect">
+                            <i class="fas fa-arrow-left me-1"></i>Quay lại
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        @if (ViewBag.EligibleMessage != null)
+                        {
+                            <div class="alert @(ViewBag.DaysLeft != null ? "alert-warning" : "alert-success") text-center fw-bold mb-4" style="font-size:1.1rem">
+                                <i class="fas fa-heartbeat me-2 heartbeat-effect"></i>@ViewBag.EligibleMessage
+                                @if (ViewBag.NextEligibleDate != null && ViewBag.DaysLeft != null)
+                                {
+                                    <br />
+                                    <span class="text-muted">Ngày đủ điều kiện: @(( (DateTime)ViewBag.NextEligibleDate ).ToString("dd/MM/yyyy"))</span>
+                                }
+                            </div>
+                        }
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Sự kiện</label>
+                                <div class="details-value">@Model.EventName</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Ngày hiến máu</label>
+                                <div class="details-value">
+                                    <i class="fas fa-calendar-alt details-icon"></i>@Model.DonationDate.ToString("dd/MM/yyyy")
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Địa điểm</label>
+                                <div class="details-value">
+                                    <i class="fas fa-map-marker-alt details-icon"></i>@Model.LocationName
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Nhóm máu</label>
+                                <div class="details-blood">
+                                    <i class="fas fa-tint details-icon"></i>@Model.BloodTypeName
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Thể tích</label>
+                                <div class="details-volume">
+                                    <i class="fas fa-flask details-icon" style="color:#28a745"></i>@Model.Volume ml
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Trạng thái</label>
+                                <div>
+                                    @{
+                                        var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(Model.Status);
+                                    }
+                                    <span class="details-status-badge @GetStatusBadgeClass(Model.Status)">@statusDisplayName</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Chứng nhận</label>
+                                <div>
+                                    @if (Model.CertificateIssued)
+                                    {
+                                        <span class="details-certificate-badge bg-success">Đã cấp</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="details-certificate-badge bg-secondary">Chưa cấp</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="details-label">Ngày đủ điều kiện tiếp theo</label>
+                                <div class="details-next-eligible">
+                                    @if (Model.NextEligibleDate.HasValue)
+                                    {
+                                        <i class="fas fa-calendar-check details-icon" style="color:#e83e8c"></i>@Model.NextEligibleDate.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không xác định</span>
+                                    }
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.Notes))
+                            {
+                                <div class="col-12 mb-3">
+                                    <label class="details-label">Ghi chú</label>
+                                    <div class="details-notes">
+                                        <i class="fas fa-sticky-note"></i>@Model.Notes
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@functions {
+    private string GetStatusBadgeClass(EnumMapper.DonationStatus status)
+    {
+        return status switch
+        {
+            EnumMapper.DonationStatus.Completed => "bg-success text-white",
+            EnumMapper.DonationStatus.InProgress => "bg-primary text-white",
+            EnumMapper.DonationStatus.Started => "bg-info text-white",
+            EnumMapper.DonationStatus.Stopped => "bg-warning text-white",
+            EnumMapper.DonationStatus.Failed => "bg-danger text-white",
+            EnumMapper.DonationStatus.Cancelled => "bg-secondary text-white",
+            _ => "bg-secondary text-white"
+        };
+    }
+} 

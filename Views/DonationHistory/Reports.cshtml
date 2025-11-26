@@ -1,0 +1,368 @@
+@using Blood_Donation_Website.Models.DTOs;
+@using Blood_Donation_Website.Utilities;
+@{
+    ViewData["Title"] = "Báo cáo hiến máu";
+    var totalDonations = ViewBag.TotalDonations ?? 0;
+    var totalVolume = ViewBag.TotalVolume ?? 0;
+    var completedDonations = ViewBag.CompletedDonations ?? 0;
+    var cancelledDonations = ViewBag.CancelledDonations ?? 0;
+    var certificatesIssued = ViewBag.CertificatesIssued ?? 0;
+    var totalUsers = ViewBag.TotalUsers ?? 0;
+    var bloodTypeStats = ViewBag.BloodTypeStats as List<BloodTypeStatDto>;
+    var monthlyStats = ViewBag.MonthlyStats as Dictionary<string, int>;
+    var topDonors = ViewBag.TopDonors as List<TopDonorDto>;
+    var eventStats = ViewBag.EventStats as List<EventStatDto>;
+    var allDonations = ViewBag.AllDonations as IEnumerable<DonationHistoryDto>;
+    
+    // Tính toán số liệu chính xác
+    var failedDonations = allDonations != null ? allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Failed) : 0;
+    var stoppedDonations = allDonations != null ? allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Stopped) : 0;
+    var totalCancelledAndFailed = cancelledDonations + failedDonations;
+}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Báo cáo tổng hợp hiến máu</h2>
+    
+    <!-- Bộ lọc theo ngày -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" asp-action="Reports" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label">
+                        <i class="fas fa-calendar-alt me-1"></i>Từ ngày
+                    </label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" 
+                           value="@(ViewBag.StartDate != null ? ((DateTime)ViewBag.StartDate).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label">
+                        <i class="fas fa-calendar-alt me-1"></i>Đến ngày
+                    </label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" 
+                           value="@(ViewBag.EndDate != null ? ((DateTime)ViewBag.EndDate).ToString("yyyy-MM-dd") : "")" />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter me-1"></i>Lọc
+                    </button>
+                    <a href="@Url.Action("Reports")" class="btn btn-secondary">
+                        <i class="fas fa-redo me-1"></i>Đặt lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Tổng lượt hiến</h5>
+                    <p class="display-6 fw-bold">@totalDonations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Tổng thể tích (ml)</h5>
+                    <p class="display-6 fw-bold">@totalVolume</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">Số người tham gia</h5>
+                    <p class="display-6 fw-bold">@totalUsers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-success shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-success">Hoàn thành</h6>
+                    <p class="h4 fw-bold">@completedDonations</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)completedDonations / totalDonations * 100, 1) : 0)%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-danger shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-danger">Đã hủy / Thất bại</h6>
+                    <p class="h4 fw-bold">@totalCancelledAndFailed</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)totalCancelledAndFailed / totalDonations * 100, 1) : 0)%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-warning">Dừng giữa chừng</h6>
+                    <p class="h4 fw-bold">@stoppedDonations</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)stoppedDonations / totalDonations * 100, 1) : 0)%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-info">Chứng nhận đã cấp</h6>
+                    <p class="h4 fw-bold">@certificatesIssued</p>
+                    <small class="text-muted">@(completedDonations > 0 ? Math.Round((double)certificatesIssued / completedDonations * 100, 1) : 0)%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Thống kê số lượng người hiến theo nhóm máu</h5>
+                    <ul class="list-group">
+                        @if (bloodTypeStats != null && bloodTypeStats.Count > 0)
+                        {
+                            foreach (var stat in bloodTypeStats)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@stat.BloodType</span>
+                                    <span class="badge bg-primary rounded-pill">@stat.Count</span>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="list-group-item">Không có dữ liệu</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Biểu đồ lượt hiến theo tháng</h5>
+                    <canvas id="monthlyChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Phân bổ lượng máu đã hiến theo nhóm máu</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="bloodTypeVolumeChart" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nhóm máu</th>
+                                        <th>Số lượt hiến</th>
+                                        <th>Tổng thể tích (ml)</th>
+                                        <th>Tỷ lệ (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (bloodTypeStats != null && bloodTypeStats.Count > 0)
+                                    {
+                                        var totalVol = bloodTypeStats.Sum(s => s.TotalVolume);
+                                        foreach (var stat in bloodTypeStats)
+                                        {
+                                            var percentage = totalVol > 0 ? (stat.TotalVolume * 100.0 / totalVol) : 0;
+                                            <tr>
+                                                <td><strong>@stat.BloodType</strong></td>
+                                                <td>@stat.Count</td>
+                                                <td>@stat.TotalVolume ml</td>
+                                                <td>@percentage.ToString("F1")%</td>
+                                            </tr>
+                                        }
+                                        <tr class="table-active">
+                                            <td><strong>Tổng cộng</strong></td>
+                                            <td><strong>@bloodTypeStats.Sum(s => s.Count)</strong></td>
+                                            <td><strong>@totalVol ml</strong></td>
+                                            <td><strong>100%</strong></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr><td colspan="4">Không có dữ liệu</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Top người hiến máu</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Lượt hiến</th>
+                                <th>Tổng thể tích</th>
+                                <th>Lần gần nhất</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (topDonors != null && topDonors.Count > 0)
+                            {
+                                foreach (var donor in topDonors)
+                                {
+                                    <tr>
+                                        <td>@donor.UserName</td>
+                                        <td>@donor.UserEmail</td>
+                                        <td>@donor.TotalDonations</td>
+                                        <td>@donor.TotalVolume</td>
+                                        <td>@donor.LastDonation.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Top sự kiện hiến máu</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tên sự kiện</th>
+                                <th>Ngày</th>
+                                <th>Lượt hiến</th>
+                                <th>Tổng thể tích</th>
+                                <th>Hoàn thành</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (eventStats != null && eventStats.Count > 0)
+                            {
+                                foreach (var evt in eventStats)
+                                {
+                                    <tr>
+                                        <td>@evt.EventName</td>
+                                        <td>@evt.EventDate?.ToString("dd/MM/yyyy")</td>
+                                        <td>@evt.TotalDonations</td>
+                                        <td>@evt.TotalVolume</td>
+                                        <td>@evt.CompletedDonations</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Biểu đồ lượt hiến theo tháng
+        var ctx = document.getElementById('monthlyChart').getContext('2d');
+        var monthlyLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(monthlyStats?.Keys?.ToList() ?? new List<string>()));
+        var monthlyData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(monthlyStats?.Values?.ToList() ?? new List<int>()));
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Lượt hiến máu',
+                    data: monthlyData,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, stepSize: 1 }
+                }
+            }
+        });
+
+        // Biểu đồ phân bổ lượng máu theo nhóm máu
+        var bloodTypeCtx = document.getElementById('bloodTypeVolumeChart').getContext('2d');
+        var bloodTypeLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bloodTypeStats?.Select(s => s.BloodType).ToList() ?? new List<string>()));
+        var bloodTypeVolumes = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bloodTypeStats?.Select(s => s.TotalVolume).ToList() ?? new List<int>()));
+        
+        // Màu sắc cho các nhóm máu
+        var bloodTypeColors = [
+            '#dc3545', // Đỏ
+            '#fd7e14', // Cam
+            '#ffc107', // Vàng
+            '#28a745', // Xanh lá
+            '#20c997', // Xanh mint
+            '#17a2b8', // Xanh dương
+            '#6610f2', // Tím
+            '#e83e8c'  // Hồng
+        ];
+
+        new Chart(bloodTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: bloodTypeLabels,
+                datasets: [{
+                    label: 'Lượng máu (ml)',
+                    data: bloodTypeVolumes,
+                    backgroundColor: bloodTypeColors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                var value = context.parsed || 0;
+                                var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                var percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return label + ': ' + value + ' ml (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,418 @@
+@model Blood_Donation_Website.Models.DTOs.ContactMessageStatisticsDto
+@using Blood_Donation_Website.Utilities
+@{
+    ViewData["Title"] = "Thống kê tin nhắn liên hệ";
+    
+    string GetStatusDisplayName(EnumMapper.MessageStatus status)
+    {
+        return EnumMapper.GetDisplayName<EnumMapper.MessageStatus>(status);
+    }
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-danger fw-bold">
+                    <i class="fas fa-chart-bar me-2"></i>Thống kê tin nhắn liên hệ
+                </h2>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
+                    </a>
+                    <a asp-action="UnreadMessages" class="btn btn-warning">
+                        <i class="fas fa-envelope-open me-2"></i>Chưa đọc
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bộ lọc theo ngày -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <form method="get" asp-action="Statistics" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="startDate" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Từ ngày
+                            </label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" 
+                                   value="@(ViewBag.StartDate != null ? ((DateTime)ViewBag.StartDate).ToString("yyyy-MM-dd") : "")" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="endDate" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>Đến ngày
+                            </label>
+                            <input type="date" class="form-control" id="endDate" name="endDate" 
+                                   value="@(ViewBag.EndDate != null ? ((DateTime)ViewBag.EndDate).ToString("yyyy-MM-dd") : "")" />
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-filter me-1"></i>Lọc
+                            </button>
+                            <a href="@Url.Action("Statistics")" class="btn btn-secondary">
+                                <i class="fas fa-redo me-1"></i>Đặt lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">@Model.Total</h4>
+                                    <p class="card-text">Tổng tin nhắn</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-envelope fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-warning text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">@Model.Unread</h4>
+                                    <p class="card-text">Chưa đọc</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-envelope-open fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">@Model.Resolved</h4>
+                                    <p class="card-text">Đã giải quyết</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">@Model.ResolutionRate.ToString("F1")%</h4>
+                                    <p class="card-text">Tỷ lệ giải quyết</p>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-percentage fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Chart Section -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>Phân bố theo trạng thái
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-clock me-2"></i>Hoạt động gần đây
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Cập nhật thống kê</h6>
+                                        <small class="text-muted">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-warning"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">@Model.Unread tin nhắn chưa đọc</h6>
+                                        <small class="text-muted">Cần xử lý</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">@Model.Resolved tin nhắn đã giải quyết</h6>
+                                        <small class="text-muted">Hoàn thành</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Statistics Table -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-table me-2"></i>Thống kê chi tiết theo trạng thái
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Trạng thái</th>
+                                    <th>Số lượng</th>
+                                    <th>Tỷ lệ</th>
+                                    <th>Màu sắc</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var stat in Model.StatusStats)
+                                {
+                                    var statusClass = stat.Status switch
+                                    {
+                                        EnumMapper.MessageStatus.New => "bg-primary",
+                                        EnumMapper.MessageStatus.Read => "bg-info",
+                                        EnumMapper.MessageStatus.InProgress => "bg-warning",
+                                        EnumMapper.MessageStatus.Resolved => "bg-success",
+                                        EnumMapper.MessageStatus.Closed => "bg-secondary",
+                                        _ => "bg-secondary"
+                                    };
+                                    
+                                    <tr>
+                                        <td>
+                                            <span class="badge @statusClass">@GetStatusDisplayName(stat.Status)</span>
+                                        </td>
+                                        <td>
+                                            <strong>@stat.Count</strong>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar @statusClass" 
+                                                     style="width: @stat.Percentage%;" 
+                                                     role="progressbar" 
+                                                     aria-valuenow="@stat.Percentage" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                    @stat.Percentage.ToString("F1")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="color-box @statusClass me-2" style="width: 20px; height: 20px; border-radius: 3px;"></div>
+                                                <small class="text-muted">@GetStatusDisplayName(stat.Status)</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Cần chú ý
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Unread > 0)
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-bell me-2"></i>
+                                    <strong>@Model.Unread tin nhắn chưa đọc</strong> cần được xử lý
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Tuyệt vời!</strong> Không có tin nhắn nào chưa đọc
+                                </div>
+                            }
+                            
+                            @if (Model.ResolutionRate < 80)
+                            {
+                                <div class="alert alert-info">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Tỷ lệ giải quyết: <strong>@Model.ResolutionRate.ToString("F1")%</strong>
+                                    <br>
+                                    <small>Cần cải thiện để đạt mục tiêu 80%</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-trophy me-2"></i>
+                                    Tỷ lệ giải quyết: <strong>@Model.ResolutionRate.ToString("F1")%</strong>
+                                    <br>
+                                    <small>Đã đạt mục tiêu!</small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>Gợi ý
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    Kiểm tra tin nhắn chưa đọc thường xuyên
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    Phản hồi nhanh chóng để tăng tỷ lệ giải quyết
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    Cập nhật trạng thái tin nhắn đúng cách
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    Theo dõi thống kê định kỳ
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -35px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .timeline-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: -29px;
+        top: 17px;
+        width: 2px;
+        height: 20px;
+        background-color: #dee2e6;
+    }
+    
+    .color-box {
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Prepare data for chart
+        const statusData = @Html.Raw(Json.Serialize(Model.StatusStats));
+        const labels = statusData.map(item => {
+            const statusNames = {
+                'New': 'Mới',
+                'Read': 'Đã đọc',
+                'InProgress': 'Đang xử lý',
+                'Resolved': 'Đã giải quyết',
+                'Closed': 'Đã đóng'
+            };
+            return statusNames[item.Status] || item.Status;
+        });
+        const data = statusData.map(item => item.Count);
+        const colors = statusData.map(item => {
+            const colorMap = {
+                'New': '#007bff',
+                'Read': '#17a2b8',
+                'InProgress': '#ffc107',
+                'Resolved': '#28a745',
+                'Closed': '#6c757d'
+            };
+            return colorMap[item.Status] || '#6c757d';
+        });
+
+        // Create pie chart
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return `${context.label}: ${context.parsed} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+} 

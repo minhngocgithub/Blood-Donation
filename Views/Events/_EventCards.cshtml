@@ -1,0 +1,126 @@
+@model IEnumerable<Blood_Donation_Website.Models.DTOs.BloodDonationEventDto>
+@using Blood_Donation_Website.Utilities
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var eventItem in Model)
+    {
+        <div class="col-lg-4 col-md-6 mb-4 d-flex align-items-stretch">
+            <div class="event-card w-100 d-flex flex-column">
+                <div class="event-image" style="position: relative !important; height: 220px !important;">
+                    <img src="@(!string.IsNullOrEmpty(eventItem.ImageUrl) ? eventItem.ImageUrl : "./image/default-image-event")"
+                         alt="@eventItem.EventName" class="img-fluid">
+                    <div class="event-date" style="position: absolute !important; top: 10px !important; right: 10px !important; background: rgba(220, 53, 69, 0.9) !important; color: white !important; padding: 8px 6px !important; border-radius: 8px !important; text-align: center !important; min-width: 50px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important; z-index: 10 !important; display: block !important; backdrop-filter: blur(3px) !important;">
+                        <span class="day" style="display: block !important; font-size: 1.4rem !important; font-weight: bold !important; line-height: 1 !important; margin-bottom: 1px !important; color: white !important;">@eventItem.EventDate.Day</span>
+                        <span class="month" style="display: block !important; font-size: 0.65rem !important; text-transform: uppercase !important; font-weight: 500 !important; letter-spacing: 0.3px !important; color: white !important;">Th@(eventItem.EventDate.Month)</span>
+                    </div>
+                </div>
+                <div class="event-content d-flex flex-column flex-grow-1 justify-content-between">
+                    <h5 class="event-title text-center">@eventItem.EventName</h5>
+                    <div class="event-meta d-flex flex-wrap justify-content-center gap-2 mb-2">
+                        <span class="event-location">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            @(!string.IsNullOrEmpty(eventItem.LocationName) ? eventItem.LocationName : "Chưa xác định")
+                        </span>
+                        <span class="event-time">
+                            <i class="fas fa-clock me-1"></i>
+                            @eventItem.StartTime.ToString(@"hh\:mm") - @eventItem.EndTime.ToString(@"hh\:mm")
+                        </span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(eventItem.EventDescription))
+                    {
+                        <p class="event-description text-center mb-2">
+                            @eventItem.EventDescription
+                        </p>
+                    }
+
+                    <div class="event-actions d-flex flex-wrap align-items-center justify-content-center gap-2 mt-2 mb-2">
+                        @{
+                            var statusClass = eventItem.Status switch
+                            {
+                                EnumMapper.EventStatus.Active => "status-active",
+                                EnumMapper.EventStatus.Full => "status-full",
+                                EnumMapper.EventStatus.Completed => "status-ended",
+                                EnumMapper.EventStatus.Cancelled => "status-ended",
+                                EnumMapper.EventStatus.Closed => "status-ended",
+                                _ => "status-active"
+                            };
+                            var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.EventStatus>(eventItem.Status);
+                        }
+                        <span class="event-status @statusClass">@statusDisplayName</span>
+                        
+                        <div class="ms-auto">
+                            <a href="/Events/Details/@eventItem.EventId" class="btn btn-outline-primary">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Chi tiết
+                            </a>
+                        </div>
+                    </div>
+
+                    @if (eventItem.MaxDonors > 0)
+                    {
+                        <div class="event-progress mt-2">
+                            @{
+                                var progressPercentage = Math.Min(100, (double)eventItem.CurrentDonors / eventItem.MaxDonors * 100);
+                            }
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">Đã đăng ký: @eventItem.CurrentDonors/@eventItem.MaxDonors</small>
+                                <small class="text-muted">@progressPercentage.ToString("F0")%</small>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                     style="width: @progressPercentage.ToString("F1")%"
+                                     aria-valuenow="@progressPercentage" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(eventItem.RequiredBloodTypes))
+                    {
+                        <div class="blood-types mt-3 text-center">
+                            <small class="text-muted d-block mb-1">Nhóm máu cần:</small>
+                            @{
+                                var bloodTypes = eventItem.RequiredBloodTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                            }
+                            @foreach (var bloodType in bloodTypes)
+                            {
+                                <span class="badge bg-danger me-1">@GetBloodTypeVi(bloodType.Trim())</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="col-12 no-events">
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem;"></i>
+            <h4 class="text-muted">Không có sự kiện nào</h4>
+            <p class="text-muted">Hiện tại chưa có sự kiện hiến máu nào được tổ chức.</p>
+        </div>
+    </div>
+}
+
+@{
+    string GetBloodTypeVi(string bloodType)
+    {
+        return bloodType switch
+        {
+            "A+" => "A+",
+            "A-" => "A-",
+            "B+" => "B+",
+            "B-" => "B-",
+            "O+" => "O+",
+            "O-" => "O-",
+            "AB+" => "AB+",
+            "AB-" => "AB-",
+            "All" => "Mọi nhóm máu",
+            _ => bloodType
+        };
+    }
+}

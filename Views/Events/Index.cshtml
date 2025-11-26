@@ -1,0 +1,197 @@
+@model Blood_Donation_Website.Models.ViewModels.EventsViewModel
+@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Sự kiện hiến máu";
+}
+
+<link rel="stylesheet" href="~/css/event-page.css" />
+
+<div class="events-page">
+    <!-- Page Header -->
+    <section class="page-header py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 mb-3">Sự kiện hiến máu</h1>
+                    <p class="lead mb-0">
+                        Tham gia các sự kiện hiến máu để góp phần cứu sống những sinh mạng quý giá
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <section class="search-filter-section py-4 bg-light">
+        <div class="container">
+            <form method="get" action="@Url.Action("Index", "Events")" id="filterForm">
+                <div class="row g-3">
+                    <!-- Search Box -->
+                    <div class="col-lg-4">
+                        <div class="search-box">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg" 
+                                       placeholder="Tìm kiếm sự kiện..." 
+                                       name="searchTerm" 
+                                       value="@Model.SearchTerm">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Date Range Filters -->
+                    <div class="col-lg-2">
+                        <input type="date" class="form-control form-control-lg" 
+                               name="fromDate" 
+                               value="@(Model.FromDate?.ToString("yyyy-MM-dd"))"
+                               placeholder="Từ ngày">
+                    </div>
+
+                    <div class="col-lg-2">
+                        <input type="date" class="form-control form-control-lg" 
+                               name="toDate" 
+                               value="@(Model.ToDate?.ToString("yyyy-MM-dd"))"
+                               placeholder="Đến ngày">
+                    </div>
+
+                    <!-- Blood Type Filter -->
+                    <div class="col-lg-2">
+                        <select class="form-select form-select-lg" name="bloodType" id="bloodTypeFilter">
+                            <option value="">Tất cả nhóm máu</option>
+                            @if (ViewBag.BloodTypes != null)
+                            {
+                                foreach (var bloodType in ViewBag.BloodTypes)
+                                {
+                                    var isSelected = Model.SelectedBloodType == bloodType.BloodTypeName;
+                                    <option value="@bloodType.BloodTypeName" selected="@isSelected">
+                                        @bloodType.BloodTypeName
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="filter-stats">
+                                <span class="badge bg-success me-2">Đang diễn ra: @Model.TotalCurrentEvents</span>
+                                <span class="badge bg-secondary">Đã qua: @Model.TotalPastEvents</span>
+                            </div>
+                            <div class="filter-actions">
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i>Lọc
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="events-list-section py-5">
+        <div class="container">
+            @if (!Model.HasAnyEvents)
+            {
+                <!-- No Events Found -->
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted">Không tìm thấy sự kiện nào</h4>
+                    <p class="text-muted">Không có sự kiện nào phù hợp với bộ lọc của bạn.</p>
+                    <a href="@Url.Action("Index", "Events")" class="btn btn-primary">
+                        <i class="fas fa-refresh me-1"></i>Xem tất cả sự kiện
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Current and Upcoming Events -->
+                @if (Model.HasCurrentEvents)
+                {
+                    <div class="events-section mb-5">
+                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-check text-success me-2"></i>
+                                Sự kiện đang và sắp diễn ra
+                                <span class="badge bg-success ms-2">@Model.TotalCurrentEvents</span>
+                            </h2>
+                        </div>
+                        <div class="row" id="currentEventsContainer">
+                            <partial name="_EventCards" model="Model.CurrentAndUpcomingEvents" />
+                        </div>
+                    </div>
+                }
+
+                <!-- Past Events -->
+                @if (Model.HasPastEvents)
+                {
+                    <div class="events-section">
+                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="section-title">
+                                <i class="fas fa-calendar-times text-secondary me-2"></i>
+                                Sự kiện đã qua
+                                <span class="badge bg-secondary ms-2">@Model.TotalPastEvents</span>
+                            </h2>
+                        </div>
+                        <div class="row" id="pastEventsContainer">
+                            <partial name="_EventCards" model="Model.PastEvents" />
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- Loading Indicator -->
+            <div class="text-center mt-5" id="loadingIndicator" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2">Đang tải thêm sự kiện...</p>
+            </div>
+
+            <!-- No More Events Message -->
+            <div class="text-center mt-5" id="noMoreEvents" style="display: none;">
+                <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                <h4>Đã hiển thị tất cả sự kiện</h4>
+                <p class="text-muted">Không có thêm sự kiện nào để hiển thị</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+@section Scripts {
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        $(function () {
+            var successMsg = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TempData["Success"]));
+            var errorMsg = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TempData["Error"]));
+            if (successMsg && successMsg.trim() !== '' && successMsg.toLowerCase() !== 'true' && successMsg.toLowerCase() !== 'false' && successMsg !== 'null') {
+                showSuccess('Thành công', successMsg);
+            }
+            if (errorMsg && errorMsg.trim() !== '' && errorMsg.toLowerCase() !== 'true' && errorMsg.toLowerCase() !== 'false' && errorMsg !== 'null') {
+                showError('Lỗi', errorMsg);
+            }
+        });
+        // Pass current location to JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const locationFilter = document.getElementById('locationFilter');
+            if (locationFilter) {
+                locationFilter.dataset.currentLocation = '@Model.Location';
+            }
+        });
+
+        function clearFilters() {
+            window.location.href = '@Url.Action("Index", "Events")';
+        }
+    </script>
+}
