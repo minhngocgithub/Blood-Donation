@@ -7,17 +7,27 @@ using static Blood_Donation_Website.Utilities.EnumMapper;
 
 namespace Blood_Donation_Website.Controllers
 {
+    /// <summary>
+    /// Controller quản lý sự kiện hiến máu (dành cho Hospital và Admin)
+    /// Xử lý: CRUD sự kiện, Cập nhật trạng thái, Gửi nhắc nhở, Xuất dữ liệu
+    /// Trạng thái sự kiện: Active, Completed, Cancelled, Postponed
+    /// Route: /admin/events/*
+    /// </summary>
     [HospitalAdminOnly]
     [Route("admin/events")]
     public class EventManagementController : Controller
     {
-        private readonly IBloodDonationEventService _eventService;
-        private readonly ILocationService _locationService;
-        private readonly IBloodTypeService _bloodTypeService;
-        private readonly IDonationRegistrationService _registrationService;
-        private readonly IEmailService _emailService;
-        private readonly DataExporter _dataExporter;
+        // Dependencies
+        private readonly IBloodDonationEventService _eventService; // Service quản lý sự kiện
+        private readonly ILocationService _locationService; // Service địa điểm
+        private readonly IBloodTypeService _bloodTypeService; // Service nhóm máu
+        private readonly IDonationRegistrationService _registrationService; // Service đăng ký
+        private readonly IEmailService _emailService; // Service gửi email
+        private readonly DataExporter _dataExporter; // Service xuất dữ liệu
 
+        /// <summary>
+        /// Constructor - Inject các service cần thiết
+        /// </summary>
         public EventManagementController(
             IBloodDonationEventService eventService,
             ILocationService locationService,
@@ -34,6 +44,10 @@ namespace Blood_Donation_Website.Controllers
             _dataExporter = dataExporter;
         }
 
+        /// <summary>
+        /// GET: /admin/events
+        /// Hiển thị danh sách tất cả sự kiện hiến máu
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -41,6 +55,11 @@ namespace Blood_Donation_Website.Controllers
             return View(events);
         }
 
+        /// <summary>
+        /// GET: /admin/events/create
+        /// Hiển thị form tạo sự kiện mới
+        /// Load danh sách địa điểm và nhóm máu cần thiết
+        /// </summary>
         [HttpGet("create")]
         public async Task<IActionResult> Create()
         {
@@ -51,6 +70,12 @@ namespace Blood_Donation_Website.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /admin/events/create
+        /// Xử lý tạo sự kiện hiến máu mới
+        /// Bao gồm: Tên sự kiện, Ngày giờ, Địa điểm, Số lượng người hiến tối đa, Nhóm máu cần thiết
+        /// </summary>
+        /// <param name="eventDto">Dữ liệu sự kiện mới</param>
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BloodDonationEventCreateDto eventDto)
@@ -69,6 +94,7 @@ namespace Blood_Donation_Website.Controllers
                 }
             }
 
+            // Nếu có lỗi, load lại dữ liệu
             var locations = await _locationService.GetAllLocationsAsync();
             var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             ViewBag.Locations = locations;
@@ -76,6 +102,12 @@ namespace Blood_Donation_Website.Controllers
             return View(eventDto);
         }
 
+        /// <summary>
+        /// GET: /admin/events/edit/{id}
+        /// Hiển thị form chỉnh sửa sự kiện
+        /// Load dữ liệu hiện tại và danh sách địa điểm, nhóm máu
+        /// </summary>
+        /// <param name="id">ID sự kiện cần chỉnh sửa</param>
         [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -94,6 +126,7 @@ namespace Blood_Donation_Website.Controllers
             ViewBag.CreatedDate = eventItem.CreatedDate;
             ViewBag.CurrentDonors = eventItem.CurrentDonors;
 
+            // Chuyển đổi sang UpdateDto
             var updateDto = new BloodDonationEventUpdateDto
             {
                 EventName = eventItem.EventName,
@@ -111,6 +144,12 @@ namespace Blood_Donation_Website.Controllers
             return View(updateDto);
         }
 
+        /// <summary>
+        /// POST: /admin/events/edit/{id}
+        /// Xử lý cập nhật thông tin sự kiện
+        /// </summary>
+        /// <param name="id">ID sự kiện</param>
+        /// <param name="eventDto">Dữ liệu cập nhật</param>
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BloodDonationEventUpdateDto eventDto)
@@ -136,6 +175,7 @@ namespace Blood_Donation_Website.Controllers
                 }
             }
 
+            // Nếu có lỗi, load lại dữ liệu
             var locations = await _locationService.GetAllLocationsAsync();
             var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             ViewBag.Locations = locations;
@@ -143,6 +183,12 @@ namespace Blood_Donation_Website.Controllers
             return View(eventDto);
         }
 
+        /// <summary>
+        /// GET: /admin/events/details/{id}
+        /// Xem chi tiết sự kiện và thống kê
+        /// Bao gồm: Thông tin sự kiện, Số người đăng ký, Số người hoàn thành
+        /// </summary>
+        /// <param name="id">ID sự kiện</param>
         [HttpGet("details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -159,12 +205,18 @@ namespace Blood_Donation_Website.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // Lấy thống kê sự kiện
             var statistics = await _eventService.GetEventStatisticsAsync(id);
             ViewBag.Statistics = statistics;
 
             return View(eventItem);
         }
 
+        /// <summary>
+        /// POST: /admin/events/delete/{id}
+        /// Xóa sự kiện hiến máu
+        /// </summary>
+        /// <param name="id">ID sự kiện cần xóa</param>
         [HttpPost("delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -189,6 +241,13 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// POST: /admin/events/status/{id}
+        /// Cập nhật trạng thái sự kiện
+        /// Trạng thái: Active (Đang hoạt động), Completed (Hoàn thành), Cancelled (Hủy), Postponed (Hoãn)
+        /// </summary>
+        /// <param name="id">ID sự kiện</param>
+        /// <param name="status">Trạng thái mới</param>
         [HttpPost("status/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, EventStatus status)
@@ -196,6 +255,7 @@ namespace Blood_Donation_Website.Controllers
             try
             {
                 bool success = false;
+                // Gọi service tương ứng theo trạng thái
                 switch (status)
                 {
                     case EventStatus.Active:
@@ -232,6 +292,12 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        /// <summary>
+        /// POST: /admin/events/reminders/{id}
+        /// Gửi email nhắc nhở cho tất cả người đăng ký sự kiện
+        /// Chỉ gửi cho các đăng ký ở trạng thái Registered hoặc Confirmed
+        /// </summary>
+        /// <param name="id">ID sự kiện</param>
         [HttpPost("reminders/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendReminders(int id)
@@ -260,6 +326,7 @@ namespace Blood_Donation_Website.Controllers
                 int sentCount = 0;
                 int failedCount = 0;
 
+                // Gửi email cho từng người đăng ký
                 foreach (var registration in activeRegistrations)
                 {
                     if (!string.IsNullOrEmpty(registration.UserEmail))
@@ -277,6 +344,7 @@ namespace Blood_Donation_Website.Controllers
                     }
                 }
 
+                // Thông báo kết quả
                 if (sentCount > 0)
                 {
                     TempData["SuccessMessage"] = $"Đã gửi nhắc nhở thành công cho {sentCount} người đăng ký.";
@@ -298,6 +366,13 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        /// <summary>
+        /// POST: /admin/events/export/{id}
+        /// Xuất dữ liệu sự kiện ra file JSON hoặc CSV
+        /// Bao gồm: Thông tin sự kiện, Danh sách đăng ký, Thống kê
+        /// </summary>
+        /// <param name="id">ID sự kiện</param>
+        /// <param name="format">Định dạng file: json hoặc csv (mặc định: json)</param>
         [HttpPost("export/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExportEventData(int id, string format = "json")
@@ -343,6 +418,7 @@ namespace Blood_Donation_Website.Controllers
 
                 if (format.ToLower() == "csv")
                 {
+                    // Xuất ra CSV
                     fileName = $"Event_{id}_Data_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
                     filePath = Path.Combine(eventExportPath, fileName);
                     contentType = "text/csv";
@@ -373,6 +449,7 @@ namespace Blood_Donation_Website.Controllers
                 }
                 else
                 {
+                    // Xuất ra JSON
                     fileName = $"Event_{id}_Data_{DateTime.Now:yyyyMMdd_HHmmss}.json";
                     filePath = Path.Combine(eventExportPath, fileName);
                     contentType = "application/json";

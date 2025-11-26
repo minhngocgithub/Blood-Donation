@@ -6,14 +6,24 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Blood_Donation_Website.Controllers
 {
+    /// <summary>
+    /// Controller quản lý sàng lọc sức khỏe (dành cho Hospital và Doctor)
+    /// Xử lý: Sàng lọc sức khỏe người hiến máu, Cập nhật nhóm máu, Thống kê
+    /// Quy trình: CheckedIn → Screening → Eligible/Ineligible
+    /// Route: /screening/*
+    /// </summary>
     [Route("screening")]
     public class HealthScreeningController : Controller
     {
-        private readonly IHealthScreeningService _screeningService;
-        private readonly IDonationRegistrationService _registrationService;
-        private readonly IUserService _userService;
-        private readonly IBloodTypeService _bloodTypeService;
-
+        // Dependencies
+        private readonly IHealthScreeningService _screeningService; // Service sàng lọc sức khỏe
+        private readonly IDonationRegistrationService _registrationService; // Service đăng ký
+        private readonly IUserService _userService; // Service người dùng
+        private readonly IBloodTypeService _bloodTypeService; // Service nhóm máu
+        
+        /// <summary>
+        /// Constructor - Inject các service cần thiết
+        /// </summary>
         public HealthScreeningController(
             IHealthScreeningService screeningService,
             IDonationRegistrationService registrationService,
@@ -26,14 +36,23 @@ namespace Blood_Donation_Website.Controllers
             _bloodTypeService = bloodTypeService;
         }
 
+        /// <summary>
+        /// GET: /screening
+        /// Hiển thị danh sách tất cả hồ sơ sàng lọc sức khỏe
+        /// </summary>
         [HttpGet]
-        [HospitalOrDoctor]
+        [HospitalOrDoctor] // Chỉ Hospital hoặc Doctor được truy cập
         public async Task<IActionResult> Index()
         {
             var screenings = await _screeningService.GetAllScreeningsAsync();
             return View(screenings);
         }
 
+        /// <summary>
+        /// GET: /screening/pending
+        /// Hiển thị danh sách đăng ký chờ sàng lọc sức khỏe
+        /// Các đăng ký đã check-in nhưng chưa sàng lọc
+        /// </summary>
         [HttpGet("pending")]
         [HospitalOrDoctor]
         public async Task<IActionResult> PendingScreenings()
@@ -42,19 +61,27 @@ namespace Blood_Donation_Website.Controllers
             return View(pendingRegistrations);
         }
 
+        /// <summary>
+        /// GET: /screening/create/{registrationId}
+        /// Hiển thị form tạo hồ sơ sàng lọc sức khỏe mới
+        /// </summary>
+        /// <param name="registrationId">ID đăng ký cần sàng lọc</param>
         [HttpGet("create/{registrationId}")]
         [HospitalOrDoctor]
         public async Task<IActionResult> Create(int registrationId)
         {
+            // Lấy thông tin đăng ký
             var registration = await _registrationService.GetRegistrationByIdAsync(registrationId);
             if (registration == null)
             {
                 return NotFound();
             }
 
+            // Lấy thông tin người hiến máu
             var user = await _userService.GetUserByIdAsync(registration.UserId);
             var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
             
+            // Truyền dữ liệu sang View
             ViewBag.Registration = registration;
             ViewBag.User = user;
             ViewBag.BloodTypes = bloodTypes;
@@ -62,6 +89,13 @@ namespace Blood_Donation_Website.Controllers
             return View();
         }
 
+        /// <summary>
+        /// POST: /screening/create/{registrationId}
+        /// Xử lý tạo hồ sơ sàng lọc sức khỏe
+        /// Bao gồm: Huyết áp, Nhịp tim, Nhiệt độ, Hemoglobin, Cân nặng
+        /// </summary>
+        /// <param name="registrationId">ID đăng ký</param>
+        /// <param name="screeningDto">Dữ liệu sàng lọc sức khỏe</param>
         [HttpPost("create/{registrationId}")]
         [HospitalOrDoctor]
         [ValidateAntiForgeryToken]
@@ -82,6 +116,7 @@ namespace Blood_Donation_Website.Controllers
                 }
             }
 
+            // Nếu có lỗi, load lại dữ liệu
             var registration = await _registrationService.GetRegistrationByIdAsync(registrationId);
             if (registration == null)
             {
@@ -254,10 +289,17 @@ namespace Blood_Donation_Website.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// GET: /screening/update-blood-type/{userId}
+        /// Form cập nhật nhóm máu cho người dùng
+        /// Dùng khi phát hiện nhóm máu thực tế khác với thông tin đã lưu
+        /// </summary>
+        /// <param name="userId">ID người dùng cần cập nhật (0 = chưa chọn)</param>
         [HttpGet("update-blood-type/{userId?}")]
         [HospitalOrDoctor]
         public async Task<IActionResult> UpdateBloodTypeForm(int userId = 0)
         {
+            // Nếu chưa chọn user, hiển thị trang tìm kiếm
             if (userId == 0)
             {
                 return View("SelectUser");
@@ -276,6 +318,7 @@ namespace Blood_Donation_Website.Controllers
                 
                 Console.WriteLine($"Found user: {user.FullName} (ID: {user.UserId})");
 
+                // Lấy danh sách nhóm máu
                 var bloodTypes = await _bloodTypeService.GetAllBloodTypesAsync();
                 
                 ViewBag.User = user;
@@ -290,6 +333,13 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /screening/search-user (AJAX)
+        /// Tìm kiếm người dùng theo email hoặc số điện thoại
+        /// Trả về JSON để hiển thị trong dropdown/autocomplete
+        /// </summary>
+        /// <param name="email">Email tìm kiếm</param>
+        /// <param name="phone">Số điện thoại tìm kiếm</param>
         [HttpGet("search-user")]
         [HospitalOrDoctor]
         public async Task<IActionResult> SearchUser(string? email = null, string? phone = null)
@@ -320,32 +370,11 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
-        [HttpGet("debug-users")]
-        [HospitalOrDoctor]
-        public async Task<IActionResult> DebugUsers()
-        {
-            try
-            {
-                var users = await _userService.GetAllUsersAsync();
-                var userList = users.Select(u => new { 
-                    u.UserId, 
-                    u.FullName, 
-                    u.Email, 
-                    u.Phone,
-                    BloodType = u.BloodTypeName ?? "Chưa cập nhật"
-                }).ToList();
-                
-                return Json(new { 
-                    totalUsers = userList.Count,
-                    users = userList
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { error = ex.Message });
-            }
-        }
-
+        /// <summary>
+        /// GET: /screening/get-all-users (AJAX)
+        /// Lấy tất cả người dùng trong hệ thống
+        /// Dùng cho trang SelectUser để hiển thị danh sách đầy đủ
+        /// </summary>
         [HttpGet("get-all-users")]
         [HospitalOrDoctor]
         public async Task<IActionResult> GetAllUsers()
@@ -353,25 +382,31 @@ namespace Blood_Donation_Website.Controllers
             try
             {
                 var users = await _userService.GetAllUsersAsync();
-                Console.WriteLine($"Found {users.Count()} users in database");
-                foreach (var user in users.Take(5))
-                {
-                    Console.WriteLine($"User ID: {user.UserId}, Name: {user.FullName}, Email: {user.Email}");
-                }
                 return Json(users);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting users: {ex.Message}");
                 return Json(new { error = ex.Message });
             }
         }
 
+        /// <summary>
+        /// GET: /screening/statistics
+        /// Thống kê sàng lọc sức khỏe
+        /// Bao gồm: Tổng số, Đạt/Không đạt, Tỷ lệ...
+        /// </summary>
+        /// <param name="startDate">Ngày bắt đầu lọc (tùy chọn)</param>
+        /// <param name="endDate">Ngày kết thúc lọc (tùy chọn)</param>
         [HttpGet("statistics")]
         [Authorize(Roles = "Admin,Hospital,Doctor")]
-        public async Task<IActionResult> Statistics()
+        public async Task<IActionResult> Statistics(DateTime? startDate, DateTime? endDate)
         {
             var stats = await _screeningService.GetScreeningStatisticsAsync();
+            
+            // Lưu giá trị lọc để hiển thị trên view
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
+            
             return View(stats);
         }
     }

@@ -9,37 +9,60 @@ using Blood_Donation_Website.Models.Entities;
 
 namespace Blood_Donation_Website.Controllers
 {
+    /// <summary>
+    /// Controller quản lý xuất/nhập dữ liệu (chỉ dành cho Admin)
+    /// Xử lý: Xuất tất cả dữ liệu, Xuất theo bảng, Xuất theo sự kiện, Xuất có lọc
+    /// Định dạng: JSON và CSV
+    /// Chức năng: Import dữ liệu, Download file, Kiểm tra trạng thái
+    /// Route: /admin/*
+    /// </summary>
     [AdminOnly]
     [Route("admin")]
     public class DataController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly DataExporter _dataExporter;
+        // Dependencies
+        private readonly ApplicationDbContext _context; // Database context
+        private readonly DataExporter _dataExporter; // Service xuất dữ liệu
 
+        /// <summary>
+        /// Constructor - Inject các service cần thiết
+        /// </summary>
         public DataController(ApplicationDbContext context, DataExporter dataExporter)
         {
             _context = context;
             _dataExporter = dataExporter;
         }
 
-        // DataExport
+        /// <summary>
+        /// GET: /admin/data-export
+        /// Hiển thị trang quản lý xuất/nhập dữ liệu
+        /// </summary>
         [HttpGet("data-export")]
         public IActionResult DataExport()
         {
             return View("DataExport");
         }
 
+        /// <summary>
+        /// POST: /admin/export-all
+        /// Xuất tất cả dữ liệu trong database ra file ZIP
+        /// Bao gồm tất cả các bảng: Users, Events, Registrations, Donations, HealthScreenings...
+        /// Trả về file ZIP chứa tất cả các file JSON/CSV
+        /// </summary>
+        /// <param name="format">Định dạng xuất: json hoặc csv (mặc định: json)</param>
         [HttpPost("export-all")]
         public async Task<IActionResult> ExportAll(string format = "json")
         {
             try
             {                
+                // Tạo thư mục xuất dữ liệu
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
                 if (!Directory.Exists(dataExportPath))
                 {
                     Directory.CreateDirectory(dataExportPath);
                 }
 
+                // Xuất dữ liệu theo định dạng
                 if (format.ToLower() == "csv")
                 {
                     await _dataExporter.ExportAllDataToCsvAsync();
@@ -49,6 +72,7 @@ namespace Blood_Donation_Website.Controllers
                     await _dataExporter.ExportAllDataAsync();
                 }
 
+                // Tìm thư mục xuất mới nhất
                 var directories = Directory.GetDirectories(dataExportPath);
                 
                 var latestFolder = directories
@@ -63,10 +87,12 @@ namespace Blood_Donation_Website.Controllers
 
                 var files = Directory.GetFiles(latestFolder);
 
+                // Tạo file ZIP
                 var tempPath = Path.GetTempPath();
                 var zipPath = Path.Combine(tempPath, $"DatabaseExport_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
                 ZipFile.CreateFromDirectory(latestFolder, zipPath);
 
+                // Đọc và trả về file
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(zipPath);
                 
                 System.IO.File.Delete(zipPath);
@@ -80,6 +106,13 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /admin/export-table
+        /// Xuất dữ liệu của một bảng cụ thể
+        /// Tìm file mới nhất trong thư mục export và trả về
+        /// </summary>
+        /// <param name="tableName">Tên bảng cần xuất (VD: Users, Events, DonationHistories...)</param>
+        /// <param name="format">Định dạng: json hoặc csv</param>
         [HttpPost("export-table")]
         public async Task<IActionResult> ExportTable(string tableName, string format = "json")
         {
@@ -126,6 +159,13 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /admin/export-event
+        /// Xuất tất cả dữ liệu liên quan đến một sự kiện cụ thể
+        /// Bao gồm: Thông tin sự kiện, Đăng ký, Lịch sử hiến máu, Sàng lọc sức khỏe, Thống kê
+        /// </summary>
+        /// <param name="eventId">ID sự kiện cần xuất</param>
+        /// <param name="format">Định dạng xuất: json hoặc csv (mặc định: json)</param>
         [HttpPost("export-event")]
         public async Task<IActionResult> ExportEventData(int eventId, string format = "json")
         {
@@ -139,7 +179,7 @@ namespace Blood_Donation_Website.Controllers
                 if (eventEntity == null)
                 {
                     TempData["ErrorMessage"] = "Sự kiện không tồn tại.";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("DataExport");
                 }
 
                 var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
@@ -177,10 +217,381 @@ namespace Blood_Donation_Website.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("DataExport");
             }
         }
 
+        /// <summary>
+        /// POST: /admin/export-filtered
+        /// Xuất dữ liệu có lọc theo các tiêu chí
+        /// Hỗ trợ lọc: Khoảng ngày, Nhóm máu, Địa điểm, Trạng thái
+        /// Loại dữ liệu: donations, registrations, events, users
+        /// </summary>
+        /// <param name="fromDate">Lọc từ ngày (tùy chọn)</param>
+        /// <param name="toDate">Lọc đến ngày (tùy chọn)</param>
+        /// <param name="bloodTypeId">Lọc theo ID nhóm máu (tùy chọn)</param>
+        /// <param name="locationId">Lọc theo ID địa điểm (tùy chọn)</param>
+        /// <param name="status">Lọc theo trạng thái (tùy chọn)</param>
+        /// <param name="dataType">Loại dữ liệu: donations, registrations, events, users (mặc định: donations)</param>
+        /// <param name="format">Định dạng: json hoặc csv (mặc định: json)</param>
+        [HttpPost("export-filtered")]
+        public async Task<IActionResult> ExportFilteredData(
+            DateTime? fromDate, 
+            DateTime? toDate, 
+            int? bloodTypeId, 
+            int? locationId,
+            string? status,
+            string dataType = "donations",
+            string format = "json")
+        {
+            try
+            {
+                var dataExportPath = Path.Combine(Directory.GetCurrentDirectory(), "DatabaseExport");
+                if (!Directory.Exists(dataExportPath))
+                {
+                    Directory.CreateDirectory(dataExportPath);
+                }
+
+                var exportPath = Path.Combine(dataExportPath, $"Filtered_{dataType}_{DateTime.Now:yyyyMMdd_HHmmss}");
+                Directory.CreateDirectory(exportPath);
+
+                if (format.ToLower() == "csv")
+                {
+                    await ExportFilteredToCsvAsync(fromDate, toDate, bloodTypeId, locationId, status, dataType, exportPath);
+                }
+                else
+                {
+                    await ExportFilteredToJsonAsync(fromDate, toDate, bloodTypeId, locationId, status, dataType, exportPath);
+                }
+
+                var tempPath = Path.GetTempPath();
+                var zipPath = Path.Combine(tempPath, $"Filtered_{dataType}_Export_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
+                ZipFile.CreateFromDirectory(exportPath, zipPath);
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(zipPath);
+                
+                System.IO.File.Delete(zipPath);
+                Directory.Delete(exportPath, true);
+                
+                return File(fileBytes, "application/zip", $"Filtered_{dataType}_Export_{DateTime.Now:yyyyMMdd_HHmmss}.zip");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Export failed: {ex.Message}";
+                return RedirectToAction("DataExport");
+            }
+        }
+
+        /// <summary>
+        /// Helper method: Xuất dữ liệu có lọc ra file JSON
+        /// Hỗ trợ 4 loại dữ liệu: donations, registrations, events, users
+        /// Tự động bao gồm thông tin xuất (exportInfo) và dữ liệu đã lọc
+        /// </summary>
+        private async Task ExportFilteredToJsonAsync(
+            DateTime? fromDate, 
+            DateTime? toDate, 
+            int? bloodTypeId, 
+            int? locationId,
+            string? status,
+            string dataType,
+            string exportPath)
+        {
+            object data = null;
+            string fileName = "";
+
+            switch (dataType.ToLower())
+            {
+                case "donations":
+                    // Xuất lịch sử hiến máu
+                    var donations = _context.DonationHistories
+                        .Include(d => d.User).ThenInclude(u => u.BloodType)
+                        .Include(d => d.Registration).ThenInclude(r => r.Event).ThenInclude(e => e.Location)
+                        .AsQueryable();
+
+                    // Áp dụng các bộ lọc
+                    if (fromDate.HasValue)
+                        donations = donations.Where(d => d.DonationDate >= fromDate.Value);
+                    if (toDate.HasValue)
+                        donations = donations.Where(d => d.DonationDate <= toDate.Value);
+                    if (bloodTypeId.HasValue)
+                        donations = donations.Where(d => d.User.BloodTypeId == bloodTypeId.Value);
+                    if (locationId.HasValue)
+                        donations = donations.Where(d => d.Registration.Event.LocationId == locationId.Value);
+
+                    var donationList = await donations.ToListAsync();
+                    data = new
+                    {
+                        exportInfo = new
+                        {
+                            exportDate = DateTime.Now,
+                            dataType = "Donation Histories",
+                            filters = new
+                            {
+                                fromDate,
+                                toDate,
+                                bloodTypeId,
+                                locationId
+                            },
+                            totalRecords = donationList.Count
+                        },
+                        data = donationList.Select(d => new
+                        {
+                            donationId = d.DonationId,
+                            donationDate = d.DonationDate,
+                            userId = d.UserId,
+                            userName = d.User?.FullName,
+                            bloodType = d.User?.BloodType?.BloodTypeName,
+                            volume = d.Volume,
+                            eventName = d.Registration?.Event?.EventName,
+                            location = d.Registration?.Event?.Location?.LocationName,
+                            notes = d.Notes
+                        })
+                    };
+                    fileName = "DonationHistories.json";
+                    break;
+
+                case "registrations":
+                    var registrations = _context.DonationRegistrations
+                        .Include(r => r.User).ThenInclude(u => u.BloodType)
+                        .Include(r => r.Event).ThenInclude(e => e.Location)
+                        .AsQueryable();
+
+                    if (fromDate.HasValue)
+                        registrations = registrations.Where(r => r.RegistrationDate >= fromDate.Value);
+                    if (toDate.HasValue)
+                        registrations = registrations.Where(r => r.RegistrationDate <= toDate.Value);
+                    if (bloodTypeId.HasValue)
+                        registrations = registrations.Where(r => r.User.BloodTypeId == bloodTypeId.Value);
+                    if (locationId.HasValue)
+                        registrations = registrations.Where(r => r.Event.LocationId == locationId.Value);
+                    if (!string.IsNullOrEmpty(status))
+                        registrations = registrations.Where(r => r.Status.ToString() == status);
+
+                    var registrationList = await registrations.ToListAsync();
+                    data = new
+                    {
+                        exportInfo = new
+                        {
+                            exportDate = DateTime.Now,
+                            dataType = "Donation Registrations",
+                            filters = new
+                            {
+                                fromDate,
+                                toDate,
+                                bloodTypeId,
+                                locationId,
+                                status
+                            },
+                            totalRecords = registrationList.Count
+                        },
+                        data = registrationList.Select(r => new
+                        {
+                            registrationId = r.RegistrationId,
+                            registrationDate = r.RegistrationDate,
+                            userId = r.UserId,
+                            userName = r.User?.FullName,
+                            bloodType = r.User?.BloodType?.BloodTypeName,
+                            eventName = r.Event?.EventName,
+                            location = r.Event?.Location?.LocationName,
+                            status = r.Status.ToString(),
+                            isEligible = r.IsEligible,
+                            checkInTime = r.CheckInTime,
+                            notes = r.Notes
+                        })
+                    };
+                    fileName = "DonationRegistrations.json";
+                    break;
+
+                case "events":
+                    var events = _context.BloodDonationEvents
+                        .Include(e => e.Location)
+                        .AsQueryable();
+
+                    if (fromDate.HasValue)
+                        events = events.Where(e => e.EventDate >= fromDate.Value);
+                    if (toDate.HasValue)
+                        events = events.Where(e => e.EventDate <= toDate.Value);
+                    if (locationId.HasValue)
+                        events = events.Where(e => e.LocationId == locationId.Value);
+                    if (!string.IsNullOrEmpty(status))
+                        events = events.Where(e => e.Status.ToString() == status);
+
+                    var eventList = await events.ToListAsync();
+                    data = new
+                    {
+                        exportInfo = new
+                        {
+                            exportDate = DateTime.Now,
+                            dataType = "Blood Donation Events",
+                            filters = new
+                            {
+                                fromDate,
+                                toDate,
+                                locationId,
+                                status
+                            },
+                            totalRecords = eventList.Count
+                        },
+                        data = eventList.Select(e => new
+                        {
+                            eventId = e.EventId,
+                            eventName = e.EventName,
+                            eventDate = e.EventDate,
+                            startTime = e.StartTime,
+                            endTime = e.EndTime,
+                            location = e.Location?.LocationName,
+                            maxDonors = e.MaxDonors,
+                            currentDonors = e.CurrentDonors,
+                            status = e.Status.ToString(),
+                            requiredBloodTypes = e.RequiredBloodTypes
+                        })
+                    };
+                    fileName = "BloodDonationEvents.json";
+                    break;
+
+                case "users":
+                    var users = _context.Users
+                        .Include(u => u.BloodType)
+                        .Include(u => u.Role)
+                        .AsQueryable();
+
+                    if (bloodTypeId.HasValue)
+                        users = users.Where(u => u.BloodTypeId == bloodTypeId.Value);
+
+                    var userList = await users.ToListAsync();
+                    data = new
+                    {
+                        exportInfo = new
+                        {
+                            exportDate = DateTime.Now,
+                            dataType = "Users",
+                            filters = new
+                            {
+                                bloodTypeId
+                            },
+                            totalRecords = userList.Count
+                        },
+                        data = userList.Select(u => new
+                        {
+                            userId = u.UserId,
+                            fullName = u.FullName,
+                            email = u.Email,
+                            phone = u.Phone,
+                            bloodType = u.BloodType?.BloodTypeName,
+                            role = u.Role?.RoleName,
+                            dateOfBirth = u.DateOfBirth,
+                            gender = u.Gender,
+                            address = u.Address,
+                            createdDate = u.CreatedDate
+                        })
+                    };
+                    fileName = "Users.json";
+                    break;
+            }
+
+            var filePath = Path.Combine(exportPath, fileName);
+            var jsonContent = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+            await System.IO.File.WriteAllTextAsync(filePath, jsonContent);
+        }
+
+        /// <summary>
+        /// Helper method: Xuất dữ liệu có lọc ra file CSV
+        /// Hỗ trợ 4 loại dữ liệu: donations, registrations, events, users
+        /// Tạo file CSV với header và dữ liệu đã lọc
+        /// </summary>
+        private async Task ExportFilteredToCsvAsync(
+            DateTime? fromDate, 
+            DateTime? toDate, 
+            int? bloodTypeId, 
+            int? locationId,
+            string? status,
+            string dataType,
+            string exportPath)
+        {
+            var csv = new System.Text.StringBuilder();
+            string fileName = "";
+
+            switch (dataType.ToLower())
+            {
+                case "donations":
+                    // Xuất lịch sử hiến máu ra CSV
+                    var donations = _context.DonationHistories
+                        .Include(d => d.User).ThenInclude(u => u.BloodType)
+                        .Include(d => d.Registration).ThenInclude(r => r.Event).ThenInclude(e => e.Location)
+                        .AsQueryable();
+
+                    // Áp dụng các bộ lọc
+                    if (fromDate.HasValue) donations = donations.Where(d => d.DonationDate >= fromDate.Value);
+                    if (toDate.HasValue) donations = donations.Where(d => d.DonationDate <= toDate.Value);
+                    if (bloodTypeId.HasValue) donations = donations.Where(d => d.User.BloodTypeId == bloodTypeId.Value);
+                    if (locationId.HasValue) donations = donations.Where(d => d.Registration.Event.LocationId == locationId.Value);
+
+                    csv.AppendLine("Donation ID,Donation Date,User ID,User Name,Blood Type,Volume,Event Name,Location,Notes");
+                    foreach (var d in await donations.ToListAsync())
+                    {
+                        csv.AppendLine($"{d.DonationId},{d.DonationDate:yyyy-MM-dd HH:mm},{d.UserId},{d.User?.FullName},{d.User?.BloodType?.BloodTypeName},{d.Volume},{d.Registration?.Event?.EventName},{d.Registration?.Event?.Location?.LocationName},{d.Notes ?? ""}");
+                    }
+                    fileName = "DonationHistories.csv";
+                    break;
+
+                case "registrations":
+                    var registrations = _context.DonationRegistrations
+                        .Include(r => r.User).ThenInclude(u => u.BloodType)
+                        .Include(r => r.Event).ThenInclude(e => e.Location)
+                        .AsQueryable();
+
+                    if (fromDate.HasValue) registrations = registrations.Where(r => r.RegistrationDate >= fromDate.Value);
+                    if (toDate.HasValue) registrations = registrations.Where(r => r.RegistrationDate <= toDate.Value);
+                    if (bloodTypeId.HasValue) registrations = registrations.Where(r => r.User.BloodTypeId == bloodTypeId.Value);
+                    if (locationId.HasValue) registrations = registrations.Where(r => r.Event.LocationId == locationId.Value);
+                    if (!string.IsNullOrEmpty(status)) registrations = registrations.Where(r => r.Status.ToString() == status);
+
+                    csv.AppendLine("Registration ID,Registration Date,User ID,User Name,Blood Type,Event Name,Location,Status,Is Eligible,Check-in Time,Notes");
+                    foreach (var r in await registrations.ToListAsync())
+                    {
+                        csv.AppendLine($"{r.RegistrationId},{r.RegistrationDate:yyyy-MM-dd HH:mm},{r.UserId},{r.User?.FullName},{r.User?.BloodType?.BloodTypeName},{r.Event?.EventName},{r.Event?.Location?.LocationName},{r.Status},{r.IsEligible},{r.CheckInTime?.ToString("yyyy-MM-dd HH:mm") ?? ""},{r.Notes ?? ""}");
+                    }
+                    fileName = "DonationRegistrations.csv";
+                    break;
+
+                case "events":
+                    var events = _context.BloodDonationEvents.Include(e => e.Location).AsQueryable();
+
+                    if (fromDate.HasValue) events = events.Where(e => e.EventDate >= fromDate.Value);
+                    if (toDate.HasValue) events = events.Where(e => e.EventDate <= toDate.Value);
+                    if (locationId.HasValue) events = events.Where(e => e.LocationId == locationId.Value);
+                    if (!string.IsNullOrEmpty(status)) events = events.Where(e => e.Status.ToString() == status);
+
+                    csv.AppendLine("Event ID,Event Name,Event Date,Start Time,End Time,Location,Max Donors,Current Donors,Status,Required Blood Types");
+                    foreach (var e in await events.ToListAsync())
+                    {
+                        csv.AppendLine($"{e.EventId},{e.EventName},{e.EventDate:yyyy-MM-dd},{e.StartTime},{e.EndTime},{e.Location?.LocationName},{e.MaxDonors},{e.CurrentDonors},{e.Status},{e.RequiredBloodTypes}");
+                    }
+                    fileName = "BloodDonationEvents.csv";
+                    break;
+
+                case "users":
+                    var users = _context.Users.Include(u => u.BloodType).Include(u => u.Role).AsQueryable();
+
+                    if (bloodTypeId.HasValue) users = users.Where(u => u.BloodTypeId == bloodTypeId.Value);
+
+                    csv.AppendLine("User ID,Full Name,Email,Phone,Blood Type,Role,Date of Birth,Gender,Address,Created Date");
+                    foreach (var u in await users.ToListAsync())
+                    {
+                        csv.AppendLine($"{u.UserId},{u.FullName},{u.Email},{u.Phone},{u.BloodType?.BloodTypeName},{u.Role?.RoleName},{u.DateOfBirth:yyyy-MM-dd},{u.Gender},{u.Address},{u.CreatedDate:yyyy-MM-dd}");
+                    }
+                    fileName = "Users.csv";
+                    break;
+            }
+
+            var filePath = Path.Combine(exportPath, fileName);
+            await System.IO.File.WriteAllTextAsync(filePath, csv.ToString());
+        }
+
+        /// <summary>
+        /// Helper method: Xuất dữ liệu sự kiện ra file JSON
+        /// Bao gồm: Chi tiết sự kiện, Đăng ký, Lịch sử hiến máu, Sàng lọc sức khỏe, Thống kê
+        /// </summary>
         private async Task ExportEventToJsonAsync(BloodDonationEvent eventEntity, string exportPath)
         {
             // Lấy dữ liệu đăng ký
@@ -290,6 +701,10 @@ namespace Blood_Donation_Website.Controllers
             await System.IO.File.WriteAllTextAsync(filePath, jsonContent);
         }
 
+        /// <summary>
+        /// Helper method: Xuất dữ liệu sự kiện ra file CSV
+        /// Tạo file CSV với các phần: Event Info, Statistics, Registrations, Donation Histories, Health Screenings
+        /// </summary>
         private async Task ExportEventToCsvAsync(BloodDonationEvent eventEntity, string exportPath)
         {
             // Lấy dữ liệu đăng ký
@@ -374,6 +789,13 @@ namespace Blood_Donation_Website.Controllers
             await System.IO.File.WriteAllTextAsync(filePath, csvContent.ToString());
         }
 
+        /// <summary>
+        /// POST: /admin/import-all
+        /// Nhập tất cả dữ liệu từ file ZIP
+        /// File ZIP phải chứa các file JSON của các bảng
+        /// Tự động phát hiện và import từng bảng theo thứ tự
+        /// </summary>
+        /// <param name="file">File ZIP chứa dữ liệu export</param>
         [HttpPost("import-all")]
         public async Task<IActionResult> ImportAll(IFormFile file)
         {
@@ -429,6 +851,13 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /admin/import-table
+        /// Nhập dữ liệu của một bảng cụ thể từ file JSON
+        /// File phải đúng định dạng với cấu trúc "data" array
+        /// </summary>
+        /// <param name="file">File JSON chứa dữ liệu bảng</param>
+        /// <param name="tableName">Tên bảng cần import</param>
         [HttpPost("import-table")]
         public async Task<IActionResult> ImportTable(IFormFile file, string tableName)
         {
@@ -477,6 +906,14 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// Helper method: Import dữ liệu từ file JSON vào bảng cụ thể
+        /// Hỗ trợ nhiều bảng: Users, Roles, BloodTypes, Locations, Events, Registrations...
+        /// Tự động parse JSON và map vào các entity tương ứng
+        /// </summary>
+        /// <param name="filePath">Đường dẫn đến file JSON</param>
+        /// <param name="tableName">Tên bảng cần import</param>
+        /// <returns>Thông báo kết quả import</returns>
         private async Task<string> ImportTableFromFile(string filePath, string tableName)
         {
             try
@@ -787,6 +1224,12 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /admin/download/{fileName}
+        /// Tải file đã export từ thư mục DatabaseExport
+        /// Tìm file mới nhất khớp với tên file
+        /// </summary>
+        /// <param name="fileName">Tên file cần tải</param>
         [HttpGet("download/{fileName}")]
         public async Task<IActionResult> DownloadFile(string fileName)
         {
@@ -811,6 +1254,11 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// GET: /admin/status
+        /// Lấy trạng thái xuất dữ liệu
+        /// Trả về thông tin về thư mục export mới nhất và danh sách file
+        /// </summary>
         [HttpGet("status")]
         public IActionResult GetExportStatus()
         {
@@ -939,6 +1387,11 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
+        /// <summary>
+        /// POST: /admin/test-tables
+        /// Test xuất dữ liệu từng bảng
+        /// Kiểm tra tính toàn vẹn dữ liệu
+        /// </summary>
         [HttpPost("test-tables")]
         public async Task<IActionResult> TestTables()
         {

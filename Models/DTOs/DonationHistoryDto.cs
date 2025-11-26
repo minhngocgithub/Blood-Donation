@@ -21,6 +21,7 @@ namespace Blood_Donation_Website.Models.DTOs
         public string? UserEmail { get; set; }
         public string? EventName { get; set; }
         public DateTime? EventDate { get; set; }
+        public string? LocationName { get; set; }
         public string? BloodTypeName { get; set; }
     }
 

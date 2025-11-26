@@ -9,6 +9,7 @@ namespace Blood_Donation_Website.Models.ViewModels
         public int CancelledRegistrations { get; set; }
         public int RejectedRegistrations { get; set; }
         public int CheckedInRegistrations { get; set; }
+        public int DeferredRegistrations { get; set; }
         
         public double CompletionRate => TotalRegistrations > 0 ? Math.Round((double)CompletedRegistrations / TotalRegistrations * 100, 1) : 0;
         public double PendingRate => TotalRegistrations > 0 ? Math.Round((double)PendingRegistrations / TotalRegistrations * 100, 1) : 0;
@@ -16,5 +17,6 @@ namespace Blood_Donation_Website.Models.ViewModels
         public double CancelledRate => TotalRegistrations > 0 ? Math.Round((double)CancelledRegistrations / TotalRegistrations * 100, 1) : 0;
         public double RejectedRate => TotalRegistrations > 0 ? Math.Round((double)RejectedRegistrations / TotalRegistrations * 100, 1) : 0;
         public double CheckedInRate => TotalRegistrations > 0 ? Math.Round((double)CheckedInRegistrations / TotalRegistrations * 100, 1) : 0;
+        public double DeferredRate => TotalRegistrations > 0 ? Math.Round((double)DeferredRegistrations / TotalRegistrations * 100, 1) : 0;
     }
 } 

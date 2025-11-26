@@ -1,0 +1,247 @@
+@model Blood_Donation_Website.Models.DTOs.NewsUpdateDto
+@{
+    ViewData["Title"] = "Chỉnh sửa tin tức";
+    var newsId = ViewBag.NewsId;
+}
+
+<style>
+.news-form-page {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.form-card {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px 10px 0 0;
+    margin: -2rem -2rem 2rem -2rem;
+}
+
+.form-header h3 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.preview-image {
+    max-width: 300px;
+    border-radius: 5px;
+    margin-top: 1rem;
+}
+</style>
+
+<div class="news-form-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="form-card">
+                    <div class="form-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3>
+                                <i class="fas fa-edit me-2"></i>Chỉnh sửa tin tức
+                            </h3>
+                            <a asp-action="Index" class="btn btn-light">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                        </div>
+                    </div>
+
+                    <form asp-action="Edit" asp-route-id="@newsId" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                            <input asp-for="Title" class="form-control" placeholder="Nhập tiêu đề tin tức..." />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                            <select asp-for="CategoryId" class="form-select">
+                                <option value="">-- Chọn danh mục --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    var categories = ViewBag.Categories as IEnumerable<Blood_Donation_Website.Models.DTOs.NewsCategoryDto>;
+                                    if (categories != null)
+                                    {
+                                        foreach (var cat in categories)
+                                        {
+                                            <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Summary" class="form-label">Tóm tắt</label>
+                            <textarea asp-for="Summary" class="form-control" rows="3" 
+                                      placeholder="Nhập tóm tắt ngắn gọn về tin tức..."></textarea>
+                            <span asp-validation-for="Summary" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label">Nội dung <span class="text-danger">*</span></label>
+                            <textarea asp-for="Content" class="form-control" rows="15" 
+                                      placeholder="Nhập nội dung chi tiết tin tức..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                            <small class="text-muted">Hỗ trợ HTML. Bạn có thể sử dụng các thẻ HTML để định dạng nội dung.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                            <input asp-for="ImageUrl" class="form-control" id="imageUrlInput" 
+                                   placeholder="/image/news.jpg" 
+                                   onchange="previewImage(this.value)" />
+                            <small class="text-muted">Nhập đường dẫn: /image/tên-file.jpg hoặc chọn ảnh có sẵn bên dưới</small>
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            
+                            <div class="mt-2">
+                                <small class="text-muted">Chọn ảnh từ dự án:</small>
+                                <div class="row g-2 mt-1">
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectProjectImage('/image/image1.jpeg')">
+                                            <i class="fas fa-image me-1"></i>Ảnh 1
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectProjectImage('/image/image2.jpeg')">
+                                            <i class="fas fa-image me-1"></i>Ảnh 2
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectProjectImage('/image/image3.jpeg')">
+                                            <i class="fas fa-image me-1"></i>Ảnh 3
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="selectProjectImage('/image/Van-dong-hien-mau-tinh-nguyen.png')">
+                                            <i class="fas fa-heart me-1"></i>Vận động hiến máu
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectSampleImage('https://images.unsplash.com/photo-1615461066159-fea0960485d5?w=800')">
+                                            <i class="fas fa-hospital me-1"></i>Mẫu 1 (Online)
+                                        </button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectSampleImage('https://images.unsplash.com/photo-1584515933487-779824d29309?w=800')">
+                                            <i class="fas fa-medkit me-1"></i>Mẫu 2 (Online)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img id="imagePreview" src="@Model.ImageUrl" class="preview-image" onerror="this.onerror=null; this.style.display='none'; alert('Không thể tải hình ảnh. Vui lòng kiểm tra đường dẫn.');" />
+                            }
+                            else
+                            {
+                                <img id="imagePreview" class="preview-image d-none" onerror="this.onerror=null; this.style.display='none'; alert('Không thể tải hình ảnh. Vui lòng kiểm tra đường dẫn.');" />
+                            }
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsPublished" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsPublished" class="form-check-label">
+                                    Xuất bản
+                                </label>
+                            </div>
+                            <small class="text-muted">Nếu không chọn, tin tức sẽ được lưu ở trạng thái nháp</small>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Cập nhật tin tức
+                            </button>
+                            <a asp-action="Details" asp-route-id="@newsId" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/sweetalert-helper.js"></script>
+    <script>
+        function selectProjectImage(path) {
+            var input = document.getElementById('imageUrlInput');
+            input.value = path;
+            previewImage(path);
+        }
+
+        function selectSampleImage(url) {
+            var input = document.getElementById('imageUrlInput');
+            input.value = url;
+            previewImage(url);
+        }
+
+        function previewImage(url) {
+            var preview = document.getElementById('imagePreview');
+            if (url) {
+                var fullUrl = url;
+                // Nếu là đường dẫn tương đối, thêm domain
+                if (url.startsWith('/')) {
+                    fullUrl = window.location.origin + url;
+                }
+                preview.src = fullUrl;
+                preview.classList.remove('d-none');
+                
+                // Kiểm tra lỗi tải ảnh
+                preview.onerror = function() {
+                    this.onerror = null;
+                    this.style.display = 'none';
+                    alert('Không thể tải hình ảnh. Vui lòng kiểm tra đường dẫn.');
+                };
+            } else {
+                preview.classList.add('d-none');
+            }
+        }
+
+        $(document).ready(function() {
+            var errorMsg = '@TempData["ErrorMessage"]';
+            if (errorMsg) {
+                showError(errorMsg);
+            }
+        });
+    </script>
+}

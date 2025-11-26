@@ -10,15 +10,25 @@ using System.Security.Claims;
 
 namespace Blood_Donation_Website.Controllers
 {
-    [Authorize(Roles = "Hospital,Doctor,Staff")]
+    /// <summary>
+    /// Controller quản lý quy trình hiến máu (dành cho Hospital, Doctor, Staff)
+    /// Xử lý: Bắt đầu hiến máu, Theo dõi quá trình, Hoàn thành/Dừng hiến máu
+    /// Quy trình: Eligible → Donating → Completed
+    /// Route: /DonationManagement/*
+    /// </summary>
+    [Authorize(Roles = "Hospital,Doctor,Staff")] // Chỉ nhân viên y tế được truy cập
     public class DonationManagementController : Controller
     {
-        private readonly IDonationRegistrationService _donationRegistrationService;
-        private readonly IDonationHistoryService _donationHistoryService;
-        private readonly IHealthScreeningService _healthScreeningService;
-        private readonly IUserService _userService;
-        private readonly ApplicationDbContext _context;
+        // Dependencies - Các service cần thiết
+        private readonly IDonationRegistrationService _donationRegistrationService; // Quản lý đăng ký
+        private readonly IDonationHistoryService _donationHistoryService; // Quản lý lịch sử hiến máu
+        private readonly IHealthScreeningService _healthScreeningService; // Quản lý sàng lọc sức khỏe
+        private readonly IUserService _userService; // Quản lý người dùng
+        private readonly ApplicationDbContext _context; // Database context để truy vấn trực tiếp
 
+        /// <summary>
+        /// Constructor - Inject các service cần thiết
+        /// </summary>
         public DonationManagementController(
             IDonationRegistrationService donationRegistrationService,
             IDonationHistoryService donationHistoryService,
@@ -33,16 +43,20 @@ namespace Blood_Donation_Website.Controllers
             _context = context;
         }
 
-        // GET: DonationManagement/Index
+        /// <summary>
+        /// GET: /DonationManagement/Index
+        /// Hiển thị danh sách người đủ điều kiện để hiến máu
+        /// Bao gồm các trạng thái: Eligible, Donating, Completed
+        /// </summary>
         public async Task<IActionResult> Index()
         {
             try
             {
                 // Lấy danh sách đăng ký đủ điều kiện hiến máu
                 var registrations = await _context.DonationRegistrations
-                    .Include(r => r.User)
-                    .Include(r => r.Event)
-                    .Include(r => r.Event.Location)
+                    .Include(r => r.User) // Thông tin người hiến
+                    .Include(r => r.Event) // Thông tin sự kiện
+                    .Include(r => r.Event.Location) // Thông tin địa điểm
                     .Where(r => r.Status == EnumMapper.RegistrationStatus.Eligible || 
                                r.Status == EnumMapper.RegistrationStatus.Donating ||
                                r.Status == EnumMapper.RegistrationStatus.Completed)
@@ -50,7 +64,7 @@ namespace Blood_Donation_Website.Controllers
                     .Select(r => new DonationRegistrationDto
                     {
                         RegistrationId = r.RegistrationId,
-                        RegistrationCode = $"REG{r.RegistrationId:D6}",
+                        RegistrationCode = $"REG{r.RegistrationId:D6}", // Mã đăng ký dạng REG000001
                         UserId = r.UserId,
                         EventId = r.EventId,
                         RegistrationDate = r.RegistrationDate,
@@ -216,7 +230,13 @@ namespace Blood_Donation_Website.Controllers
             }
         }
 
-        // POST: DonationManagement/Complete
+        /// <summary>
+        /// POST: /DonationManagement/Complete
+        /// Hoàn thành quy trình hiến máu - Tạo bản ghi lịch sử và hủy các đăng ký khác
+        /// </summary>
+        /// <param name="id">ID đăng ký</param>
+        /// <param name="notes">Ghi chú (tùy chọn)</param>
+        /// <param name="volume">Thể tích máu hiến (ml) - Mặc định: 350ml, Khoảng: 200-500ml</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Complete(int id, string notes = "", int volume = 350)
@@ -235,30 +255,32 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
+                // Kiểm tra trạng thái phải là "Đang hiến máu"
                 if (registration.Status != EnumMapper.RegistrationStatus.Donating)
                 {
                     TempData["ErrorMessage"] = "Đăng ký này không đang trong quá trình hiến máu.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Validate volume
+                // Validate thể tích máu (200-500ml)
                 if (volume < 200 || volume > 500)
                 {
                     TempData["ErrorMessage"] = "Thể tích máu không hợp lệ. Vui lòng nhập giá trị từ 200ml đến 500ml.";
                     return RedirectToAction(nameof(InProgress), new { id });
                 }
 
+                // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
                 using var transaction = await _context.Database.BeginTransactionAsync();
 
                 try
                 {
-                    // Cập nhật trạng thái đăng ký thành "Hoàn thành"
+                    // Bước 1: Cập nhật trạng thái đăng ký thành "Hoàn thành"
                     registration.Status = EnumMapper.RegistrationStatus.Completed;
                     registration.Notes = string.IsNullOrEmpty(notes) 
                         ? $"Hoàn tất hiến máu lúc {DateTime.Now:dd/MM/yyyy HH:mm:ss}"
                         : $"Hoàn tất hiến máu lúc {DateTime.Now:dd/MM/yyyy HH:mm:ss}. Ghi chú: {notes}";
 
-                    // Tạo record trong DonationHistory
+                    // Bước 2: Tạo record trong DonationHistory (lưu lịch sử hiến máu)
                     var donationHistory = new DonationHistory
                     {
                         UserId = registration.UserId,
@@ -267,20 +289,22 @@ namespace Blood_Donation_Website.Controllers
                         DonationDate = DateTime.Now,
                         Status = EnumMapper.DonationStatus.Completed,
                         Notes = registration.Notes,
-                        BloodTypeId = registration.User.BloodTypeId ?? 1, // Default to BloodTypeId = 1 if null
-                        Volume = volume
+                        BloodTypeId = registration.User.BloodTypeId ?? 1, // Mặc định BloodTypeId = 1 nếu null
+                        Volume = volume // Thể tích máu hiến
                     };
 
                     _context.DonationHistories.Add(donationHistory);
                     await _context.SaveChangesAsync();
 
-                    // Huỷ các đăng ký còn lại của user (trừ đăng ký này)
+                    // Bước 3: Hủy các đăng ký còn lại của user (trừ đăng ký này)
+                    // Lý do: Người hiến máu cần nghỉ 90 ngày trước khi hiến lần tiếp theo
                     await _donationRegistrationService.CancelAllActiveRegistrationsExceptAsync(
                         registration.UserId,
                         registration.RegistrationId,
                         EnumMapper.DisqualificationReason.RecentDonation
                     );
 
+                    // Commit transaction
                     await transaction.CommitAsync();
 
                     // Lưu DonationHistoryId để hiển thị trong View
@@ -310,6 +334,7 @@ namespace Blood_Donation_Website.Controllers
                 }
                 catch
                 {
+                    // Rollback nếu có lỗi
                     await transaction.RollbackAsync();
                     throw;
                 }

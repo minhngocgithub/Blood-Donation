@@ -27,6 +27,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donation = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .FirstOrDefaultAsync(d => d.DonationId == donationId);
@@ -50,6 +51,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = donation.User?.Email,
                     EventName = donation.Event?.EventName,
                     EventDate = donation.Event?.EventDate,
+                    LocationName = donation.Event?.Location?.LocationName,
                     BloodTypeName = donation.BloodType?.BloodTypeName
                 };
             }
@@ -66,6 +68,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .OrderByDescending(d => d.DonationDate)
@@ -88,6 +91,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -104,6 +108,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var query = _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .AsQueryable();
@@ -199,6 +204,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 }).ToList();
 
@@ -380,6 +386,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.UserId == userId)
@@ -403,6 +410,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -419,6 +427,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.EventId == eventId)
@@ -442,6 +451,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -458,6 +468,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.BloodTypeId == bloodTypeId)
@@ -481,6 +492,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -497,6 +509,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.Status == status)
@@ -520,6 +533,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -536,6 +550,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.DonationDate >= startDate && d.DonationDate <= endDate)
@@ -559,6 +574,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -575,6 +591,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.RegistrationId == registrationId)
@@ -598,6 +615,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
@@ -614,6 +632,7 @@ namespace Blood_Donation_Website.Services.Implementations
                 var donations = await _context.DonationHistories
                     .Include(d => d.User)
                     .Include(d => d.Event)
+                        .ThenInclude(e => e.Location)
                     .Include(d => d.BloodType)
                     .Include(d => d.Registration)
                     .Where(d => d.Notes == reason.ToString())
@@ -637,6 +656,7 @@ namespace Blood_Donation_Website.Services.Implementations
                     UserEmail = d.User?.Email,
                     EventName = d.Event?.EventName,
                     EventDate = d.Event?.EventDate,
+                    LocationName = d.Event?.Location?.LocationName,
                     BloodTypeName = d.BloodType?.BloodTypeName
                 });
             }
