@@ -10,7 +10,7 @@
 }
 @{
     var selectedStatus = Context.Request.Query["status"].ToString();
-    if (string.IsNullOrEmpty(selectedStatus)) { selectedStatus = "active"; }
+    if (string.IsNullOrEmpty(selectedStatus)) { selectedStatus = "all"; }
 }
 
 @section Styles {
@@ -35,6 +35,11 @@
                             <div class="row g-2 align-items-center">
                                 <div class="col-auto">
                                     <select name="status" class="form-select form-select-sm status-filter-select" onchange="this.form.submit()">
+                                        @if (selectedStatus == "all") {
+                                            <option value="all" selected>Tất cả</option>
+                                        } else {
+                                            <option value="all">Tất cả</option>
+                                        }
                                         @if (selectedStatus == "active") {
                                             <option value="active" selected>Đang đăng ký</option>
                                         } else {
@@ -50,15 +55,15 @@
                                         } else {
                                             <option value="completed">Hoàn thành</option>
                                         }
+                                        @if (selectedStatus == "deferred") {
+                                            <option value="deferred" selected>Tạm hoãn</option>
+                                        } else {
+                                            <option value="deferred">Tạm hoãn</option>
+                                        }
                                         @if (selectedStatus == "cancelled") {
                                             <option value="cancelled" selected>Đã hủy</option>
                                         } else {
                                             <option value="cancelled">Đã hủy</option>
-                                        }
-                                        @if (selectedStatus == "all") {
-                                            <option value="all" selected>Tất cả</option>
-                                        } else {
-                                            <option value="all">Tất cả</option>
                                         }
                                     </select>
                                 </div>
@@ -154,7 +159,7 @@
                                                 <span>Chi tiết</span>
                                             </a>
                                             
-                                            @if (registration.Status == EnumMapper.RegistrationStatus.Registered)
+                                            @if (registration.Status == EnumMapper.RegistrationStatus.Registered || registration.Status == EnumMapper.RegistrationStatus.Confirmed)
                                             {
                                                 <button type="button" class="action-btn btn-cancel" 
                                                         onclick="showCancelConfirmation(@registration.RegistrationId, '@Html.Raw(registration.EventName!.Replace("'", "\\'"))')">

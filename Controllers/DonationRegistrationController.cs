@@ -144,7 +144,7 @@ namespace Blood_Donation_Website.Controllers
 
         // GET: /DonationRegistration/MyRegistrations
         [AuthenticatedUser]
-        public async Task<IActionResult> MyRegistrations(string status = "active")
+        public async Task<IActionResult> MyRegistrations(string status = "all")
         {
             try
             {
@@ -157,7 +157,7 @@ namespace Blood_Donation_Website.Controllers
                 var allRegs = await _registrationService.GetRegistrationsByUserAsync(userId);
                 IEnumerable<DonationRegistrationDto> filtered = allRegs;
 
-                if (string.IsNullOrEmpty(status) || status == "active")
+                if (status == "active")
                 {
                     var activeStatuses = new RegistrationStatus[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed, RegistrationStatus.CheckedIn, RegistrationStatus.Screening, RegistrationStatus.Eligible, RegistrationStatus.Ineligible, RegistrationStatus.Donating };
                     filtered = allRegs.Where(r => activeStatuses.Contains(r.Status)).ToList();
@@ -175,7 +175,11 @@ namespace Blood_Donation_Website.Controllers
                     var cancelledStatuses = new RegistrationStatus[] { RegistrationStatus.Cancelled, RegistrationStatus.Failed, RegistrationStatus.NoShow };
                     filtered = allRegs.Where(r => cancelledStatuses.Contains(r.Status)).ToList();
                 }
-                // else: show all
+                else if (status == "deferred")
+                {
+                    filtered = allRegs.Where(r => r.Status == RegistrationStatus.Deferred).ToList();
+                }
+                // else: show all (mặc định)
 
                 return View(filtered);
             }
@@ -264,48 +268,79 @@ namespace Blood_Donation_Website.Controllers
                     return RedirectToAction(nameof(MyRegistrations));
                 }
 
-                // Kiểm tra xem đăng ký có thể hủy không
-                if (registration.Status != RegistrationStatus.Registered)
+                // Kiểm tra xem đăng ký có thể hủy không - Cho phép hủy khi đang ở trạng thái Registered hoặc Confirmed
+                var cancellableStatuses = new[] { RegistrationStatus.Registered, RegistrationStatus.Confirmed };
+                if (!cancellableStatuses.Contains(registration.Status))
                 {
+                    var statusMessage = registration.Status switch
+                    {
+                        RegistrationStatus.CheckedIn => "Bạn đã check-in, không thể hủy đăng ký.",
+                        RegistrationStatus.Screening => "Bạn đang trong quá trình sàng lọc sức khỏe, không thể hủy đăng ký.",
+                        RegistrationStatus.Donating => "Bạn đang trong quá trình hiến máu, không thể hủy đăng ký.",
+                        RegistrationStatus.Completed => "Đăng ký đã hoàn thành, không thể hủy.",
+                        RegistrationStatus.Cancelled => "Đăng ký đã được hủy trước đó.",
+                        _ => "Không thể hủy đăng ký ở trạng thái hiện tại."
+                    };
+                    
                     if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                     {
-                        return Json(new { success = false, message = "Đăng ký này không thể hủy." });
+                        return Json(new { success = false, message = statusMessage });
                     }
-                    TempData["Error"] = "Đăng ký này không thể hủy.";
+                    TempData["Error"] = statusMessage;
                     return RedirectToAction(nameof(Details), new { id });
                 }
 
-                if (Enum.TryParse<DisqualificationReason>(reason, out var reasonEnum))
+                // Kiểm tra thời gian - không cho hủy nếu sự kiện đã bắt đầu hoặc đã qua
+                if (registration.EventDate.HasValue)
                 {
-                    var success = await _registrationService.CancelRegistrationAsync(id, reasonEnum);
-                    if (success)
+                    var eventDateTime = registration.EventDate.Value;
+                    if (registration.EventStartTime.HasValue)
                     {
+                        eventDateTime = eventDateTime.Date.Add(registration.EventStartTime.Value);
+                    }
+
+                    if (DateTime.Now >= eventDateTime)
+                    {
+                        var message = "Sự kiện đã bắt đầu hoặc đã qua, không thể hủy đăng ký.";
                         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                         {
-                            return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                            return Json(new { success = false, message });
                         }
-                        TempData["Success"] = "Đã hủy đăng ký thành công.";
+                        TempData["Error"] = message;
+                        return RedirectToAction(nameof(Details), new { id });
                     }
-                    else
+                }
+
+                // Xử lý lý do hủy - nếu không có lý do thì dùng "Other"
+                DisqualificationReason cancelReason = DisqualificationReason.Other;
+                if (!string.IsNullOrEmpty(reason))
+                {
+                    // Nếu reason là text tự do, lưu vào CancellationReason
+                    if (!Enum.TryParse<DisqualificationReason>(reason, out cancelReason))
                     {
-                        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                        {
-                            return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
-                        }
-                        TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
+                        cancelReason = DisqualificationReason.Other;
                     }
+                }
+
+                var success = await _registrationService.CancelRegistrationAsync(id, cancelReason);
+                if (success)
+                {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = true, message = "Đã hủy đăng ký thành công." });
+                    }
+                    TempData["Success"] = "Đã hủy đăng ký thành công.";
+                    return RedirectToAction(nameof(MyRegistrations));
                 }
                 else
                 {
-                    TempData["Error"] = "Lý do hủy không hợp lệ.";
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
+                    }
+                    TempData["Error"] = "Có lỗi xảy ra khi hủy đăng ký.";
                     return RedirectToAction(nameof(MyRegistrations));
                 }
-
-                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-                {
-                    return Json(new { success = false, message = "Có lỗi xảy ra khi hủy đăng ký." });
-                }
-                return RedirectToAction(nameof(MyRegistrations));
             }
             catch
             {
@@ -365,7 +400,8 @@ namespace Blood_Donation_Website.Controllers
                     CompletedRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Completed),
                     PendingRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Registered),
                     CancelledRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Cancelled),
-                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.CheckedIn)
+                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.CheckedIn),
+                    DeferredRegistrations = await _registrationService.GetRegistrationCountByUserAndStatusAsync(userId, RegistrationStatus.Deferred)
                 };
 
                 return View("MyStatistics", statistics);
@@ -389,7 +425,8 @@ namespace Blood_Donation_Website.Controllers
                     CompletedRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Completed),
                     ApprovedRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Confirmed),
                     CancelledRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Cancelled),
-                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.CheckedIn)
+                    CheckedInRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.CheckedIn),
+                    DeferredRegistrations = await _registrationService.GetRegistrationCountByStatusAsync(RegistrationStatus.Deferred)
                 };
                 return View("Statistics", statistics);
             }

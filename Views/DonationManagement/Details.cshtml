@@ -223,7 +223,7 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-            @if (Model.Status == EnumMapper.RegistrationStatus.Eligible)
+            @if (Model.Status == EnumMapper.RegistrationStatus.Eligible && !User.IsInRole("Staff"))
             {
                 <a asp-action="Start" asp-route-id="@Model.RegistrationId" class="btn btn-donation btn-success">
                     <i class="fas fa-play me-2"></i>Bắt đầu hiến máu

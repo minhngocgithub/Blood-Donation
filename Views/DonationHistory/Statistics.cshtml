@@ -2,6 +2,12 @@
 @using Blood_Donation_Website.Models.DTOs
 @{
     ViewData["Title"] = "Thống kê hiến máu tổng quan";
+    
+    // Tính toán số liệu chính xác
+    var allDonations = ViewBag.AllDonations as IEnumerable<DonationHistoryDto>;
+    var failedCount = allDonations?.Count(d => d.Status == EnumMapper.DonationStatus.Failed) ?? 0;
+    var stoppedCount = allDonations?.Count(d => d.Status == EnumMapper.DonationStatus.Stopped) ?? 0;
+    var cancelledAndFailed = (ViewBag.CancelledDonations ?? 0) + failedCount;
 }
 
 @section Styles {
@@ -67,8 +73,16 @@
                 <div class="stat-icon">
                     <i class="fas fa-times-circle"></i>
                 </div>
-                <div class="stat-number">@ViewBag.CancelledDonations</div>
-                <div class="stat-label">Lần hiến bị hủy</div>
+                <div class="stat-number">@cancelledAndFailed</div>
+                <div class="stat-label">Đã hủy / Thất bại</div>
+            </div>
+            
+            <div class="stat-card warning">
+                <div class="stat-icon">
+                    <i class="fas fa-pause-circle"></i>
+                </div>
+                <div class="stat-number">@stoppedCount</div>
+                <div class="stat-label">Dừng giữa chừng</div>
             </div>
             
             <div class="stat-card success">
@@ -78,7 +92,9 @@
                 <div class="stat-number">@(ViewBag.TotalDonations > 0 ? Math.Round((double)ViewBag.CompletedDonations / ViewBag.TotalDonations * 100, 1) : 0)<span class="stat-unit">%</span></div>
                 <div class="stat-label">Tỷ lệ thành công</div>
             </div>
-            
+        </div>
+
+        <div class="overview-stats">
             <div class="stat-card info">
                 <div class="stat-icon">
                     <i class="fas fa-chart-line"></i>
@@ -191,36 +207,61 @@
             var topDonors = ViewBag.TopDonors as IEnumerable<TopDonorDto>;
             if (topDonors != null && topDonors.Any())
             {
-                <div class="chart-section">
+                <div class="chart-section top-donors-section">
                     <div class="chart-header">
                         <i class="fas fa-trophy me-2"></i>Top 10 người hiến máu tích cực
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Người hiến máu</th>
-                                    <th>Email</th>
-                                    <th>Tổng lần hiến</th>
-                                    <th>Tổng thể tích (ml)</th>
-                                    <th>Lần hiến gần nhất</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var (donor, idx) in topDonors.Select((x, i) => (x, i + 1)))
-                                {
-                                    <tr>
-                                        <td>@idx</td>
-                                        <td><strong>@donor.UserName</strong></td>
-                                        <td>@donor.UserEmail</td>
-                                        <td><span class="badge bg-primary">@donor.TotalDonations</span></td>
-                                        <td><span class="badge bg-success">@donor.TotalVolume ml</span></td>
-                                        <td>@donor.LastDonation.ToString("dd/MM/yyyy")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                    <div class="top-donors-grid">
+                        @foreach (var (donor, idx) in topDonors.Select((x, i) => (x, i + 1)))
+                        {
+                            var rankClass = idx switch
+                            {
+                                1 => "rank-gold",
+                                2 => "rank-silver",
+                                3 => "rank-bronze",
+                                _ => "rank-normal"
+                            };
+                            <div class="top-donor-card @rankClass">
+                                <div class="donor-rank">
+                                    @if (idx <= 3)
+                                    {
+                                        <i class="fas fa-medal"></i>
+                                    }
+                                    <span class="rank-number">#@idx</span>
+                                </div>
+                                <div class="donor-avatar">
+                                    @(donor.UserName?.Substring(0, 1).ToUpper() ?? "U")
+                                </div>
+                                <div class="donor-info">
+                                    <h6 class="donor-name">@donor.UserName</h6>
+                                    <p class="donor-email">@donor.UserEmail</p>
+                                </div>
+                                <div class="donor-stats">
+                                    <div class="donor-stat">
+                                        <div class="stat-icon-small">
+                                            <i class="fas fa-tint"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-value">@donor.TotalDonations</div>
+                                            <div class="stat-label-small">Lần hiến</div>
+                                        </div>
+                                    </div>
+                                    <div class="donor-stat">
+                                        <div class="stat-icon-small">
+                                            <i class="fas fa-flask"></i>
+                                        </div>
+                                        <div class="stat-info">
+                                            <div class="stat-value">@donor.TotalVolume ml</div>
+                                            <div class="stat-label-small">Tổng thể tích</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="donor-last-donation">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    <small>Lần cuối: @donor.LastDonation.ToString("dd/MM/yyyy")</small>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -232,39 +273,67 @@
             var eventStats = ViewBag.EventStats as IEnumerable<EventStatDto>;
             if (eventStats != null && eventStats.Any())
             {
-                <div class="chart-section">
+                <div class="chart-section top-events-section">
                     <div class="chart-header">
-                        <i class="fas fa-calendar-alt me-2"></i>Thống kê sự kiện hiến máu
+                        <i class="fas fa-calendar-alt me-2"></i>Top 10 sự kiện hiến máu
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Sự kiện</th>
-                                    <th>Ngày sự kiện</th>
-                                    <th>Tổng lần hiến</th>
-                                    <th>Tổng thể tích (ml)</th>
-                                    <th>Hoàn thành</th>
-                                    <th>Tỷ lệ thành công</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var (eventStat, idx) in eventStats.Select((x, i) => (x, i + 1)))
-                                {
-                                    var successRate = eventStat.TotalDonations > 0 ? Math.Round((double)eventStat.CompletedDonations / eventStat.TotalDonations * 100, 1) : 0;
-                                    <tr>
-                                        <td>@idx</td>
-                                        <td><strong>@eventStat.EventName</strong></td>
-                                        <td>@(eventStat.EventDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                        <td><span class="badge bg-primary">@eventStat.TotalDonations</span></td>
-                                        <td><span class="badge bg-success">@eventStat.TotalVolume ml</span></td>
-                                        <td><span class="badge bg-info">@eventStat.CompletedDonations</span></td>
-                                        <td><span class="badge bg-warning">@successRate%</span></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                    <div class="top-events-list">
+                        @foreach (var (eventStat, idx) in eventStats.Select((x, i) => (x, i + 1)))
+                        {
+                            var successRate = eventStat.TotalDonations > 0 ? Math.Round((double)eventStat.CompletedDonations / eventStat.TotalDonations * 100, 1) : 0;
+                            var progressColor = successRate >= 80 ? "success" : successRate >= 60 ? "warning" : "danger";
+                            <div class="top-event-card">
+                                <div class="event-header">
+                                    <div class="event-rank-badge">#@idx</div>
+                                    <div class="event-details">
+                                        <h6 class="event-name">@eventStat.EventName</h6>
+                                        <small class="event-date">
+                                            <i class="fas fa-calendar me-1"></i>@(eventStat.EventDate?.ToString("dd/MM/yyyy") ?? "N/A")
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="event-stats-grid">
+                                    <div class="event-stat-item">
+                                        <div class="event-stat-icon bg-primary">
+                                            <i class="fas fa-tint"></i>
+                                        </div>
+                                        <div class="event-stat-info">
+                                            <div class="event-stat-value">@eventStat.TotalDonations</div>
+                                            <div class="event-stat-label">Tổng lần hiến</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-stat-item">
+                                        <div class="event-stat-icon bg-success">
+                                            <i class="fas fa-flask"></i>
+                                        </div>
+                                        <div class="event-stat-info">
+                                            <div class="event-stat-value">@eventStat.TotalVolume</div>
+                                            <div class="event-stat-label">Thể tích (ml)</div>
+                                        </div>
+                                    </div>
+                                    <div class="event-stat-item">
+                                        <div class="event-stat-icon bg-info">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="event-stat-info">
+                                            <div class="event-stat-value">@eventStat.CompletedDonations</div>
+                                            <div class="event-stat-label">Hoàn thành</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event-success-rate">
+                                    <div class="success-rate-header">
+                                        <span>Tỷ lệ thành công</span>
+                                        <span class="success-rate-value">@successRate%</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-@progressColor" role="progressbar" 
+                                             style="width: @successRate%" aria-valuenow="@successRate" 
+                                             aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             }

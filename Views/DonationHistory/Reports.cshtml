@@ -1,4 +1,5 @@
 @using Blood_Donation_Website.Models.DTOs;
+@using Blood_Donation_Website.Utilities;
 @{
     ViewData["Title"] = "Báo cáo hiến máu";
     var totalDonations = ViewBag.TotalDonations ?? 0;
@@ -11,6 +12,12 @@
     var monthlyStats = ViewBag.MonthlyStats as Dictionary<string, int>;
     var topDonors = ViewBag.TopDonors as List<TopDonorDto>;
     var eventStats = ViewBag.EventStats as List<EventStatDto>;
+    var allDonations = ViewBag.AllDonations as IEnumerable<DonationHistoryDto>;
+    
+    // Tính toán số liệu chính xác
+    var failedDonations = allDonations != null ? allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Failed) : 0;
+    var stoppedDonations = allDonations != null ? allDonations.Count(d => d.Status == EnumMapper.DonationStatus.Stopped) : 0;
+    var totalCancelledAndFailed = cancelledDonations + failedDonations;
 }
 <div class="container py-5">
     <h2 class="text-center mb-4">Báo cáo tổng hợp hiến máu</h2>
@@ -46,22 +53,34 @@
                 <div class="card-body text-center">
                     <h6 class="card-title text-success">Hoàn thành</h6>
                     <p class="h4 fw-bold">@completedDonations</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)completedDonations / totalDonations * 100, 1) : 0)%</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card border-danger shadow-sm">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-danger">Đã hủy</h6>
-                    <p class="h4 fw-bold">@cancelledDonations</p>
+                    <h6 class="card-title text-danger">Đã hủy / Thất bại</h6>
+                    <p class="h4 fw-bold">@totalCancelledAndFailed</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)totalCancelledAndFailed / totalDonations * 100, 1) : 0)%</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card border-warning shadow-sm">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-warning">Chứng nhận đã cấp</h6>
+                    <h6 class="card-title text-warning">Dừng giữa chừng</h6>
+                    <p class="h4 fw-bold">@stoppedDonations</p>
+                    <small class="text-muted">@(totalDonations > 0 ? Math.Round((double)stoppedDonations / totalDonations * 100, 1) : 0)%</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-info">Chứng nhận đã cấp</h6>
                     <p class="h4 fw-bold">@certificatesIssued</p>
+                    <small class="text-muted">@(completedDonations > 0 ? Math.Round((double)certificatesIssued / completedDonations * 100, 1) : 0)%</small>
                 </div>
             </div>
         </div>
