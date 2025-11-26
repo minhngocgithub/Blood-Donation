@@ -343,7 +343,7 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        @if (reg.Status == EnumMapper.RegistrationStatus.Eligible)
+                                        @if (reg.Status == EnumMapper.RegistrationStatus.Eligible && !User.IsInRole("Staff"))
                                         {
                                             <a asp-action="Start" asp-route-id="@reg.RegistrationId" class="btn btn-donation btn-start">
                                                 <i class="fas fa-play me-1"></i>Bắt đầu

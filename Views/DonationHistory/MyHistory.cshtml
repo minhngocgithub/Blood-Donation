@@ -11,19 +11,136 @@
             <div class="col-12">
                 <div class="history-main-card">
                     <div class="history-card-header">
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <h4 class="mb-0">
-                                <i class="fas fa-history me-2"></i>Lịch sử hiến máu của tôi
+                                <i class="fas fa-history me-2"></i>
+                                @if (ViewBag.SearchedUserName != null)
+                                {
+                                    <span>Lịch sử hiến máu của @ViewBag.SearchedUserName</span>
+                                    <small class="text-muted ms-2">(@ViewBag.SearchedUserEmail)</small>
+                                }
+                                else
+                                {
+                                    <span>Lịch sử hiến máu của tôi</span>
+                                }
                             </h4>
-                            @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
-                            {
-                                <a href="@Url.Action("Statistics", "DonationHistory")" class="btn btn-info btn-sm">
-                                    <i class="fas fa-chart-bar me-1"></i>Thống kê
-                                </a>
-                            }
+                            <div class="d-flex gap-2">
+                                @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
+                                {
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#searchUserModal">
+                                        <i class="fas fa-search me-1"></i>Tra cứu người dùng
+                                    </button>
+                                }
+                                @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                                {
+                                    <a href="@Url.Action("Statistics", "DonationHistory")" class="btn btn-info btn-sm">
+                                        <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                    </a>
+                                }
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
+                    <!-- Bộ lọc và tìm kiếm (chỉ hiển thị cho Admin/Hospital/Doctor) -->
+                    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor"))
+                    {
+                        <div class="filter-section mb-4">
+                            <form method="get" asp-action="MyHistory" id="filterForm">
+                                <div class="row g-3">
+                                    <!-- Tìm kiếm -->
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-primary text-white">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control" name="searchTerm" 
+                                                   placeholder="Tên, Email, Sự kiện..." 
+                                                   value="@ViewBag.SearchTerm" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Nhóm máu -->
+                                    <div class="col-md-2">
+                                        <select class="form-select" name="bloodType">
+                                            <option value="">Tất cả nhóm máu</option>
+                                            @if (ViewBag.BloodTypes != null)
+                                            {
+                                                @foreach (var bt in ViewBag.BloodTypes)
+                                                {
+                                                    <option value="@bt" selected="@(ViewBag.BloodType == bt)">@bt</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Trạng thái -->
+                                    <div class="col-md-2">
+                                        <select class="form-select" name="status">
+                                            <option value="">Tất cả trạng thái</option>
+                                            <option value="Completed" selected="@(ViewBag.Status == "Completed")">Hoàn thành</option>
+                                            <option value="InProgress" selected="@(ViewBag.Status == "InProgress")">Đang thực hiện</option>
+                                            <option value="Started" selected="@(ViewBag.Status == "Started")">Bắt đầu</option>
+                                            <option value="Stopped" selected="@(ViewBag.Status == "Stopped")">Dừng giữa chừng</option>
+                                            <option value="Failed" selected="@(ViewBag.Status == "Failed")">Thất bại</option>
+                                            <option value="Cancelled" selected="@(ViewBag.Status == "Cancelled")">Đã hủy</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Từ ngày -->
+                                    <div class="col-md-2">
+                                        <input type="date" class="form-control" name="fromDate" 
+                                               placeholder="Từ ngày" value="@ViewBag.FromDate" />
+                                    </div>
+
+                                    <!-- Đến ngày -->
+                                    <div class="col-md-2">
+                                        <input type="date" class="form-control" name="toDate" 
+                                               placeholder="Đến ngày" value="@ViewBag.ToDate" />
+                                    </div>
+
+                                    <!-- Nút tìm kiếm -->
+                                    <div class="col-md-1">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mt-2">
+                                    <!-- Sắp xếp -->
+                                    <div class="col-md-3">
+                                        <select class="form-select" name="sortBy" onchange="this.form.submit()">
+                                            <option value="date_desc" selected="@(ViewBag.SortBy == "date_desc")">Mới nhất</option>
+                                            <option value="date_asc" selected="@(ViewBag.SortBy == "date_asc")">Cũ nhất</option>
+                                            <option value="name_asc" selected="@(ViewBag.SortBy == "name_asc")">Tên A-Z</option>
+                                            <option value="name_desc" selected="@(ViewBag.SortBy == "name_desc")">Tên Z-A</option>
+                                            <option value="volume_desc" selected="@(ViewBag.SortBy == "volume_desc")">Thể tích cao nhất</option>
+                                            <option value="volume_asc" selected="@(ViewBag.SortBy == "volume_asc")">Thể tích thấp nhất</option>
+                                            <option value="bloodtype_asc" selected="@(ViewBag.SortBy == "bloodtype_asc")">Nhóm máu A-Z</option>
+                                            <option value="bloodtype_desc" selected="@(ViewBag.SortBy == "bloodtype_desc")">Nhóm máu Z-A</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Nút reset -->
+                                    <div class="col-md-2">
+                                        <a href="@Url.Action("MyHistory", "DonationHistory")" class="btn btn-secondary w-100">
+                                            <i class="fas fa-redo me-1"></i>Đặt lại
+                                        </a>
+                                    </div>
+
+                                    <!-- Thống kê -->
+                                    <div class="col-md-7 text-end">
+                                        <span class="badge bg-info fs-6 me-2">
+                                            <i class="fas fa-list me-1"></i>Tổng: @Model.Count() bản ghi
+                                        </span>
+                                        <span class="badge bg-success fs-6 me-2">
+                                            <i class="fas fa-tint me-1"></i>Tổng thể tích: @Model.Sum(d => d.Volume) ml
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    }
                     @if (!Model.Any())
                     {
                         <div class="empty-state fade-in">
@@ -42,6 +159,10 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>#</th>
+                                        @if (ViewBag.IsManagerView == true)
+                                        {
+                                            <th>Người hiến</th>
+                                        }
                                         <th>Sự kiện</th>
                                         <th>Ngày hiến</th>
                                         <th>Địa điểm</th>
@@ -57,11 +178,25 @@
                                     {
                                         <tr class="slide-in">
                                             <td>@idx</td>
+                                            @if (ViewBag.IsManagerView == true)
+                                            {
+                                                <td>
+                                                    <div>
+                                                        <strong>@item.UserName</strong>
+                                                        <br />
+                                                        <small class="text-muted">@item.UserEmail</small>
+                                                    </div>
+                                                </td>
+                                            }
                                             <td>@item.EventName</td>
                                             <td>@item.DonationDate.ToString("dd/MM/yyyy")</td>
-                                            <td>@item.EventDate?.ToString("dd/MM/yyyy")</td>
-                                            <td>@item.BloodTypeName</td>
-                                            <td>@item.Volume</td>
+                                            <td>@item.LocationName</td>
+                                            <td>
+                                                <span class="badge bg-danger">@item.BloodTypeName</span>
+                                            </td>
+                                            <td>
+                                                <strong class="text-danger">@item.Volume</strong>
+                                            </td>
                                             <td>
                                                 @{
                                                     var statusDisplayName = EnumMapper.GetDisplayName<EnumMapper.DonationStatus>(item.Status);
@@ -95,6 +230,81 @@
         </div>
     </div>
 </div>
+
+<!-- Modal tra cứu người dùng -->
+@if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
+{
+    <div class="modal fade" id="searchUserModal" tabindex="-1" aria-labelledby="searchUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchUserModalLabel">
+                        <i class="fas fa-search me-2"></i>Tra cứu lịch sử hiến máu người dùng
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="searchUserForm">
+                        <div class="mb-3">
+                            <label for="searchTerm" class="form-label">Email hoặc Số điện thoại</label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                   placeholder="Nhập email hoặc số điện thoại..." required>
+                        </div>
+                        <div id="searchResults" class="mt-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="searchBtn">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (User.IsInRole("Admin") || User.IsInRole("Hospital") || User.IsInRole("Doctor") || User.IsInRole("Staff"))
+    {
+        <script>
+            $(document).ready(function() {
+                $('#searchBtn').on('click', function() {
+                    var searchTerm = $('#searchTerm').val().trim();
+                    if (!searchTerm) {
+                        alert('Vui lòng nhập email hoặc số điện thoại');
+                        return;
+                    }
+                    
+                    $('#searchResults').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...</div>');
+                    
+                    $.ajax({
+                        url: '@Url.Action("SearchUser", "DonationHistory")',
+                        type: 'GET',
+                        data: { searchTerm: searchTerm },
+                        success: function(data) {
+                            if (data.success && data.userId) {
+                                window.location.href = '@Url.Action("UserHistory", "DonationHistory")' + '?userId=' + data.userId;
+                            } else {
+                                $('#searchResults').html('<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>' + (data.message || 'Không tìm thấy người dùng') + '</div>');
+                            }
+                        },
+                        error: function() {
+                            $('#searchResults').html('<div class="alert alert-danger"><i class="fas fa-times me-2"></i>Có lỗi xảy ra khi tìm kiếm</div>');
+                        }
+                    });
+                });
+                
+                $('#searchTerm').on('keypress', function(e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        $('#searchBtn').click();
+                    }
+                });
+            });
+        </script>
+    }
+}
 
 @functions {
     private string GetStatusBadgeClass(EnumMapper.DonationStatus status)

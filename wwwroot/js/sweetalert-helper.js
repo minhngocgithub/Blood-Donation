@@ -3,21 +3,24 @@
  * Cung cấp các function tiện ích để sử dụng SweetAlert trong toàn bộ ứng dụng
  */
 
-// Cấu hình mặc định cho SweetAlert
-const defaultSwalConfig = {
+// Chỉ khai báo nếu chưa tồn tại
+if (typeof defaultSwalConfig === "undefined") {
+  // Cấu hình mặc định cho SweetAlert
+  var defaultSwalConfig = {
     customClass: {
-        confirmButton: 'btn btn-primary me-2',
-        cancelButton: 'btn btn-secondary',
-        denyButton: 'btn btn-danger',
-        popup: 'swal2-popup',
-        title: 'swal2-title',
-        'html-container': 'swal2-html-container'
+      confirmButton: "btn btn-primary me-2",
+      cancelButton: "btn btn-secondary",
+      denyButton: "btn btn-danger",
+      popup: "swal2-popup",
+      title: "swal2-title",
+      "html-container": "swal2-html-container",
     },
     buttonsStyling: false,
     showCloseButton: true,
     allowOutsideClick: false,
-    allowEscapeKey: true
-};
+    allowEscapeKey: true,
+  };
+}
 
 /**
  * Hiển thị thông báo thành công
@@ -25,18 +28,18 @@ const defaultSwalConfig = {
  * @param {string} text - Nội dung thông báo (tùy chọn)
  * @param {number} timer - Thời gian tự động đóng (ms, mặc định 3000)
  */
-function showSuccess(title, text = '', timer = 3000) {
-    return Swal.fire({
-        icon: 'success',
-        title: title,
-        text: text,
-        timer: timer,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: false,
-        position: 'center',
-        ...defaultSwalConfig
-    });
+function showSuccess(title, text = "", timer = 3000) {
+  return Swal.fire({
+    icon: "success",
+    title: title,
+    text: text,
+    timer: timer,
+    timerProgressBar: true,
+    showConfirmButton: false,
+    toast: false,
+    position: "center",
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -44,14 +47,14 @@ function showSuccess(title, text = '', timer = 3000) {
  * @param {string} title - Tiêu đề thông báo
  * @param {string} text - Nội dung thông báo (tùy chọn)
  */
-function showError(title, text = '') {
-    return Swal.fire({
-        icon: 'error',
-        title: title,
-        text: text,
-        confirmButtonText: 'Đồng ý',
-        ...defaultSwalConfig
-    });
+function showError(title, text = "") {
+  return Swal.fire({
+    icon: "error",
+    title: title,
+    text: text,
+    confirmButtonText: "Đồng ý",
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -59,14 +62,14 @@ function showError(title, text = '') {
  * @param {string} title - Tiêu đề thông báo
  * @param {string} text - Nội dung thông báo (tùy chọn)
  */
-function showWarning(title, text = '') {
-    return Swal.fire({
-        icon: 'warning',
-        title: title,
-        text: text,
-        confirmButtonText: 'Đồng ý',
-        ...defaultSwalConfig
-    });
+function showWarning(title, text = "") {
+  return Swal.fire({
+    icon: "warning",
+    title: title,
+    text: text,
+    confirmButtonText: "Đồng ý",
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -74,14 +77,14 @@ function showWarning(title, text = '') {
  * @param {string} title - Tiêu đề thông báo
  * @param {string} text - Nội dung thông báo (tùy chọn)
  */
-function showInfo(title, text = '') {
-    return Swal.fire({
-        icon: 'info',
-        title: title,
-        text: text,
-        confirmButtonText: 'Đồng ý',
-        ...defaultSwalConfig
-    });
+function showInfo(title, text = "") {
+  return Swal.fire({
+    icon: "info",
+    title: title,
+    text: text,
+    confirmButtonText: "Đồng ý",
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -92,17 +95,23 @@ function showInfo(title, text = '') {
  * @param {string} cancelText - Text nút hủy (mặc định: "Hủy bỏ")
  * @param {string} icon - Icon hiển thị (mặc định: "question")
  */
-function showConfirm(title, text = '', confirmText = 'Có, tiếp tục!', cancelText = 'Hủy bỏ', icon = 'question') {
-    return Swal.fire({
-        icon: icon,
-        title: title,
-        text: text,
-        showCancelButton: true,
-        confirmButtonText: confirmText,
-        cancelButtonText: cancelText,
-        reverseButtons: true,
-        ...defaultSwalConfig
-    });
+function showConfirm(
+  title,
+  text = "",
+  confirmText = "Có, tiếp tục!",
+  cancelText = "Hủy bỏ",
+  icon = "question"
+) {
+  return Swal.fire({
+    icon: icon,
+    title: title,
+    text: text,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    reverseButtons: true,
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -110,16 +119,16 @@ function showConfirm(title, text = '', confirmText = 'Có, tiếp tục!', cance
  * @param {string} itemName - Tên item cần xóa
  * @param {string} additionalInfo - Thông tin bổ sung (tùy chọn)
  */
-function showDeleteConfirm(itemName = 'mục này', additionalInfo = '') {
-    const text = additionalInfo ? 
-        `Bạn có chắc chắn muốn xóa ${itemName}? ${additionalInfo}` : 
-        `Bạn có chắc chắn muốn xóa ${itemName}?`;
-    
-    return Swal.fire({
-        icon: 'warning',
-        title: 'Xóa dữ liệu',
-        text: text,
-        html: `
+function showDeleteConfirm(itemName = "mục này", additionalInfo = "") {
+  const text = additionalInfo
+    ? `Bạn có chắc chắn muốn xóa ${itemName}? ${additionalInfo}`
+    : `Bạn có chắc chắn muốn xóa ${itemName}?`;
+
+  return Swal.fire({
+    icon: "warning",
+    title: "Xóa dữ liệu",
+    text: text,
+    html: `
             <div class="text-start">
                 <p class="mb-2">${text}</p>
                 <div class="alert alert-warning small mb-0">
@@ -128,17 +137,17 @@ function showDeleteConfirm(itemName = 'mục này', additionalInfo = '') {
                 </div>
             </div>
         `,
-        showCancelButton: true,
-        confirmButtonText: '<i class="fas fa-trash me-1"></i>Xóa',
-        cancelButtonText: '<i class="fas fa-times me-1"></i>Hủy bỏ',
-        reverseButtons: true,
-        customClass: {
-            ...defaultSwalConfig.customClass,
-            confirmButton: 'btn btn-danger me-2',
-            cancelButton: 'btn btn-secondary'
-        },
-        buttonsStyling: false
-    });
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-trash me-1"></i>Xóa',
+    cancelButtonText: '<i class="fas fa-times me-1"></i>Hủy bỏ',
+    reverseButtons: true,
+    customClass: {
+      ...defaultSwalConfig.customClass,
+      confirmButton: "btn btn-danger me-2",
+      cancelButton: "btn btn-secondary",
+    },
+    buttonsStyling: false,
+  });
 }
 
 /**
@@ -148,23 +157,23 @@ function showDeleteConfirm(itemName = 'mục này', additionalInfo = '') {
  * @param {number} timer - Thời gian hiển thị (ms, mặc định 3000)
  * @param {string} position - Vị trí hiển thị (mặc định: 'top-end')
  */
-function showToast(type, title, timer = 3000, position = 'top-end') {
-    const Toast = Swal.mixin({
-        toast: true,
-        position: position,
-        showConfirmButton: false,
-        timer: timer,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-        }
-    });
+function showToast(type, title, timer = 3000, position = "top-end") {
+  const Toast = Swal.mixin({
+    toast: true,
+    position: position,
+    showConfirmButton: false,
+    timer: timer,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener("mouseenter", Swal.stopTimer);
+      toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+  });
 
-    return Toast.fire({
-        icon: type,
-        title: title
-    });
+  return Toast.fire({
+    icon: type,
+    title: title,
+  });
 }
 
 /**
@@ -172,24 +181,24 @@ function showToast(type, title, timer = 3000, position = 'top-end') {
  * @param {string} title - Tiêu đề loading (mặc định: "Đang xử lý...")
  * @param {string} text - Text loading (tùy chọn)
  */
-function showLoading(title = 'Đang xử lý...', text = '') {
-    return Swal.fire({
-        title: title,
-        text: text,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        showConfirmButton: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+function showLoading(title = "Đang xử lý...", text = "") {
+  return Swal.fire({
+    title: title,
+    text: text,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
 }
 
 /**
  * Đóng loading overlay
  */
 function hideLoading() {
-    Swal.close();
+  Swal.close();
 }
 
 /**
@@ -200,29 +209,35 @@ function hideLoading() {
  * @param {string} inputValue - Giá trị mặc định (tùy chọn)
  * @param {string} inputType - Loại input (text, email, password, etc.)
  */
-function showInputForm(title, inputLabel, inputPlaceholder = '', inputValue = '', inputType = 'text') {
-    return Swal.fire({
-        title: title,
-        html: `
+function showInputForm(
+  title,
+  inputLabel,
+  inputPlaceholder = "",
+  inputValue = "",
+  inputType = "text"
+) {
+  return Swal.fire({
+    title: title,
+    html: `
             <div class="mb-3 text-start">
                 <label class="form-label">${inputLabel}</label>
                 <input type="${inputType}" class="form-control" id="swal-input" 
                        placeholder="${inputPlaceholder}" value="${inputValue}">
             </div>
         `,
-        showCancelButton: true,
-        confirmButtonText: 'Xác nhận',
-        cancelButtonText: 'Hủy bỏ',
-        preConfirm: () => {
-            const input = document.getElementById('swal-input');
-            if (!input.value.trim()) {
-                Swal.showValidationMessage('Vui lòng nhập thông tin!');
-                return false;
-            }
-            return input.value.trim();
-        },
-        ...defaultSwalConfig
-    });
+    showCancelButton: true,
+    confirmButtonText: "Xác nhận",
+    cancelButtonText: "Hủy bỏ",
+    preConfirm: () => {
+      const input = document.getElementById("swal-input");
+      if (!input.value.trim()) {
+        Swal.showValidationMessage("Vui lòng nhập thông tin!");
+        return false;
+      }
+      return input.value.trim();
+    },
+    ...defaultSwalConfig,
+  });
 }
 
 /**
@@ -232,18 +247,18 @@ function showInputForm(title, inputLabel, inputPlaceholder = '', inputValue = ''
  * @param {string} icon - Icon (tùy chọn)
  */
 function showCustomHTML(title, html, icon = null) {
-    const config = {
-        title: title,
-        html: html,
-        confirmButtonText: 'Đóng',
-        ...defaultSwalConfig
-    };
-    
-    if (icon) {
-        config.icon = icon;
-    }
-    
-    return Swal.fire(config);
+  const config = {
+    title: title,
+    html: html,
+    confirmButtonText: "Đóng",
+    ...defaultSwalConfig,
+  };
+
+  if (icon) {
+    config.icon = icon;
+  }
+
+  return Swal.fire(config);
 }
 
 /**
@@ -251,11 +266,11 @@ function showCustomHTML(title, html, icon = null) {
  * @param {string} title - Tiêu đề
  * @param {string} text - Text mô tả (tùy chọn)
  */
-function showProgress(title, text = '') {
-    Swal.fire({
-        title: title,
-        text: text,
-        html: `
+function showProgress(title, text = "") {
+  Swal.fire({
+    title: title,
+    text: text,
+    html: `
             <div class="progress mb-3" style="height: 25px;">
                 <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
                      id="progress-bar"
@@ -266,16 +281,16 @@ function showProgress(title, text = '') {
             </div>
             <div class="text-muted small" id="progress-status">Đang khởi tạo...</div>
         `,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        customClass: {
-            popup: 'swal2-popup',
-            title: 'swal2-title',
-            'html-container': 'swal2-html-container'
-        },
-        buttonsStyling: false
-    });
+    showConfirmButton: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    customClass: {
+      popup: "swal2-popup",
+      title: "swal2-title",
+      "html-container": "swal2-html-container",
+    },
+    buttonsStyling: false,
+  });
 }
 
 /**
@@ -283,34 +298,38 @@ function showProgress(title, text = '') {
  * @param {number} value - Giá trị phần trăm (0-100)
  * @param {string} status - Text trạng thái (tùy chọn)
  */
-function updateProgress(value, status = '') {
-    const bar = document.getElementById('progress-bar');
-    const text = document.getElementById('progress-text');
-    const statusEl = document.getElementById('progress-status');
-    
-    if (bar && text) {
-        // Đảm bảo value trong khoảng 0-100
-        value = Math.max(0, Math.min(100, value));
-        
-        bar.style.width = `${value}%`;
-        bar.setAttribute('aria-valuenow', value);
-        text.innerText = `${value}%`;
-        
-        // Thay đổi màu sắc dựa trên progress
-        if (value < 30) {
-            bar.className = 'progress-bar bg-primary progress-bar-striped progress-bar-animated';
-        } else if (value < 70) {
-            bar.className = 'progress-bar bg-info progress-bar-striped progress-bar-animated';
-        } else if (value < 100) {
-            bar.className = 'progress-bar bg-warning progress-bar-striped progress-bar-animated';
-        } else {
-            bar.className = 'progress-bar bg-success progress-bar-striped progress-bar-animated';
-        }
+function updateProgress(value, status = "") {
+  const bar = document.getElementById("progress-bar");
+  const text = document.getElementById("progress-text");
+  const statusEl = document.getElementById("progress-status");
+
+  if (bar && text) {
+    // Đảm bảo value trong khoảng 0-100
+    value = Math.max(0, Math.min(100, value));
+
+    bar.style.width = `${value}%`;
+    bar.setAttribute("aria-valuenow", value);
+    text.innerText = `${value}%`;
+
+    // Thay đổi màu sắc dựa trên progress
+    if (value < 30) {
+      bar.className =
+        "progress-bar bg-primary progress-bar-striped progress-bar-animated";
+    } else if (value < 70) {
+      bar.className =
+        "progress-bar bg-info progress-bar-striped progress-bar-animated";
+    } else if (value < 100) {
+      bar.className =
+        "progress-bar bg-warning progress-bar-striped progress-bar-animated";
+    } else {
+      bar.className =
+        "progress-bar bg-success progress-bar-striped progress-bar-animated";
     }
-    
-    if (statusEl && status) {
-        statusEl.innerText = status;
-    }
+  }
+
+  if (statusEl && status) {
+    statusEl.innerText = status;
+  }
 }
 
 // Xuất các functions để sử dụng global
